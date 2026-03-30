@@ -1,5 +1,5 @@
 <template>
-  <div class="swap" :class="skin">
+  <div class="swap dark-skin" :class="skin">
     <!-- <section v-loading="loading"></section> -->
     <div class="symbol">
       <div class="item" @mouseenter="showPopup = true" @mouseleave="showPopup = false">
@@ -67,7 +67,7 @@
           <div class="center">
             <!--K线和深度图-->
             <div class="imgtable">
-              <div class="handler">
+              <div class="handler-toggle">
                 <span @click="changeImgTable('k')" :class="{ active: currentImgTable === 'k' }">{{ $t("swap.kline")
                 }}</span>
                 <span @click="changeImgTable('s')" :class="{ active: currentImgTable === 's' }">{{ $t("swap.depth")
@@ -178,250 +178,123 @@
         </div>
       </div>
 
-      <!-- 成交记录 -->
-      <div class="left plate-wrap box3 " style="position:relative;width: 20%;">
-        <!-- 开仓/平仓 -->
-        <div class=" flex3">
-          <div class="order" style="margin-top: 5px; ">
-            <div v-if="marginMode === '0'" @click="showMarginModeModal()"
-              style="border-bottom: 1px solid #eaeaed; cursor: pointer; padding: 5px 10px ;font-size: 12px;">
-              全仓
+      <!-- 成交记录 / 下单区域 -->
+      <div class="left plate-wrap box3 new-trade-panel" style="position:relative;width: 20%;">
+        <div class="trade-panel-inner">
+          <!-- 顶部 Tabs -->
+          <div class="trade-tabs">
+            <div class="trade-tab active">开仓</div>
+          </div>
+
+          <!-- 全仓/逐仓 与 杠杆 -->
+          <div class="margin-leverage-row">
+            <div class="ml-dropdown" @click="showMarginModeModal()">
+              <span>{{ marginMode === '0' ? '全仓' : '逐仓' }} </span>
+              <span class="arrow">▼</span>
             </div>
-            <div v-if="marginMode === '1'" @click="showMarginModeModal()"
-              style="border-bottom: 1px solid #eaeaed; cursor: pointer; padding: 5px 10px ;font-size: 12px;">
-              逐仓
+            <div class="ml-dropdown green-text" @click="showAdjustLeverage(1)">
+              <span>{{ leverage }}x</span>
+              <span class="arrow">▼</span>
             </div>
-            <div class="order-handler" style="justify-content: space-between;">
-              <span class="order-handler-item" @click="entrustChange(1)" :class="{ active: entrustType === 1 }">{{
-                $t('swap.open') }}</span>
-              <span style="display: none;" class="order-handler-item" @click="entrustChange(2)"
-                :class="{ active: entrustType === 2 }">{{
-                  $t('平仓') }}</span>
-            </div>
-            <div class="table open-close">
-              <div v-if="entrustType === 1" class="open" style="width: 100%;">
-                <RadioGroup class="radioGroup-border" v-model="entrustOrderType" type="button" size="default"
-                  @on-change="changeEntrustOrderType">
-                  <Radio label="0">{{ $t('swap.market_price') }}</Radio>
-                  <Radio label="1">{{ $t('swap.limited_price') }}</Radio>
-                  <!-- <Radio label="2">{{ $t('swap.spot_price') }}</Radio> -->
-                </RadioGroup>
-                <Form style="width: 94%;margin-left: 3%;margin-top:10px;">
-                  <FormItem style="margin-bottom: 10px;" v-if="entrustOrderType == '1'">
-                    <label class="before">{{ $t('swap.entrustprice') }}</label>
-                    <Input v-model="form.entrustPrice"
-                      @on-keyup="form.entrustPrice = form.entrustPrice.replace(/[^\d^\.]+/g, '')"></Input>
-                    <label class="after">{{ currentCoin.base }}</label>
-                  </FormItem>
-                  <FormItem style="margin-bottom: 10px;" v-if="entrustOrderType == '0'">
-                    <label class="before">{{ $t('swap.entrustprice') }}</label>
-                    <Input :value="$t('swap.marketpriceplaceholder')" disabled class="market-price"></Input>
-                  </FormItem>
+          </div>
 
-                  <FormItem style="margin-bottom: 10px;" v-if="entrustOrderType == '2'">
-                    <label class="before">{{ $t('swap.triggleprice') }}</label>
-                    <Input v-model="form.triggerPrice"
-                      @on-keyup="form.triggerPrice = form.triggerPrice.replace(/[^\d^\.]+/g, '')"></Input>
-                    <label class="after">{{ currentCoin.base }}</label>
-                  </FormItem>
+          <!-- 订单类型 -->
+          <div class="order-types-row">
+            <span class="order-type-item" :class="{ active: entrustOrderType == '1' }"
+              @click="changeEntrustOrderType('1')">现价委托</span>
+            <span class="order-type-item" :class="{ active: entrustOrderType == '0' }"
+              @click="changeEntrustOrderType('0')">市价委托</span>
+          </div>
 
-                  <FormItem style="margin-bottom: 10px;" v-if="entrustOrderType == '2'">
-                    <label class="before">{{ $t('swap.entrustprice') }}</label>
-                    <Input v-model="form.entrustPrice" :placeholder="$t('swap.triggleplaceholder')"
-                      @on-keyup="form.entrustPrice = form.entrustPrice.replace(/[^\d^\.]+/g, '')"></Input>
-                    <label class="after">{{ currentCoin.base }}</label>
-                  </FormItem>
+          <!-- 可用 -->
+          <div class="available-row">
+            <span class="label">可用</span>
+            <span class="value">{{ freeMargin() | fixed4 }}USDT <span
+                style="color: #b5d820; cursor: pointer; margin-left: 4px;"
+                @click="$router.push('/assets/transfer')">⇌</span></span>
+          </div>
 
-                  <FormItem style="margin-bottom: 10px;">
-                    <label class="before">{{ $t('swap.openvolume') }}</label>
-                    <Input @input="openChange" v-model="form.volume" v-if="sliderOpenPercent == 0"
-                      @on-keyup="form.volume = form.volume.replace(/[^\d^\.]+/g, '')"></Input>
-                    <Input class="market-price" :readonly="true" v-if="sliderOpenPercent != 0"
-                      @on-focus="onOpenAmountFocus" :value="sliderOpenPercent + ' %'"></Input>
-                    <label class="after" v-if="sliderOpenPercent == 0">{{ currentCoin.coin }}</label>
-                  </FormItem>
-                  <div class="split-panel" v-if="entrustOrderType != '2'">
-                    <div :class="{ selected: Number(sliderOpenPercent) === 25 }" @click="onChangeOpenPercent(25)">25%
-                    </div>
-                    <div :class="{ selected: Number(sliderOpenPercent) === 50 }" @click="onChangeOpenPercent(50)">50%
-                    </div>
-                    <div :class="{ selected: Number(sliderOpenPercent) === 75 }" @click="onChangeOpenPercent(75)">75%
-                    </div>
-                    <div :class="{ selected: Number(sliderOpenPercent) === 100 }" @click="onChangeOpenPercent(100)">100%
-                    </div>
-                  </div>
-
-                </Form>
-                <div class="open-tips">
-                  <div><span class="open_tips_up">{{ $t('swap.canup') }}:</span><span class="num">{{ avaOpenBuy() |
-                    fixed4 }}
-                      {{ currentCoin.coin }}</span></div>
-                  <div><span class="open_tips_up_down">{{ $t('swap.candown') }}:</span><span class="num">{{
-                    avaOpenSell() | fixed4 }}
-                      {{ currentCoin.coin }}</span></div>
-                </div>
-                <div class="operate" v-if="isLogin">
-                  <Button type="primary" shape="circle" class="open-up" @click="onOpen(0)">{{ $t('swap.openup')
-                  }}</Button>
-                  <Button type="primary" shape="circle" class="open-down" @click="onOpen(1)">{{ $t('swap.opendown')
-                  }}</Button>
-                </div>
-                <div class="operate" v-if="form.volume > 0">
-                  <div class="operate_lebal">保证金 : </div>
-                  <div class="operate_value"> {{ calculateMargin }} USDT</div>
-                </div>
-                <div class="operate-login" v-if="!isLogin" style="width: 94%; margin-left:3%;">
-                  <span
-                    style="display: inline-block;width: 100%; text-align: center;border:1px solid #232d3a;padding: 5px 0;border-radius: 5px;">
-                    {{ $t("common.please") }}
-                    <router-link to="/login">
-                      <span style="color:#f0a70a;">{{ $t("common.login") }}</span>
-                    </router-link> /
-                    <router-link to="/register">
-                      <span style="color:#00dcff;">{{ $t("common.register") }}</span>
-                    </router-link>
-                  </span>
+          <!-- 表单区域 (只保留开仓逻辑) -->
+          <div class="trade-form">
+            <!-- 委托价格 (如果非市价单) -->
+            <div class="input-box-wrapper" v-if="entrustOrderType == '1'">
+              <div class="input-box">
+                <input type="text" :placeholder="$t('swap.entrustprice')" v-model="form.entrustPrice"
+                  @keyup="form.entrustPrice = form.entrustPrice.replace(/[^\d^\.]+/g, '')" />
+                <div class="suffix">
+                  <span>{{ currentCoin.base }}</span>
                 </div>
               </div>
-              <div v-else class="open" style="width: 100%;">
-                <RadioGroup v-model="entrustOrderType" type="button" size="default" @on-change="changeEntrustOrderType">
-                  <Radio label="1">{{ $t('swap.limited_price') }}</Radio>
-                  <Radio label="0">{{ $t('swap.market_price') }}</Radio>
-                  <Radio label="2">{{ $t('swap.spot_price') }}</Radio>
-                </RadioGroup>
-                <Form style="width: 94%;margin-left: 3%;margin-top:10px;">
-                  <FormItem style="margin-bottom: 10px;" v-if="entrustOrderType == '1'">
-                    <label class="before">{{ $t('swap.entrustprice') }}</label>
-                    <Input v-model="form.entrustPrice"
-                      @on-keyup="form.entrustPrice = form.entrustPrice.replace(/[^\d^\.]+/g, '')"></Input>
-                    <label class="after">{{ currentCoin.base }}</label>
-                  </FormItem>
-                  <FormItem style="margin-bottom: 10px;" v-if="entrustOrderType == '0'">
-                    <label class="before">{{ $t('swap.entrustprice') }}</label>
-                    <Input :value="$t('swap.marketpriceplaceholder')" disabled class="market-price"></Input>
-                  </FormItem>
+            </div>
 
-                  <FormItem style="margin-bottom: 10px;" v-if="entrustOrderType == '2'">
-                    <label class="before">{{ $t('swap.triggleprice') }}</label>
-                    <Input v-model="form.triggerPrice"
-                      @on-keyup="form.trigglePrice = form.triggerPrice.replace(/[^\d^\.]+/g, '')"></Input>
-                    <label class="after">{{ currentCoin.base }}</label>
-                  </FormItem>
+            <!-- 市价单提示 -->
+            <div class="input-box-wrapper" v-if="entrustOrderType == '0'">
+              <div class="input-box disabled">
+                <input type="text" :value="$t('swap.marketpriceplaceholder')" disabled />
+              </div>
+            </div>
 
-                  <FormItem style="margin-bottom: 10px;" v-if="entrustOrderType == '2'">
-                    <label class="before">{{ $t('swap.entrustprice') }}</label>
-                    <Input v-model="form.entrustPrice" :placeholder="$t('swap.triggleplaceholder')"
-                      @on-keyup="form.entrustPrice = form.entrustPrice.replace(/[^\d^\.]+/g, '')"></Input>
-                    <label class="after">{{ currentCoin.base }}</label>
-                  </FormItem>
-
-                  <FormItem style="margin-bottom: 10px;">
-                    <label class="before">{{ $t('swap.closevolume') }}</label>
-                    <Input v-model="form.volume" v-if="sliderClosePercent == 0"
-                      @on-keyup="form.volume = form.volume.replace(/\D/g, '')"></Input>
-                    <Input class="market-price" :readonly="true" v-if="sliderClosePercent != 0"
-                      @on-focus="onCloseAmountFocus"></Input>
-                    <label class="after">{{ $t('swap.shareNumber') }}</label>
-                    <div style="color: #7c7f82; text-align: end;">1{{ $t('swap.shareNumber') }} =
-                      {{ contractCoinInfo.shareNumber }}USDT</div>
-                  </FormItem>
-
-
-                  <div class="split-panel" v-if="entrustOrderType != '2'">
-                    <div :class="{ selected: Number(sliderClosePercent) === 25 }" @click="onChangeClosePercent(25)">25%
-                    </div>
-                    <div :class="{ selected: Number(sliderClosePercent) === 50 }" @click="onChangeClosePercent(50)">50%
-                    </div>
-                    <div :class="{ selected: Number(sliderClosePercent) === 75 }" @click="onChangeClosePercent(75)">75%
-                    </div>
-                    <div :class="{ selected: Number(sliderClosePercent) === 100 }" @click="onChangeClosePercent(100)">
-                      100%
-                    </div>
-                  </div>
-                </Form>
-                <div class="open-tips">
-                  <div><span class="red">{{ $t('swap.canclosedown') }}:</span><span class="num">{{
-                    contractWalletInfo.usdtBuyPosition }} {{ $t('swap.shareNumber') }}</span></div>
-                  <div><span class="green">{{ $t('swap.cancloseup') }}:</span><span class="num">{{
-                    contractWalletInfo.usdtSellPosition }} {{ $t('swap.shareNumber') }}</span></div>
+            <!-- 保证金/数量 输入框 -->
+            <div class="input-box-wrapper margin-input-wrapper">
+              <div class="input-box">
+                <input type="text" placeholder="保证金" v-model="form.volume"
+                  @keyup="form.volume = form.volume.replace(/[^\d^\.]+/g, '')" />
+                <div class="suffix">
+                  <span>保证金</span>
                 </div>
-                <div class="operate" v-if="isLogin">
-                  <Button type="primary" shape="circle" class="open-down" @click="onClose(1)">{{ $t('swap.closedown')
-                  }}</Button>
-                  <Button type="primary" shape="circle" class="open-up" @click="onClose(0)">{{ $t('swap.closeup')
-                  }}</Button>
-                </div>
-                <div class="operate-login" v-if="!isLogin" style="width: 94%; margin-left:3%;">
-                  <span
-                    style="display: inline-block;width: 100%; text-align: center;border:1px solid #232d3a;padding: 5px 0;border-radius: 5px;">
-                    {{ $t("common.please") }}
-                    <router-link to="/login">
-                      <span style="color:#f0a70a;">{{ $t("common.login") }}</span>
-                    </router-link> /
-                    <router-link to="/register">
-                      <span style="color:#00dcff;">{{ $t("common.register") }}</span>
-                    </router-link>
-                  </span>
-                </div>
+              </div>
+            </div>
+
+            <!-- 滑块 -->
+            <div class="slider-wrapper">
+              <el-slider class="open-percent-slider" v-model="sliderOpenPercent" :step="25" :show-tooltip="false"
+                :show-stops="true" @input="onChangeOpenPercent"></el-slider>
+              <div class="slider-labels">
+                <span>0%</span>
+                <span>25%</span>
+                <span>50%</span>
+                <span>75%</span>
+                <span>100%</span>
+              </div>
+            </div>
+
+
+
+            <!-- 充值/开仓 按钮 -->
+            <div class="submit-btn-row">
+              <button v-if="!isLogin" class="submit-btn green-bg" @click="$router.push('/login')">登录 / 注册</button>
+              <button v-else-if="contractWalletInfo && contractWalletInfo.usdtBalance === 0" class="submit-btn green-bg"
+                @click="$router.push('/assets/transfer')">充值</button>
+              <div v-else style="display: flex; gap: 10px; width: 100%;">
+                <button class="submit-btn green-bg" style="flex: 1; padding: 12px 0;" @click="onOpen(0)">买入开多</button>
+                <button class="submit-btn red-bg" style="flex: 1; padding: 12px 0;" @click="onOpen(1)">卖出开空</button>
               </div>
             </div>
           </div>
 
-          <!-- 我的合约账户 -->
-          <div class="order" style="width: 100%; margin-top: 5px;min-height: 320px;color:#61688A;">
-            <div
-              style="height:32px;line-height:32px;padding-left:10px;border-bottom: 1px solid #eaeaed;font-size: 13px;">
-              <span>{{ $t("swap.myswapaccount") }}</span>
-              <router-link class="linkmore" to="/assets/transfer">{{ $t("swap.zijinhuazhuan") }}</router-link>
+          <!-- 资产列表 -->
+          <div class="assets-section">
+            <div class="assets-header">
+              <div style="color: #888; font-size: 14px;">资产</div>
+              <div style="font-size: 14px;">USDT</div>
             </div>
-            <div class="table swap-my-account">
-              <div class="account-item">
-                <div style="width:35%; color: #8e8e92;">{{ $t("swap.accountmargin") }}</div>
-                <div class="margin" style="width: 65%;">
-                  <Button @click="showAdjustLeverage(1)" size="small"
-                    style="flex: 0 0 47%;;color: #fff; border-radius: 10px; background-color: #2bc287; ">{{ leverage
-                    }}X</Button>
-                </div>
+            <div class="assets-list">
+              <div class="asset-item"><span class="label">可用保证金</span><span class="value">{{ freeMargin() | fixed4
+                  }}</span></div>
+              <div class="asset-item"><span class="label">持仓保证金</span><span class="value">{{ bonds() | fixed4 }}</span>
               </div>
-              <div class="account-item" style="padding-bottom:5px;">
-                <div style="display: flex; align-items: center;">
-                  <div style="color: #8e8e92">可用保证金</div>
-                  <div class="tooltip-container" style="position: relative; display: inline-block;">
-                    <img style="width: 12px; height: 12px; margin-left: 3px; cursor: pointer;"
-                      src="../../assets/images/wenhao.png" alt="" @mouseenter="showMarginTip = true"
-                      @mouseleave="showMarginTip = false">
-                    <div v-show="showMarginTip" class="tooltip-content"
-                      style="position: absolute; left: -70px; bottom: 20px; background-color: #333; color: #fff; padding: 5px 10px; border-radius: 4px; white-space: nowrap; z-index: 10; font-size: 12px;">
-                      可用保证金=钱包余额-占用保证金+未实现盈亏
-                    </div>
-                  </div>
-                </div>
-                <div><span>{{ freeMargin() | fixed4 }}</span></div>
-              </div>
-              <div class="account-item">
-                <div style="color: #8e8e92">钱包余额</div>
-                <div><span>{{ contractWalletInfo.usdtBalance | fixed4 }}</span></div>
-              </div>
-              <div class="account-item">
-                <div style="color: #8e8e92">未实现盈亏</div>
-                <div><span>{{ unrealizedProfitAndLoss() | fixed4 }}</span></div>
-              </div>
-              <div class="account-item">
-                <div style="color: #8e8e92">风险率</div>
-                <div><span> {{
-                  (() => {
-                    const result = (maxBonds() / (contractWalletInfo.usdtBalance + unrealizedProfitAndLoss()) *
-                      100).toFixed(2);
-                    return isNaN(result) ? '0' : result;
-                  })()
-                }}%</span></div>
-              </div>
+              <div class="asset-item"><span class="label">未实现盈亏</span><span class="value">{{ unrealizedProfitAndLoss() |
+                fixed4 }}</span></div>
+            </div>
+            <div class="assets-actions">
+              <button class="action-btn outline" @click="$router.push('/assets/transfer')">划转</button>
+              <button class="action-btn outline" @click="$router.push('/assets/transfer')">充值</button>
             </div>
           </div>
+
         </div>
       </div>
     </div>
-
 
     <!-- 弹出框: 变更仓位模式 -->
     <Modal v-model="marginModeModal" :title="$t('swap.modifyMarginModeTitle')" width="20"
@@ -441,27 +314,59 @@
     </Modal>
 
     <!-- 弹出框: 调整杠杆 -->
-    <Modal v-model="leverageModal" :title="$t('swap.modifyLeverage')" width="25" class-name="vertical-center-modal">
-      <div class="leverage">
-        <!-- 连续杠杆 -->
-        <InputNumber size="large" style="width: 100%;" :value.sync="leverageAdjustVal" v-if="leverageType == 2"
-          @on-change="onLeverageChange">
-        </InputNumber>
-        <!-- 离散杠杆 -->
-        <div class="leverage-panel" v-if="leverageType == 1 && changeLeverageType == 1">
-          <Button v-for="item in leverageList" style="margin-left:5px;margin-right:5px;margin-bottom: 10px;"
-            @click="changeLeverage(Number(item))" :class="{ leverageSelect: Number(item) === leverageAdjustVal }">{{
-              item }}X</Button>
+    <Modal v-model="leverageModal" title="调整杠杆" width="25" class-name="vertical-center-modal custom-leverage-modal">
+      <div class="leverage-custom-content">
+        <div class="leverage-info-header">
+          <span class="symbol-name">{{ currentCoin.symbol ? currentCoin.symbol.replace('/', '') : '' }}</span>
+          <span class="mode-tag">{{ marginMode === '0' ? '全仓' : '逐仓' }} </span>
+          <span class="leverage-tag">{{ leverageModalValue }}x</span>
         </div>
-        <div class="leverage-panel" v-if="leverageType == 1 && changeLeverageType == 2">
-          <Button v-for="item in leverageList" style="margin-left:5px;margin-right:5px;margin-bottom: 10px;"
-            @click="changeLeverage(Number(item))" :class="{ leverageSelect: Number(item) === leverageAdjustVal }">{{
-              item }}X</Button>
+
+        <div class="leverage-input-wrapper">
+          <InputNumber size="large" style="width: 100%;" :value="leverageModalValue" v-if="leverageType == 2"
+            @on-change="onLeverageChange"></InputNumber>
+          <div class="discrete-leverage-display" v-else>
+            {{ leverageModalValue }}
+          </div>
+        </div>
+
+        <div class="leverage-slider-wrapper" v-if="leverageType == 2">
+          <!-- We keep the original functionality but style it later, using a simple range input for visual effect as requested, synced with InputNumber -->
+          <input type="range" :min="1"
+            :max="contractCoinInfo && contractCoinInfo.leverage ? Number(contractCoinInfo.leverage.split(',').pop()) : 200"
+            :value="leverageModalValue" class="custom-range-slider" @input="onLeverageChange($event.target.value)" />
+          <div class="range-labels">
+            <span>1x</span>
+            <span>40x</span>
+            <span>80x</span>
+            <span>120x</span>
+            <span>160x</span>
+            <span>200x</span>
+          </div>
+        </div>
+
+        <!-- 离散杠杆快速选择区 -->
+        <div class="leverage-quick-select" v-if="leverageType == 1">
+          <div class="quick-items">
+            <span v-for="item in leverageList" :key="item" class="quick-item"
+              :class="{ active: Number(item) === leverageModalValue }" @click="changeLeverage(Number(item))">
+              {{ item }}x
+            </span>
+          </div>
+        </div>
+
+        <div class="leverage-quick-select" v-if="leverageType == 2">
+          <div class="quick-items">
+            <span v-for="item in [1, 2, 3, 5, 10, 20, 30, 50, 75, 100, 125, 150, 200]" :key="item" class="quick-item"
+              :class="{ active: leverageModalValue === item }" @click="changeLeverage(item)">
+              {{ item }}x
+            </span>
+          </div>
         </div>
       </div>
-      <div slot="footer">
-        <Button type="default" size="large" @click="leverageModal = false">{{ $t("common.close") }}</Button>
-        <Button type="primary" size="large" @click="adjustLeverage()">{{ $t("common.ok") }}</Button>
+      <div slot="footer" class="custom-modal-footer">
+        <Button class="btn-cancel" size="large" @click="leverageModal = false">{{ $t("common.close") }}</Button>
+        <Button class="btn-confirm" size="large" @click="adjustLeverage()">{{ $t("common.ok") }}</Button>
       </div>
     </Modal>
 
@@ -1621,28 +1526,37 @@ export default {
 
       this.leverageModal = true;
       this.leverageType = this.contractCoinInfo.leverageType;
+      this.changeLeverageType = type;
+      var levArr = this.contractCoinInfo.leverage.split(",");
+      var defaultLeverage = Number(levArr[0] || 10);
+      var currentLeverage = type == 1
+        ? Number(this.contractWalletInfo.usdtBuyLeverage)
+        : Number(this.contractWalletInfo.usdtSellLeverage);
+      if (!Number.isFinite(currentLeverage) || currentLeverage <= 0) {
+        currentLeverage = Number(this.leverage);
+      }
+      if (!Number.isFinite(currentLeverage) || currentLeverage <= 0) {
+        currentLeverage = defaultLeverage;
+      }
       if (type == 1) {
         this.leverageAdjustVal = Number(this.contractWalletInfo.usdtBuyLeverage);
       } else {
         this.leverageAdjustVal = Number(this.contractWalletInfo.usdtSellLeverage);
       }
-      // 默认杠杆如不在范围内
-      var levArr = this.contractCoinInfo.leverage.split(",");
-      if (this.leverageAdjustVal < levArr[0]) {
-        this.leverageAdjustVal = Number(levArr[0]);
+      this.leverageModalValue = currentLeverage;
+      if (!Number.isFinite(this.leverageAdjustVal) || this.leverageAdjustVal <= 0) {
+        this.leverageAdjustVal = currentLeverage;
       }
-      if (this.leverageAdjustVal > levArr[levArr.length - 1]) {
-        this.leverageAdjustVal = Number(levArr[levArr.length - 1]);
+      if (this.leverageModalValue < Number(levArr[0])) {
+        this.leverageModalValue = Number(levArr[0]);
       }
-
-      this.changeLeverageType = type;
+      if (this.leverageModalValue > Number(levArr[levArr.length - 1])) {
+        this.leverageModalValue = Number(levArr[levArr.length - 1]);
+      }
+      this.leverageAdjustVal = this.leverageModalValue;
     },
     changeLeverage(lev) { // 离散模式：选择杠杆
-      if (this.changeLeverageType == 1) {//多仓杠杆
-        this.leverageAdjustVal = lev;
-      } else {//空仓杠杆
-        this.leverageAdjustVal = lev;
-      }
+      this.leverageModalValue = Number(lev);
     },
 
     openChange() {
@@ -1652,11 +1566,11 @@ export default {
     },
     changeEntrustOrderType(value) {
       this.form.entrustPrice = this.currentCoin.price;
-      if (value == "2") { // 计划委托
-        this.form.trigglePrice = "";
-        this.form.volume = "";
-      } else if (value == "0") { // 限价委托
+      this.entrustOrderType = value;
+      if (value == "0") { // 市价委托
         this.form.entrustPrice = this.currentCoin.price;
+        this.form.volume = "";
+      } else { // 现价委托
         this.form.volume = "";
       }
     },
@@ -1683,11 +1597,16 @@ export default {
     },
     onLeverageChange(val) {
       if (!this.isLogin) return;
-      this.leverageAdjustVal = val;
+      var nextValue = Number(val);
+      if (!Number.isFinite(nextValue) || nextValue <= 0) {
+        return;
+      }
+      this.leverageModalValue = nextValue;
     },
     adjustLeverage() { // 连续模式，确认选择杠杆
       if (!this.isLogin) return;
       var levArr = this.contractCoinInfo.leverage.split(",");
+      this.leverageAdjustVal = Number(this.leverageModalValue);
       if (this.leverageAdjustVal < Number(levArr[0])) {
         this.leverageAdjustVal = Number(levArr[0]);
         this.$Message.error(this.$t("swap.levmintip"));
@@ -1746,6 +1665,7 @@ export default {
           } else { // 空仓杠杆
             this.sellLeverage = this.leverageAdjustVal;
           }
+          this.leverage = this.leverageAdjustVal;
 
           this.leverageModal = false;
         });
@@ -2118,7 +2038,7 @@ $popper-background-color: #192330;
         display: inline-block;
         margin-top: 10px;
         margin-bottom: 5px;
-        background-color: #eaeaed;
+        background-color: #0f0f0f;
         font-size: 0;
         border-radius: 20px;
         height: 26px;
@@ -2176,7 +2096,7 @@ $popper-background-color: #192330;
         justify-content: center;
 
         .price {
-          font-size: 20px !important;
+          font-size: 16px !important;
           font-weight: 700;
           margin-right: 10px;
         }
@@ -2196,7 +2116,7 @@ $popper-background-color: #192330;
       width: 80%;
       height: 620px;
       border: 1px solid #eaeaed;
-      padding: 10px 10px 10px 0;
+      padding: 0 10px 10px 0;
       border-radius: 12px;
 
       .imgtable {
@@ -2328,11 +2248,10 @@ $popper-background-color: #192330;
   .symbol {
     display: flex;
     gap: 30px;
-    padding: 12px 0 12px 20px;
+    padding: 8px 0 8px 20px;
     margin-bottom: 5px;
     align-items: center;
     line-height: 1;
-    border: 1px solid #eaeaed;
     border-radius: 8px;
 
     .item {
@@ -2661,7 +2580,7 @@ $popper-background-color: #192330;
 }
 
 .box3 {
-  border: 1px solid #eaeaed;
+  border: 1px solid #292929;
   border-radius: 12px !important;
 }
 
@@ -2839,7 +2758,7 @@ $popper-background-color: #192330;
 
 .order-box {
   width: 100%;
-  margin-top: 5px;
+  margin-top: 10px;
   flex: 0 0 100%;
   border: 1px solid #eaeaed;
   border-radius: 12px;
@@ -2847,8 +2766,12 @@ $popper-background-color: #192330;
 
 ::v-deep(.ivu-table-header) {
   padding: 5px 0;
-  border-bottom: 1px solid #eaeaed !important;
+  border-bottom: 1px solid #292929 !important;
   margin-bottom: 5px;
+}
+
+::v-deep(.ivu-modal-header-inner) {
+  color: #fff;
 }
 
 .buyPlate ::v-deep(.ivu-table-header) {
@@ -2887,4 +2810,944 @@ $popper-background-color: #192330;
 // ::v-deep(.ivu-input-default) {
 //   width: 80%;
 //   margin-left: 20px;
-// }</style>
+// }
+
+/* 强制黑色背景布局覆盖 */
+.dark-skin {
+  background-color: #000 !important;
+  color: #fff !important;
+  min-height: 100vh;
+}
+
+.dark-skin .symbol {
+  background-color: #0c0c0c !important;
+  border-bottom: 1px solid #1a1a1a !important;
+  color: #fff;
+  box-shadow: none !important;
+}
+
+.dark-skin .symbol .item .text {
+  color: #888 !important;
+}
+
+.dark-skin .symbol .item .num {
+  color: #fff !important;
+}
+
+.dark-skin .main_box .box1 .center {
+  background-color: #0c0c0c !important;
+  border: 1px solid #1a1a1a !important;
+}
+
+.dark-skin .main_box .box1 .plate-wrap,
+.dark-skin .main_box .box1 .trade-wrap {
+  background-color: #0c0c0c !important;
+  border: 1px solid #1a1a1a !important;
+}
+
+.dark-skin .main_box .box1 .trade-wrap .title {
+  color: #fff !important;
+  border-bottom: 1px solid #1a1a1a !important;
+}
+
+.dark-skin .handler-toggle {
+  position: absolute;
+  right: 40px;
+  display: inline-flex;
+  background-color: #1a1a1a;
+  border-radius: 6px;
+  padding: 2px;
+  margin: 10px 0 10px 20px;
+  border: 1px solid #333;
+  z-index: 1000;
+}
+
+.dark-skin .handler-toggle span {
+  padding: 2px 8px;
+  font-size: 12px;
+  color: #888;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.dark-skin .handler-toggle span.active {
+  background-color: #2a2a2a;
+  color: #d4ff00;
+  border: 1px solid #d4ff00;
+}
+
+.dark-skin .tab-header .tab-item {
+  color: #888 !important;
+}
+
+.dark-skin .tab-header .tab-item.active {
+  color: #fff !important;
+  border-bottom-color: #d4ff00 !important;
+}
+
+.dark-skin .tab-item.active::after {
+  background: #d4ff00 !important;
+}
+
+.dark-skin .trade-panel {
+  background-color: #0c0c0c !important;
+  border: 1px solid #1a1a1a !important;
+}
+
+.dark-skin .trade-panel .title {
+  border-bottom: 1px solid #1a1a1a !important;
+}
+
+.dark-skin .ivu-table,
+.dark-skin .ivu-table-wrapper,
+.dark-skin .ivu-table td,
+.dark-skin .ivu-table th {
+  background-color: transparent !important;
+  border-bottom: 1px solid #1a1a1a !important;
+  color: #fff !important;
+}
+
+.dark-skin .ivu-table th {
+  color: #888 !important;
+}
+
+.dark-skin .ivu-table-row:hover td {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.dark-skin .ivu-table-wrapper {
+  border: none !important;
+}
+
+.dark-skin .ivu-table::before {
+  display: none;
+}
+
+.dark-skin .ivu-table::after {
+  display: none;
+}
+
+.dark-skin .ivu-input {
+  background-color: #1a1a1a !important;
+  border: 1px solid #333 !important;
+  color: #fff !important;
+}
+
+.dark-skin .btn-buy {
+  background-color: #ABE127 !important;
+  color: #000 !important;
+}
+
+.dark-skin .btn-sell {
+  background-color: #f92855 !important;
+  color: #fff !important;
+}
+
+.dark-skin .buy {
+  color: #ABE127 !important;
+}
+
+.dark-skin .sell {
+  color: #f92855 !important;
+}
+
+.dark-skin .popup {
+  background-color: #0c0c0c !important;
+  border: 1px solid #1a1a1a !important;
+}
+
+.dark-skin .coin-menu .sc_filter span {
+  color: #888 !important;
+}
+
+.dark-skin .coin-menu .sc_filter span.active {
+  color: #fff !important;
+  border-bottom-color: #d4ff00 !important;
+}
+
+.dark-skin .open-panel,
+.dark-skin .close-panel {
+  background-color: transparent !important;
+}
+
+.dark-skin .slider-box .ivu-slider-bar {
+  background-color: #d4ff00 !important;
+}
+
+.dark-skin .slider-box .ivu-slider-button {
+  border-color: #d4ff00 !important;
+}
+
+.dark-skin .custom-tabs,
+.dark-skin .order-box {
+  border: 1px solid #1a1a1a !important;
+  background-color: #0c0c0c !important;
+}
+
+.dark-skin .tab-header,
+.dark-skin .order-handler,
+.dark-skin .radioGroup-border,
+.dark-skin .paragraph-line {
+  border-bottom: 1px solid #1a1a1a !important;
+  background-color: transparent !important;
+}
+
+.dark-skin .order-handler-item {
+  background-color: #1a1a1a !important;
+  color: #fff !important;
+}
+
+.dark-skin .order-handler>span {
+  background-color: #1a1a1a !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.dark-skin .order-handler>span.active {
+  background-color: #333 !important;
+  color: #d4ff00 !important;
+}
+
+.dark-skin .paragraph-info,
+.dark-skin .position-type,
+.dark-skin .position-leverage {
+  background-color: #1a1a1a !important;
+  color: #fff !important;
+}
+
+.dark-skin .position-box {
+  border: 1px solid #1a1a1a !important;
+}
+
+.dark-skin .tooltip-content {
+  background-color: #1a1a1a !important;
+  color: #fff !important;
+  border: 1px solid #333 !important;
+}
+
+.dark-skin .ivu-tooltip-inner {
+  background-color: #1a1a1a !important;
+  color: #fff !important;
+}
+
+.dark-skin .ivu-tooltip-arrow {
+  border-bottom-color: #1a1a1a !important;
+}
+
+.dark-skin .order {
+  box-shadow: none !important;
+  border: 1px solid #1a1a1a !important;
+  background-color: #0c0c0c !important;
+}
+
+.dark-skin .ivu-input-wrapper input {
+  background-color: #1a1a1a !important;
+  border: 1px solid #333 !important;
+  color: #fff !important;
+}
+
+.dark-skin .ivu-table-body td {
+  background-color: transparent !important;
+}
+
+.dark-skin .order-handler-item.active {
+  background-color: #333 !important;
+  color: #d4ff00 !important;
+}
+
+.dark-skin .box3 .order {
+  border: 1px solid #1a1a1a !important;
+  background-color: #0c0c0c !important;
+}
+
+.dark-skin .box3 .order>div:first-child {
+  border-bottom: 1px solid #1a1a1a !important;
+}
+
+.dark-skin .handlers .ceneter {
+  background-color: #1a1a1a !important;
+  border-color: #333 !important;
+}
+
+.dark-skin .handlers .ceneter.active {
+  background-color: #333 !important;
+  border-color: #555 !important;
+}
+
+.dark-skin .ivu-table-cell {
+  color: #fff !important;
+}
+
+.dark-skin .plate-nowprice {
+  background-color: #1a1a1a !important;
+  border-top: 1px solid #333 !important;
+  border-bottom: 1px solid #333 !important;
+}
+
+.dark-skin .plate-nowprice .price-cny {
+  color: #888 !important;
+}
+
+.dark-skin .order-handler span {
+  background-color: #1a1a1a !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+.dark-skin .order-handler span.active {
+  background-color: #333 !important;
+  color: #d4ff00 !important;
+}
+
+.dark-skin .account-item .title {
+  color: #888 !important;
+}
+
+.dark-skin .account-item .val {
+  color: #fff !important;
+}
+
+.dark-skin .slider-box .ivu-slider-wrap {
+  background-color: #333 !important;
+}
+
+.dark-skin .slider-box .ivu-slider-stop {
+  background-color: #1a1a1a !important;
+}
+
+.dark-skin .modal-content {
+  background-color: #1a1a1a !important;
+  color: #fff !important;
+}
+
+.dark-skin .ivu-modal-content {
+  background-color: #1a1a1a !important;
+  color: #fff !important;
+}
+
+.dark-skin .ivu-modal-header {
+  border-bottom: 1px solid #333 !important;
+}
+
+.dark-skin .ivu-modal-footer {
+  border-top: 1px solid #333 !important;
+}
+
+.dark-skin .ivu-modal-header p,
+.dark-skin .ivu-modal-header-inner {
+  color: #fff !important;
+}
+
+.dark-skin .ivu-icon-ios-close {
+  color: #888 !important;
+}
+
+.dark-skin .tab-pane {
+  background-color: transparent !important;
+}
+
+.dark-skin .ivu-input-number-input {
+  background-color: #1a1a1a !important;
+  color: #fff !important;
+}
+
+.dark-skin .ivu-input-number {
+  border-color: #333 !important;
+  background-color: #1a1a1a !important;
+}
+
+.dark-skin .ivu-input-number-handler-wrap {
+  background-color: #1a1a1a !important;
+  border-left: 1px solid #333 !important;
+}
+
+.dark-skin .ivu-input-number-handler-up-inner,
+.dark-skin .ivu-input-number-handler-down-inner {
+  color: #888 !important;
+}
+
+.dark-skin .ivu-radio-wrapper {
+  color: #888 !important;
+}
+
+.dark-skin .radioGroup-border {
+  border-bottom: 1px solid #1a1a1a !important;
+}
+
+.ivu-table-cell {
+  color: #fff !important;
+}
+
+::v-deep(.ivu-table) {
+  color: #fff !important;
+}
+
+/* New Trade Panel UI */
+.new-trade-panel {
+  background-color: #0b0e11 !important;
+  color: #fff;
+  padding: 10px 0;
+  border-left: 1px solid #1a1a1a;
+}
+
+.trade-panel-inner {
+  padding: 0 15px;
+}
+
+.trade-tabs {
+  display: flex;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.trade-tab {
+  text-align: center;
+  padding: 10px 0;
+  font-size: 16px;
+  color: #888;
+  cursor: pointer;
+  position: relative;
+}
+
+.trade-tab.active {
+  color: #fff;
+  font-weight: bold;
+}
+
+.trade-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background-color: #fff;
+}
+
+.margin-leverage-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.ml-dropdown {
+  flex: 1;
+  background-color: #1a1a1a;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.ml-dropdown.green-text {
+  color: #b5d820;
+}
+
+.ml-dropdown.red-text {
+  color: #f6465d;
+}
+
+.ml-dropdown .arrow {
+  font-size: 10px;
+  transform: scale(0.8);
+}
+
+.order-types-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  font-size: 13px;
+}
+
+.order-type-item {
+  color: #888;
+  margin-right: 15px;
+  cursor: pointer;
+}
+
+.order-type-item.active {
+  color: #fff;
+  font-weight: bold;
+}
+
+.available-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 15px;
+}
+
+.available-row .value {
+  color: #fff;
+  font-weight: bold;
+}
+
+.input-box-wrapper {
+  margin-bottom: 15px;
+}
+
+.input-box {
+  display: flex;
+  background-color: #1a1a1a;
+  border-radius: 4px;
+  overflow: hidden;
+  align-items: center;
+}
+
+.input-box input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #fff;
+  padding: 10px 12px;
+  font-size: 14px;
+  outline: none;
+}
+
+.input-box input:disabled {
+  color: #888;
+}
+
+.input-box .suffix {
+  padding: 0 12px;
+  color: #888;
+  font-size: 12px;
+}
+
+.slider-wrapper {
+  margin-bottom: 20px;
+  padding: 0 5px;
+}
+
+.slider-track-container {
+  padding: 10px 0;
+}
+
+.open-percent-slider {
+  padding: 2px 0 0;
+}
+
+.open-percent-slider ::v-deep .el-slider__runway {
+  margin: 8px 0;
+  height: 4px;
+  background-color: #2a2a2a;
+}
+
+.open-percent-slider ::v-deep .el-slider__bar {
+  height: 4px;
+  background-color: #b5d820;
+}
+
+.open-percent-slider ::v-deep .el-slider__button-wrapper {
+  top: -16px;
+  z-index: 3;
+}
+
+.open-percent-slider ::v-deep .el-slider__button {
+  width: 12px;
+  height: 12px;
+  border: 3px solid #b5d820;
+  background-color: #fff;
+}
+
+.open-percent-slider ::v-deep .el-slider__stop {
+  width: 12px;
+  height: 12px;
+  margin-top: -4px;
+  border: 3px solid #0b0e11;
+  background-color: #2a2a2a;
+}
+
+.open-percent-slider ::v-deep .el-slider__stop:first-child {
+  margin-left: 0;
+}
+
+.open-percent-slider ::v-deep .el-slider__marks {
+  display: none;
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #888;
+  margin-top: 5px;
+}
+
+.tpsl-row {
+  margin-bottom: 20px;
+  font-size: 12px;
+}
+
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.custom-checkbox input {
+  display: none;
+}
+
+.checkmark {
+  width: 14px;
+  height: 14px;
+  border: 1px solid #333;
+  border-radius: 2px;
+  margin-right: 8px;
+  display: inline-block;
+  position: relative;
+}
+
+.custom-checkbox input:checked+.checkmark {
+  background-color: #b5d820;
+  border-color: #b5d820;
+}
+
+.custom-checkbox input:checked+.checkmark::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid #000;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.label-text {
+  color: #fff;
+}
+
+.submit-btn-row {
+  margin-bottom: 20px;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  color: #000;
+}
+
+.submit-btn.green-bg {
+  background-color: #b5d820;
+}
+
+.submit-btn.red-bg {
+  background-color: #f6465d;
+  color: #fff;
+}
+
+.assets-section {
+  border-top: 1px solid #1a1a1a;
+  padding-top: 15px;
+  margin-bottom: 15px;
+}
+
+.assets-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #fff;
+  margin-bottom: 15px;
+  cursor: pointer;
+}
+
+.assets-header .right {
+  color: #888;
+  font-size: 12px;
+}
+
+.asset-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.asset-item .label {
+  color: #888;
+}
+
+.asset-item .value {
+  color: #fff;
+}
+
+.assets-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.assets-actions .action-btn {
+  flex: 1;
+  background: transparent;
+  border: 1px solid #333;
+  color: #fff;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.contract-info-section {
+  border-top: 1px solid #1a1a1a;
+  padding-top: 15px;
+  font-size: 14px;
+  color: #fff;
+  cursor: pointer;
+}
+
+::v-deep(.ivu-modal-content) {
+  background-color: #1a1a1a !important;
+  border-radius: 8px;
+  color: #fff;
+}
+
+.custom-leverage-modal .ivu-modal-header {
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.custom-leverage-modal .ivu-modal-header-inner {
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.custom-leverage-modal .ivu-modal-close .ivu-icon-ios-close {
+  color: #888;
+}
+
+.leverage-custom-content {
+  padding: 10px 0;
+}
+
+.leverage-info-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.symbol-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.mode-tag {
+  background-color: #2a2a2a;
+  color: #ccc;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.direction-tag {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.direction-tag.green {
+  background-color: rgba(181, 216, 32, 0.1);
+  color: #b5d820;
+}
+
+.direction-tag.red {
+  background-color: rgba(246, 70, 93, 0.1);
+  color: #f6465d;
+}
+
+.leverage-tag {
+  background-color: rgba(181, 216, 32, 0.1);
+  color: #b5d820;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.leverage-input-wrapper {
+  margin-bottom: 24px;
+}
+
+.leverage-input-wrapper .ivu-input-number {
+  background-color: #2a2a2a;
+  border: none;
+  border-radius: 6px;
+}
+
+.leverage-input-wrapper .ivu-input-number-input {
+  background-color: transparent;
+  color: #fff;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  height: 48px;
+  line-height: 48px;
+}
+
+.leverage-input-wrapper .ivu-input-number-handler-wrap {
+  display: none;
+  /* Hide up/down arrows for cleaner look */
+}
+
+.discrete-leverage-display {
+  background-color: #2a2a2a;
+  color: #fff;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  height: 48px;
+  line-height: 48px;
+  border-radius: 6px;
+}
+
+.leverage-slider-wrapper {
+  margin-bottom: 30px;
+}
+
+.custom-range-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  background: #333;
+  border-radius: 2px;
+  outline: none;
+  margin-bottom: 10px;
+}
+
+.custom-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 4px solid #000;
+  cursor: pointer;
+  box-shadow: 0 0 0 2px #b5d820;
+}
+
+.range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #888;
+}
+
+.leverage-quick-select {
+  display: flex;
+  align-items: center;
+  background-color: #2a2a2a;
+  border-radius: 24px;
+  padding: 4px;
+  margin-bottom: 30px;
+}
+
+.quick-items {
+  display: flex;
+  flex: 1;
+  overflow-x: auto;
+  gap: 4px;
+  scrollbar-width: none;
+}
+
+.quick-items::-webkit-scrollbar {
+  display: none;
+}
+
+.quick-item {
+  padding: 8px 16px;
+  border-radius: 20px;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.quick-item.active {
+  background-color: #b5d820;
+  color: #000;
+  font-weight: bold;
+}
+
+.leverage-details {
+  font-size: 13px;
+  color: #aaa;
+  line-height: 2;
+}
+
+.detail-row {
+  display: flex;
+  gap: 10px;
+}
+
+.detail-row .val {
+  color: #fff;
+  font-weight: bold;
+}
+
+.detail-link {
+  color: #b5d820;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.custom-modal-footer {
+  display: flex;
+  gap: 15px;
+  padding-top: 10px;
+}
+
+.custom-modal-footer .btn-cancel,
+.custom-modal-footer .btn-confirm {
+  flex: 1;
+  height: 44px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+}
+
+.custom-modal-footer .btn-cancel {
+  background-color: #2a2a2a !important;
+  color: #fff !important;
+}
+
+.custom-modal-footer .btn-confirm {
+  background-color: #b5d820 !important;
+  color: #000 !important;
+}
+
+::v-deep(.ivu-modal-header) {
+  border-bottom: 1px solid #1a1a1a !important;
+}
+
+::v-deep(.ivu-modal-footer) {
+  border-top: 1px solid #1a1a1a;
+}
+
+::v-deep(.ivu-btn-default) {
+  background-color: #28292A;
+  border: none;
+  color: #fff;
+}
+
+::v-deep(.ivu-btn-primary:last-child:not(:first-child)) {
+  background-color: #d4ff00 !important;
+  border: none;
+  color: #000 !important;
+}
+</style>

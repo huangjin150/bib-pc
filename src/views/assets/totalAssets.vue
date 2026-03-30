@@ -2,7 +2,13 @@
     <div class="total-assets-page">
         <!-- 页面标题和操作按钮 -->
         <div class="page-header">
-            <h1 class="page-title">资产</h1>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <h1 class="page-title">总览</h1>
+                <div class="visibility-toggle" @click="toggleVisibility">
+                    <img v-if="isVisible" src="../../assets/svg/eye_open.svg" alt="">
+                    <img v-else src="../../assets/svg//eye_closed.svg" alt="">
+                </div>
+            </div>
             <div class="action-buttons">
                 <button class="action-btn primary" @click="navigateTo('/recharge')">
                     充值
@@ -20,12 +26,6 @@
             <div style="flex: 1;">
                 <div class="card-header">
                     <div class="title-section">
-                        <span class="title">预估总资产</span>
-                        <div class="visibility-toggle" @click="toggleVisibility">
-                            <img v-if="isVisible" src="../../assets/svg/eye_open.svg" alt="">
-                            <img v-else src="../../assets/svg//eye_closed.svg" alt="">
-
-                        </div>
                     </div>
                 </div>
                 <div class="asset-amount">
@@ -33,18 +33,7 @@
                     <div class="sub-amount"> {{ displayTotalAssetsUsd }} </div>
                 </div>
             </div>
-            <div style="flex: 1;" class="time-filter">
-                <div class="flex_alicenter" style="justify-content: flex-end;">
-                    <button v-for="period in timePeriods" :key="period.value"
-                        :class="['time-btn', { active: selectedPeriod === period.value }]"
-                        @click="selectPeriod(period.value)">
-                        {{ period.label }}
-                    </button>
-                </div>
-                <div class="chart-container">
-                    <AssetChart :data="chartData" height="140px" />
-                </div>
-            </div>
+
         </div>
 
         <!-- 账户列表 -->
@@ -253,8 +242,8 @@ export default {
 
 <style scoped>
 .total-assets-page {
-    padding: 10px;
     min-height: 100vh;
+    padding: 36px 80px 80px 56px;
 }
 
 .page-header {
@@ -265,7 +254,7 @@ export default {
 }
 
 .page-title {
-    font-size: 36px;
+    font-size: 24px;
     font-weight: 600;
     color: #333;
     margin: 0;
@@ -277,8 +266,10 @@ export default {
 }
 
 .action-btn {
-    padding: 8px 16px;
-    border-radius: 30px;
+    min-width: 60px;
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 15px;
     border: none;
     font-size: 14px;
     font-weight: 500;
@@ -315,9 +306,8 @@ export default {
     justify-content: space-between;
     background: #fff;
     border-radius: 12px;
-    padding: 24px;
+    padding: 0;
     margin-bottom: 24px;
-    border: 1px solid #eaeaed;
 }
 
 .card-header {
@@ -378,7 +368,7 @@ export default {
 }
 
 .main-amount {
-    font-size: 40px;
+    font-size: 24px;
     font-weight: 700;
     color: #000;
 }
@@ -500,7 +490,7 @@ export default {
 
 .record_title {
     color: #000;
-    font-size: 36px;
+    font-size: 24px;
     font-weight: 700;
     padding: 24px 0;
 }

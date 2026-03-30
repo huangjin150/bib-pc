@@ -1,25 +1,25 @@
 <template>
-    <div class="notice">
+    <div class="notice dark-skin">
         <div class="box">
             <div class="breadcrumb">
                 <span @click="goToHome">首页</span>
-                <span class="separator">></span>
-                <span class="current">{{ currentCategory.title }}</span>
+                <span class="separator">/</span>
+                <span class="current">{{ getCategoryTitle() }}</span>
             </div>
 
             <div class="notice-container">
+                <!-- 左侧导航栏 -->
                 <div class="sidebar">
-
                     <div v-for="(item, index) in sidebarItems" :key="index" class="sidebar-item"
-                        :class="{ active: activeCategory == item.id }" @click="changeCategory(item.id)">
-                        <img class="image" :src="item.icon" alt="">
+                        :class="{ active: currentCategoryId == item.id }" @click="goToCategory(item.id)">
+                        <img style="width: 25px; height: 25px;" :src="item.icon" alt="">
                         <span class="text">{{ item.title }}</span>
                     </div>
                 </div>
 
                 <div class="content">
                     <div class="content-header">
-                        <h2>{{ currentCategory.title }}</h2>
+                        <h2>{{ getCategoryTitle() }}</h2>
                     </div>
 
                     <div class="notice-list">
@@ -42,6 +42,7 @@ import { marketItems } from "./data.js";
 export default {
     data() {
         return {
+            currentCategoryId: null,
             activeCategory: null,
             sidebarItems: [
                 { id: marketItems[0].id, title: marketItems[0].title, icon: require('@/assets/images/notice_new.png') },
@@ -78,18 +79,29 @@ export default {
             (newId) => {
                 if (newId) {
                     this.activeCategory = newId;
+                    this.currentCategoryId = newId;
                     this.initFromRoute();
                 }
             }
         );
     },
     methods: {
+        getCategoryTitle() {
+            const category = this.sidebarItems.find(item => item.id == this.currentCategoryId);
+            return category ? category.title : 'Abtcoin最新动态';
+        },
+        goToCategory(id) {
+            this.currentCategoryId = id;
+            this.changeCategory(id);
+        },
         initFromRoute() {
             const id = this.$route.params.id;
             if (id) {
                 this.activeCategory = id;
+                this.currentCategoryId = id;
             } else {
                 this.activeCategory = '1';
+                this.currentCategoryId = '1';
                 this.$router.replace(`/announcementList/1`).catch(err => {
                     if (err.name !== 'NavigationDuplicated') {
                         throw err;
@@ -131,10 +143,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+/* 强制深色主题 */
+.dark-skin {
+    background-color: #000;
+    color: #fff;
+    min-height: 100vh;
+}
+
 .image {
     width: 20px;
     height: 20px;
     margin-right: 5px;
+    filter: invert(1);
 }
 
 .flex {
@@ -209,10 +229,10 @@ export default {
         cursor: pointer;
         display: flex;
         align-items: center;
-        color: #000;
+        color: #fff;
 
         &:hover {
-            color: #F0B90B;
+            color: #d4ff00;
         }
 
         .icon {
@@ -226,16 +246,19 @@ export default {
         cursor: pointer;
         display: flex;
         align-items: center;
-        color: #000;
+        gap: 10px;
+        color: #888;
         border-radius: 10px;
         margin-bottom: 10px;
 
         &:hover {
-            background-color: #f9f9f9;
+            background-color: #1a1a1a;
+            color: #fff;
         }
 
         &.active {
-            background-color: #f7f7f7;
+            background-color: #333;
+            color: #d4ff00;
             font-weight: 700;
         }
 
@@ -248,7 +271,7 @@ export default {
 }
 
 .content {
-    border-left: 1px solid #eaeaed;
+    border-left: 1px solid #1a1a1a;
     flex: 1;
     padding: 20px 20px 0 20px;
 
@@ -258,6 +281,7 @@ export default {
         h2 {
             font-size: 20px;
             font-weight: 500;
+            color: #fff;
         }
     }
 
@@ -265,10 +289,11 @@ export default {
         .notice-item {
             padding: 15px 0;
             cursor: pointer;
+            border-bottom: 1px solid #1a1a1a;
 
             &:hover {
                 .notice-title {
-                    color: #000;
+                    color: #d4ff00;
                     font-weight: 700;
                 }
             }
@@ -276,11 +301,13 @@ export default {
             .notice-title {
                 font-size: 16px;
                 margin-bottom: 8px;
+                color: #fff;
+                transition: color 0.3s;
             }
 
             .notice-date {
                 font-size: 12px;
-                color: #848E9C;
+                color: #888;
             }
         }
     }
@@ -288,44 +315,45 @@ export default {
 
 .latest-news {
     width: 280px;
-    background-color: #1E2329;
+    background-color: #0c0c0c;
+    border: 1px solid #1a1a1a;
     border-radius: 8px;
     padding: 20px;
 
     .latest-header {
         padding-bottom: 15px;
-        border-bottom: 1px solid #2C3138;
+        border-bottom: 1px solid #1a1a1a;
         margin-bottom: 20px;
 
         h3 {
             font-size: 16px;
             font-weight: 500;
-            color: #EAECEF;
+            color: #fff;
         }
     }
 
     .latest-list {
         .latest-item {
             padding: 12px 0;
-            border-bottom: 1px solid #2C3138;
+            border-bottom: 1px solid #1a1a1a;
             cursor: pointer;
 
             &:hover {
                 .latest-title {
-                    color: #F0B90B;
+                    color: #d4ff00;
                 }
             }
 
             .latest-title {
                 font-size: 14px;
-                color: #EAECEF;
+                color: #fff;
                 margin-bottom: 6px;
                 line-height: 1.4;
             }
 
             .latest-date {
                 font-size: 12px;
-                color: #848E9C;
+                color: #888;
             }
         }
     }
@@ -338,15 +366,31 @@ export default {
     padding: 15px 0;
 }
 
-::v-deep(.ivu-page-prev) {
-    border: none;
-}
-
+::v-deep(.ivu-page-prev),
 ::v-deep(.ivu-page-next) {
-    border: none;
+    background-color: #1a1a1a !important;
+    border-color: #333 !important;
+
+    a {
+        color: #888 !important;
+    }
 }
 
 ::v-deep(.ivu-page-item) {
-    border: none;
+    background-color: #1a1a1a !important;
+    border-color: #333 !important;
+
+    a {
+        color: #888 !important;
+    }
+}
+
+::v-deep(.ivu-page-item-active) {
+    background-color: #333 !important;
+    border-color: #d4ff00 !important;
+
+    a {
+        color: #d4ff00 !important;
+    }
 }
 </style>

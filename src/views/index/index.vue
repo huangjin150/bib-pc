@@ -1,158 +1,183 @@
 <template>
-    <div>
-        <div class="banner" :class="themeClass">
+    <div class="dark-home">
+        <div class="banner" :class="themeClass" v-if="!isLogin">
             <div class="banner_describe">
-                <div class="">
-                    <div style="font-size: 70px; font-weight: bold; color: #000; margin-bottom: 10px;">
-                        Abt coin
+                <div class="banner_left_content">
+                    <div style="font-size: 54px; color: #fff; margin-bottom: 5px; letter-spacing: 2px;">
+                        福利尽在掌握
                     </div>
-                    <!-- <img style="width: 297px; height: 167px;" src="../../assets/images/banner_title.webp" alt=""> -->
-                    <div style="font-size: 24px;   text-align: start;margin-top: 14px ; color: #070808;">
-                        <span style="font-size: 32px; color: #0068ff; font-weight: 700;"> 4300万</span>交易者的信赖首选
+                    <div
+                        style="font-size: 54px; color: #fff; margin-bottom: 40px; letter-spacing: 2px; display: inline-block;  padding: 0 10px;">
+                        奖励真实可见
                     </div>
-                    <div v-if="!isLogin" class="flex input_box">
-                        <div>
-                            <input style="border: none; height: 100%; outline: 2px solid transparent;
-                          outline-offset: 2px" type="text" placeholder="邮箱/手机号">
+                    <router-link to="/login" style="text-decoration: none;">
+                        <div
+                            style="background-color: #fff; color: #000; font-size: 18px; font-weight: 600; padding: 15px 48px; border-radius: 8px; display: inline-block; cursor: pointer;">
+                            登录/注册
                         </div>
-                        <router-link to="/login">
-                            <div class="start_btn">立即注册</div>
-                        </router-link>
-                    </div>
-                    <div style="display: flex; gap: 40px; width: 380px; margin-top: 60px " v-else>
-                        <div @click="rechargeClick" class="buyCoins_btn">充值</div>
-                        <div @click="transactionClick" class="transaction_btn">交易</div>
-                    </div>
+                    </router-link>
                 </div>
-                <div class="Gainers_item" style="width: 31%;">
-                    <!--跌幅榜 -->
-                    <GainersRanking :sort-type="'none'" :default-limit="6" @coin-selected="onCoinSelected" />
-                </div>
+                <div class="banner_right_image"> </div>
             </div>
         </div>
-        <div class="downloadModule">
-            <div>
-                <img style="width: 463px; height: 556px;" src="../../assets/images/index_phone_images.webp" alt="">
-            </div>
-            <div
-                style="height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 100px 0; ">
-                <div class="download_title">交易 ,随时随地</div>
-                <div class="">
-                    <div class="download_code_box">
-                        <div class="download_code">
-                            <img style="width: 100%; height: 100%;" src="../../assets/images/unload_code.png" alt="">
-                        </div>
-                        <div class="download_text_box">
-                            <div class="download_text_1">扫码下载</div>
-                            <div class="download_text_2">iOS & Android</div>
 
+        <div class="banner_logged_in" :class="themeClass" v-else>
+            <div class="banner_describe_logged_in">
+                <div class="banner_left_content" style="margin-left: 50px;">
+                    <div
+                        style="font-size: 52px;  color: #fff; margin-bottom: 30px; line-height: 1.4; letter-spacing: 1px; max-width: 540px;">
+                        积分不限量，奖励兑不停，Apple 全家桶等你拿！
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 30px;">
+                        <span
+                            style="color: #fff; font-size: 16px; font-weight: 600; display: flex; align-items: center;">
+                            <span style="margin-right: 8px; font-size: 20px;">🎁</span>新用户专享 <span
+                                style="color: #d4ff00; margin: 0 4px;">$500</span> 奖励
+                        </span>
+                    </div>
+
+                    <div @click="transactionClick"
+                        style="background-color: #fff; width: 100%; color: #000; font-size: 18px;  padding: 16px 0; border-radius: 8px; cursor: pointer; text-align: center;  margin-bottom: 40px; transition: opacity 0.3s;"
+                        onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                        即刻交易
+                    </div>
+
+                    <div style="display: flex; gap: 16px;">
+                        <div style="width: 50px; height: 50px; border: 1px solid #333; border-radius: 8px; display: flex; justify-content: center; align-items: center; cursor: pointer; background-color: rgba(255,255,255,0.05); transition: all 0.3s;"
+                            onmouseover="this.style.borderColor='#888'" onmouseout="this.style.borderColor='#333'">
+                            <svg width="35" height="35" viewBox="0 0 24 24" fill="#fff">
+                                <path
+                                    d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.78 1.18-.19 2.31-.88 3.5-.84 1.58.11 2.81.7 3.58 1.84-3.02 1.76-2.5 5.76.28 6.84-.71 1.81-1.74 3.39-2.44 4.35zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+                            </svg>
+                        </div>
+                        <div style="width: 50px; height: 50px; border: 1px solid #333; border-radius: 8px; display: flex; justify-content: center; align-items: center; cursor: pointer; background-color: rgba(255,255,255,0.05); transition: all 0.3s;"
+                            onmouseover="this.style.borderColor='#888'" onmouseout="this.style.borderColor='#333'">
+                            <svg width="35" height="35" viewBox="0 0 24 24" fill="#fff">
+                                <path
+                                    d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993.0004.5511-.4482.9997-.9993.9997zm-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997zm11.4045-6.02l1.9973-3.4592c.1158-.201.0467-.4584-.1545-.5745-.2006-.1154-.4576-.0463-.5741.1545l-2.0418 3.5361c-1.3533-.6182-2.8893-.9645-4.5097-.9645s-3.156.3463-4.5097.9645l-2.0418-3.5361c-.1165-.2006-.3735-.2695-.5741-.1545-.2009.1162-.2702.3735-.1545.5745l1.9973 3.4592c-2.6133 1.4426-4.3828 4.0955-4.5772 7.151h19.7196c-.1943-3.0555-1.9635-5.7084-4.5768-7.151z" />
+                            </svg>
                         </div>
                     </div>
                 </div>
-                <div></div>
+                <div class="banner_right_image_logged_in"> </div>
             </div>
+        </div>
+
+        <div class="market-section">
+            <h2 class="market-title">热门币对</h2>
+            <Market />
         </div>
 
         <div v-if="!isLogin" class="newbie-guide-section">
-            <h2 class="guide-main-title">新手指南</h2>
+            <h2 class="guide-main-title" style="color: #fff;">新手指南</h2>
             <div class="guide-content">
                 <div class="guide-steps">
                     <div class="step-item">
-                        <div class="step-number">1</div>
+                        <div class="step-number" style="color: #fff;">1</div>
                         <div class="step-details">
-                            <h3 class="step-title">创建账户</h3>
-                            <p class="step-description">注册并领取新人独家奖励</p>
+                            <h3 class="step-title" style="color: #fff;">创建账户</h3>
+                            <p class="step-description" style="color: #aaa;">注册并领取新人独家奖励</p>
                             <button class="step-button primary" @click="onGuideClick('/login')">即刻注册 →</button>
                         </div>
                     </div>
                     <div class="step-item">
-                        <div class="step-number">2</div>
+                        <div class="step-number" style="color: #fff;">2</div>
                         <div class="step-details">
-                            <h3 class="step-title">快捷买币</h3>
-                            <p class="step-description">简单几步购买加密货币</p>
-                            <button class="step-button" @click="onGuideClick('/buy')">即刻买币 →</button>
+                            <h3 class="step-title" style="color: #fff;">快捷买币</h3>
+                            <p class="step-description" style="color: #aaa;">简单几步购买加密货币</p>
+                            <button class="step-button" style="background-color: #333; color: #fff; border-color: #555;"
+                                @click="onGuideClick('/buy')">即刻买币 →</button>
                         </div>
                     </div>
                     <div class="step-item">
-                        <div class="step-number">3</div>
+                        <div class="step-number" style="color: #fff;">3</div>
                         <div class="step-details">
-                            <h3 class="step-title">开始交易</h3>
-                            <p class="step-description">买卖数字货币、轻松跟单，探索更多玩法</p>
-                            <button class="step-button" @click="onGuideClick('/swap')">即刻交易 →</button>
+                            <h3 class="step-title" style="color: #fff;">开始交易</h3>
+                            <p class="step-description" style="color: #aaa;">买卖数字货币、轻松跟单，探索更多玩法</p>
+                            <button class="step-button" style="background-color: #333; color: #fff; border-color: #555;"
+                                @click="onGuideClick('/swap')">即刻交易 →</button>
                         </div>
                     </div>
                 </div>
                 <div class="guide-image">
-                    <img src="../../assets/images/gift-light.d.webp" alt="新手指南">
+                    <img src="../../assets/images/gift-light.d.webp" alt="新手指南" style="filter: brightness(0.8);">
                 </div>
             </div>
         </div>
         <div class="security-section">
-            <h2 class="section-title">为您的安全交易保驾护航</h2>
+            <h2 class="section-title" style="color: #fff;">为您的安全交易保驾护航</h2>
             <div class="features-container">
                 <div class="feature-item">
-                    <img src="../../assets/svg/securitySection1.svg" class="feature-icon">
-                    <h3 class="feature-title">智能合约安全</h3>
-                    <p class="feature-description">合约权限审计与链上监控, 覆盖大量合约漏洞类型</p>
+                    <img src="../../assets/svg/securitySection1.svg" class="feature-icon" style="filter: invert(1);">
+                    <h3 class="feature-title" style="color: #fff;">智能合约安全</h3>
+                    <p class="feature-description" style="color: #aaa;">合约权限审计与链上监控, 覆盖大量合约漏洞类型</p>
                     <a href="#" class="feature-link">
-                        <img src="../../assets/svg/arrow_rg.svg" alt="详情">
+                        <img src="../../assets/svg/arrow_rg.svg" alt="详情" style="filter: invert(1);">
                     </a>
                 </div>
                 <div class="feature-item">
-                    <img src="../../assets/svg/securitySection2.svg" class="feature-icon">
-                    <h3 class="feature-title">储备金审计证明</h3>
-                    <p class="feature-description">Abtcoin 是首家承诺 100% 储备金的主流平台</p>
+                    <img src="../../assets/svg/securitySection2.svg" class="feature-icon" style="filter: invert(1);">
+                    <h3 class="feature-title" style="color: #fff;">储备金审计证明</h3>
+                    <p class="feature-description" style="color: #aaa;">Abtcoin 是首家承诺 100% 储备金的主流平台</p>
                     <a href="#" class="feature-link">
-                        <img src="../../assets/svg/arrow_rg.svg" alt="详情">
+                        <img src="../../assets/svg/arrow_rg.svg" alt="详情" style="filter: invert(1);">
                     </a>
                 </div>
                 <div class="feature-item">
-                    <img src="../../assets/svg/securitySection3.svg" class="feature-icon">
-                    <h3 class="feature-title">冷/热钱包分离储存</h3>
-                    <p class="feature-description">设置合理策略将大部分资产存储于冷钱包以保证资产安全</p>
+                    <img src="../../assets/svg/securitySection3.svg" class="feature-icon" style="filter: invert(1);">
+                    <h3 class="feature-title" style="color: #fff;">冷/热钱包分离储存</h3>
+                    <p class="feature-description" style="color: #aaa;">设置合理策略将大部分资产存储于冷钱包以保证资产安全</p>
                     <a href="#" class="feature-link">
-                        <img src="../../assets/svg/arrow_rg.svg" alt="详情">
+                        <img src="../../assets/svg/arrow_rg.svg" alt="详情" style="filter: invert(1);">
                     </a>
                 </div>
             </div>
         </div>
 
-        <div style="background-color: #fafafa; margin-bottom: 100px;">
-            <div class="transaction_box">
+        <div style="background-color: #111; margin-bottom: 100px;">
+            <div class="transaction_box" style="background-color: #111;">
                 <div>
-                    <div class="transaction_box_text1">$353.22亿</div>
+                    <div class="transaction_box_text1" style="color: #fff;">$353.22亿</div>
                     <div class="transaction_box_text2">24 小时交易量</div>
                 </div>
                 <div>
-                    <div class="transaction_box_text1">3,400+</div>
+                    <div class="transaction_box_text1" style="color: #fff;">3,400+</div>
                     <div class="transaction_box_text2">币种</div>
                 </div>
                 <div>
-                    <div class="transaction_box_text1">11.29%</div>
+                    <div class="transaction_box_text1" style="color: #fff;">11.29%</div>
                     <div class="transaction_box_text2">余币宝年化收益</div>
                 </div>
                 <div>
-                    <div class="transaction_box_text1">124%</div>
+                    <div class="transaction_box_text1" style="color: #fff;">124%</div>
                     <div class="transaction_box_text2">总储备金率</div>
                 </div>
             </div>
         </div>
 
         <div class="faq-section">
-            <h2 class="faq-title">常见问题</h2>
+            <h2 class="faq-title" style="color: #fff;">常见问题</h2>
             <div class="faq-list">
                 <div class="faq-item" v-for="(faq, idx) in faqList" :key="idx">
                     <button class="faq-header" @click="toggleFaq(idx)">
-                        <span class="faq-question">{{ faq.q }}</span>
+                        <span class="faq-question" style="color: #fff;">{{ faq.q }}</span>
                         <span class="faq-arrow" :class="{ open: activeFaqIndex === idx }">
-                            <img src="../../assets/images/arrow__bottom.png" alt="展开/收起">
+                            <img src="../../assets/images/arrow__bottom.png" alt="展开/收起" style="filter: invert(1);">
                         </span>
                     </button>
                     <div class="faq-content" v-show="activeFaqIndex === idx">
-                        <p style="font-size: 16px;" v-html="faq.a"></p>
+                        <p style="font-size: 16px; color: #ccc;" v-html="faq.a"></p>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div class="bottom-banner-section">
+            <div class="bottom-text">福利尽在掌握，奖励真实可见。</div>
+            <router-link to="/login" class="bottom-btn-link">
+                <div class="bottom-btn">登录/注册</div>
+            </router-link>
         </div>
 
         <div>
@@ -173,7 +198,7 @@ import AdvantageSwiper from '@/views/index/components/AdvantageSwiper.vue'
 import IsLoginStatusView from './components/IsLoginStatusView.vue';
 import CustomerServicePop from '@/components/customerServicepop.vue'
 import Chat from '@/components/chat.vue'
-import GainersRanking from '@/components/GainersRanking.vue'
+import Market from './components/Market.vue'
 
 
 export default {
@@ -184,8 +209,8 @@ export default {
         AdvantageSwiper,
         IsLoginStatusView,
         CustomerServicePop,
-        GainersRanking,
-        Chat
+        Chat,
+        Market
     },
 
     name: 'IndexView',
@@ -274,10 +299,75 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.market-section {
+    max-width: 1440px;
+    margin: 80px auto;
+    padding: 0 20px;
+
+    .market-title {
+        font-size: 36px;
+        font-weight: 700;
+        color: #fff;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+}
+
+.dark-home {
+    background-color: #000;
+    color: #fff;
+    min-height: 100vh;
+}
+
+.bottom-banner-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 0 120px;
+    background: linear-gradient(to bottom, #000 0%, #2b3a00 100%);
+    text-align: center;
+
+    .bottom-text {
+        font-size: 32px;
+        font-weight: bold;
+        color: #fff;
+        margin-bottom: 30px;
+    }
+
+    .bottom-btn-link {
+        text-decoration: none;
+    }
+
+    .bottom-btn {
+        background-color: #d4ff00;
+        color: #000;
+        font-size: 16px;
+        font-weight: 600;
+        padding: 12px 60px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: opacity 0.3s;
+
+        &:hover {
+            opacity: 0.9;
+        }
+    }
+}
+
 .banner {
-    height: 673px;
+    padding: 50px 20px;
     position: relative;
     overflow: hidden;
+}
+
+.banner_logged_in {
+    padding: 0 20px;
+    position: relative;
+    overflow: hidden;
+    background-image: url(../../assets/images/bg-pc.png);
+    background-size: cover;
+    background-position: center;
 }
 
 .banner_left {
@@ -339,7 +429,18 @@ export default {
 
 .banner_describe {
     height: 100%;
-    max-width: 1200px;
+    padding: 40px 240px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.banner_describe_logged_in {
+    padding-top: 100px;
+    padding-bottom: 50px;
+    max-width: 1440px;
+    height: 100%;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -348,12 +449,12 @@ export default {
 
 .input_box {
     width: 408px;
-    background-color: #fff;
+    background-color: #1a1a1a;
     height: 56px;
     padding: 4px 4px 4px 28px;
     border-radius: 30px;
     margin-top: 20px;
-    border: 1px solid #dfe0e2;
+    border: 1px solid #333;
 }
 
 .start_btn {
@@ -654,7 +755,7 @@ export default {
     .main-title {
         font-size: 40px;
         font-weight: 700;
-        color: #000;
+        color: #fff;
         margin-bottom: 16px;
         line-height: 1.2;
 
@@ -834,12 +935,14 @@ export default {
 
 .Gainers_item {
     padding: 20px 0;
-    border: 1px solid #eaeaed;
+    border: 1px solid #333;
+    background-color: #111;
     border-radius: 16px;
 
     .title {
         font-size: 20px;
         font-weight: 700;
+        color: #fff;
     }
 
     .arrow_rg {
@@ -849,11 +952,12 @@ export default {
         width: 32px;
         height: 32px;
         border-radius: 9999px;
-        border: 1px solid #eaeaed;
+        border: 1px solid #333;
         cursor: pointer;
 
         &:hover {
             background-color: #d0f500;
+            border-color: #d0f500;
         }
     }
 }
@@ -868,6 +972,10 @@ export default {
     margin-right: 20px;
 }
 
+::v-deep(.ivu-table-cell) {
+    padding: 0 !important;
+}
+
 .downloadModule {
     width: 1200px;
     margin: 0 auto;
@@ -880,7 +988,7 @@ export default {
     .download_title {
         font-size: 48px;
         font-weight: 700;
-        color: #000;
+        color: #fff;
     }
 
     .download_code_box {
@@ -890,7 +998,7 @@ export default {
         .download_code {
             width: 182px;
             height: 182px;
-            border: 1px solid #dfe0e2;
+            border: 1px solid #333;
             border-radius: 20px;
         }
 
@@ -924,7 +1032,7 @@ export default {
         font-weight: 700;
         text-align: center;
         margin-bottom: 70px;
-        color: #000;
+        color: #fff;
     }
 
     .guide-content {
@@ -949,7 +1057,7 @@ export default {
         font-size: 36px;
         font-weight: 700;
         line-height: 1;
-        color: #1a1a1a;
+        color: #fff;
         margin-top: 10px;
     }
 
@@ -960,7 +1068,7 @@ export default {
             font-size: 20px;
             font-weight: 600;
             margin: 0 0 8px;
-            color: #1a1a1a;
+            color: #fff;
         }
 
         .step-description {
@@ -970,9 +1078,9 @@ export default {
         }
 
         .step-button {
-            border: 1px solid #EAEAEB;
-            background-color: #F8F8F8;
-            color: #1A1A1A;
+            border: 1px solid #555;
+            background-color: #333;
+            color: #fff;
             padding: 10px 24px;
             border-radius: 20px;
             cursor: pointer;
@@ -1002,7 +1110,7 @@ export default {
         font-size: 44px;
         font-weight: 700;
         margin-bottom: 70px;
-        color: #000;
+        color: #fff;
     }
 
     .features-container {
@@ -1026,7 +1134,7 @@ export default {
         font-size: 20px;
         font-weight: 700;
         margin-bottom: 12px;
-        color: #000;
+        color: #fff;
     }
 
     .feature-description {
@@ -1068,12 +1176,12 @@ export default {
     justify-content: space-between;
     margin: 0 auto;
     padding: 50px 0;
-    background-color: #fafafa;
+    background-color: #111;
 
     .transaction_box_text1 {
         font-size: 40px;
         font-weight: 700;
-        color: #000;
+        color: #fff;
     }
 
     .transaction_box_text2 {
@@ -1093,7 +1201,7 @@ export default {
         font-size: 36px;
         font-weight: 700;
         margin-bottom: 36px;
-        color: #000;
+        color: #fff;
     }
 
     .faq-list {
@@ -1113,7 +1221,7 @@ export default {
             .faq-question {
                 font-size: 22px;
                 font-weight: 700;
-                color: #000;
+                color: #fff;
                 text-align: left;
             }
 
@@ -1145,7 +1253,7 @@ export default {
 
         .faq-content {
             padding: 0 8px 22px 8px;
-            color: #333;
+            color: #ccc;
             line-height: 1.8;
 
             a {
@@ -1173,13 +1281,33 @@ export default {
 .transaction_btn {
     flex: 1;
     height: 56px;
-    background-color: #f5f6f7;
+    background-color: #333;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 30px;
     font-weight: 600;
     font-size: 16px;
+    color: #fff;
     cursor: pointer;
 }
+
+.banner_right_image {
+    width: 390px;
+    height: 350px;
+    background: url(../../assets/images/illustration-1.png) no-repeat;
+    background-size: cover;
+    background-position: 50%;
+}
+
+.banner_right_image_logged_in {
+    width: 500px;
+    height: 400px;
+    background: url(../../assets/images/illustration-1.png) no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+
+.panel-box {}
 </style>

@@ -1949,7 +1949,6 @@ export default {
 
 .option .trade_wrap .ivu-form-item-content input::-webkit-input-placeholder {
   font-size: 14px;
-  color: #515a6e;
   margin-bottom: 10px;
   text-align: left;
 }
@@ -2627,7 +2626,6 @@ export default {
   background-color: #24313c;
   /* 背景颜色 */
   padding: 10px;
-  color: #515a6e;
   border-radius: 10px;
   cursor: pointer;
 
@@ -3591,5 +3589,9 @@ export default {
   min-width: 380px;
   border: 1px solid #eaeaed;
   border-radius: 20px;
+}
+
+::v-deep(.el-input__inner) {
+  background-color: #28292A !important;
 }
 </style>

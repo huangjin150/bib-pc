@@ -1,22 +1,18 @@
 <template>
     <div class="property-layout">
-        <div class="">
-            <div class="layout-wrapper">
-                <!-- 左侧菜单 -->
-                <div class="sidebar">
-                    <nav class="nav-menu">
-                        <router-link v-for="item in menuItems" :key="item.path" :to="item.path" class="nav-item"
-                            active-class="active">
-                            <img :src="item.icon" alt="" class="nav-icon">
-                            <span style="margin-left: 5px;">{{ item.name }}</span>
-                        </router-link>
-                    </nav>
-                </div>
+        <div class="layout-wrapper">
+            <div class="sidebar">
+                <nav class="nav-menu">
+                    <router-link v-for="item in menuItems" :key="item.path" :to="item.path" class="nav-item"
+                        active-class="active">
+                        <img :src="item.icon" alt="" class="nav-icon">
+                        <span class="nav-label">{{ item.name }}</span>
+                    </router-link>
+                </nav>
+            </div>
 
-                <!-- 右侧路由出口 -->
-                <div class="main-content">
-                    <router-view></router-view>
-                </div>
+            <div class="main-content">
+                <router-view></router-view>
             </div>
         </div>
     </div>
@@ -52,63 +48,91 @@ export default {
 <style scoped>
 .property-layout {
     min-height: 100vh;
+    box-sizing: border-box;
 }
 
 .layout-wrapper {
     display: flex;
+    align-items: flex-start;
+    margin: 0 auto;
 }
 
 .sidebar {
-    width: 280px;
+    height: 100vh;
+    width: 260px;
     border-right: 1px solid #eaeaed;
-    background: white;
-    min-height: 100vh;
-    border-radius: 8px;
-    padding: 36px 0 0 0;
+    flex-shrink: 0;
+    background: #ffffff;
+    padding: 20px 0;
+    box-sizing: border-box;
+    position: sticky;
+    top: 24px;
 }
 
 .nav-menu {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
+    padding: 0 12px;
 }
 
 .nav-item {
     display: flex;
-    margin-right: 24px;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 10px;
-    padding: 12px 16px;
-    border-radius: 6px;
+    gap: 10px;
+    min-height: 48px;
+    padding: 0 14px;
+    border-radius: 12px;
     cursor: pointer;
-    color: #000;
+    color: #111111;
     transition: all 0.3s ease;
-    font-size: 14px;
+    font-size: 15px;
     text-decoration: none;
+    box-sizing: border-box;
 }
 
 .nav-item:hover {
-    --un-bg-opacity: 1;
-    background-color: rgba(248, 248, 248, var(--un-bg-opacity));
+    background-color: #f2f2f2;
 }
 
 .nav-item.active {
-    --un-bg-opacity: 1;
-    background-color: rgba(248, 248, 248, var(--un-bg-opacity));
-    font-weight: 500;
+    background-color: #ededed;
+    font-weight: 600;
 }
 
 .nav-icon {
     width: 24px;
     height: 24px;
+    flex-shrink: 0;
+}
+
+.nav-label {
+    line-height: 1;
 }
 
 .main-content {
-    width: 1272px;
-    background: white;
-    border-radius: 8px;
-    padding: 30px 0 30px 30px;
-    min-height: 600px;
+    flex: 1;
+    min-width: 0;
+    min-height: calc(100vh - 48px);
+}
+
+@media (max-width: 1200px) {
+    .property-layout {
+        padding: 16px;
+    }
+
+    .layout-wrapper {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        position: static;
+    }
+
+    .main-content {
+        width: 100%;
+        min-height: auto;
+    }
 }
 </style>

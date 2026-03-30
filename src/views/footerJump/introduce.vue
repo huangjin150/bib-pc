@@ -1,5 +1,5 @@
 <template>
-    <div class="introduce-page">
+    <div class="introduce-page dark-skin">
         <div class="banner">
             <div class="flex banner_describe">
                 <div class="logged-in">
@@ -86,7 +86,7 @@
             </div>
         </div>
 
-        <div class="container" style="margin-bottom: 50px;">
+        <div class="container" style="padding-bottom: 50px;">
             <MediaTestimonials :items="mediaReviews" />
         </div>
     </div>
@@ -297,9 +297,177 @@ export default {
 </script>
 
 <style scoped lang="scss">
+/* 强制黑色背景布局覆盖 */
+.dark-skin {
+    background-color: #000 !important;
+    color: #fff !important;
+    min-height: 100vh;
+}
+
+.dark-skin .banner_describe .logged-in .banner_describe_left .banner_left_title {
+    color: #fff !important;
+}
+
+.dark-skin .banner_describe .logged-in .main-title {
+    color: #888 !important;
+}
+
+.dark-skin .main-titles {
+    color: #fff !important;
+}
+
+.dark-skin .banner_describe .logged-in .action-buttons {
+    background-color: #d4ff00 !important;
+    color: #000 !important;
+}
+
+.dark-skin .about-section {
+    background-color: #000 !important;
+}
+
+.dark-skin .about-section .section-title {
+    color: #fff !important;
+}
+
+.dark-skin .about-section .about-text {
+    color: #888 !important;
+}
+
+.dark-skin .container_flex_left_top,
+.dark-skin .container_flex_left_bottom,
+.dark-skin .container_flex_middle,
+.dark-skin .container_flex_right {
+    background-color: #0c0c0c !important;
+    border: 1px solid #1a1a1a !important;
+}
+
+.dark-skin .container_flex_left_top_1,
+.dark-skin .container_flex_left_bottom_1,
+.dark-skin .container_flex_middle_title,
+.dark-skin .container_flex_right_title {
+    color: #fff !important;
+}
+
+.dark-skin .container_flex_left_top_2,
+.dark-skin .container_flex_left_bottom_2,
+.dark-skin .container_flex_middle_text,
+.dark-skin .container_flex_right_text {
+    color: #888 !important;
+}
+
+.dark-skin .vision-section {
+    background-color: #000 !important;
+}
+
+/* EcosystemCarousel 组件覆盖 */
+.dark-skin ::v-deep .ecosystem__title {
+    color: #fff !important;
+}
+
+.dark-skin ::v-deep .eco-card {
+    background-color: #0c0c0c !important;
+    border-color: #1a1a1a !important;
+}
+
+.dark-skin ::v-deep .eco-card__title {
+    color: #fff !important;
+}
+
+.dark-skin ::v-deep .eco-card__desc {
+    color: #888 !important;
+}
+
+.dark-skin ::v-deep .icon-placeholder {
+    background: #1a1a1a !important;
+    border-color: #333 !important;
+}
+
+.dark-skin ::v-deep .eco-btn {
+    background-color: #1a1a1a !important;
+    border-color: #333 !important;
+}
+
+.dark-skin ::v-deep .eco-btn::after {
+    border-color: #fff !important;
+}
+
+.dark-skin ::v-deep .eco-btn:hover {
+    background-color: #d4ff00 !important;
+    border-color: #d4ff00 !important;
+}
+
+.dark-skin ::v-deep .eco-btn:hover::after {
+    border-color: #000 !important;
+}
+
+/* SecurityAssurance 组件覆盖 */
+.dark-skin ::v-deep .security-assurance-title {
+    color: #fff !important;
+}
+
+.dark-skin ::v-deep .sa-title {
+    color: #fff !important;
+}
+
+.dark-skin ::v-deep .sa-desc {
+    color: #888 !important;
+}
+
+/* MediaTestimonials 组件覆盖 */
+.dark-skin ::v-deep .media__title {
+    color: #fff !important;
+}
+
+.dark-skin ::v-deep .media__card {
+    background-color: #0c0c0c !important;
+    border-color: #1a1a1a !important;
+}
+
+.dark-skin ::v-deep .media__quote {
+    color: #fff !important;
+}
+
+.dark-skin ::v-deep .brand-text {
+    color: #fff !important;
+}
+
+.dark-skin ::v-deep .media__source {
+    color: #888 !important;
+}
+
+.dark-skin ::v-deep .media-btn {
+    background-color: #1a1a1a !important;
+    border-color: #333 !important;
+}
+
+.dark-skin ::v-deep .media-btn::after {
+    border-color: #fff !important;
+}
+
+.dark-skin ::v-deep .media-btn:hover {
+    background-color: #d4ff00 !important;
+    border-color: #d4ff00 !important;
+}
+
+.dark-skin ::v-deep .media-btn:hover::after {
+    border-color: #000 !important;
+}
+
+.dark-skin ::v-deep .media__dots .dot {
+    background-color: #333 !important;
+}
+
+.dark-skin ::v-deep .media__dots .dot.active {
+    background-color: #d4ff00 !important;
+}
+
+.dark-skin .banner_describe .logged-in .banner_describe_left>div>div:nth-child(2) {
+    color: #888 !important;
+}
+
 .introduce-page {
     padding-top: 50px;
-    background-color: #fff;
+    background-color: transparent;
 }
 
 .banner {
@@ -384,7 +552,7 @@ export default {
 
 .about-section {
     padding: 60px 0;
-    background-color: #fff;
+    background-color: transparent;
 
     .container_flex {
         width: 1200px;
@@ -402,8 +570,8 @@ export default {
             gap: 24px;
 
             .container_flex_left_top {
-                background-color: #f8f9fb;
-                border: 1px solid #edeff2;
+                background-color: transparent;
+                border: none;
                 padding: 20px;
                 border-radius: 8px;
 
@@ -421,9 +589,9 @@ export default {
             }
 
             .container_flex_left_bottom {
-                background-color: #f8f9fb;
+                background-color: transparent;
                 flex: 1 1 0%;
-                border: 1px solid #edeff2;
+                border: none;
                 padding: 20px;
                 border-radius: 8px;
 
@@ -440,10 +608,10 @@ export default {
         }
 
         .container_flex_middle {
-            background-color: #f8f9fb;
+            background-color: transparent;
             flex: 1 1 0%;
             height: 100%;
-            border: 1px solid #edeff2;
+            border: none;
             border-radius: 8px;
             display: flex;
             flex-direction: column;
@@ -463,10 +631,10 @@ export default {
         }
 
         .container_flex_right {
-            background-color: #f8f9fb;
+            background-color: transparent;
             flex: 1 1 0%;
             height: 100%;
-            border: 1px solid #edeff2;
+            border: none;
             border-radius: 8px;
             padding: 20px;
             display: flex;
@@ -528,7 +696,7 @@ export default {
     align-items: flex-start;
     gap: 30px;
     padding: 58px 32px;
-    background-color: #fff;
+    background-color: transparent;
     transition: all 0.3s ease;
 }
 

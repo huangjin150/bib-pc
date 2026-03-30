@@ -128,13 +128,13 @@ span.price {
 }
 
 .buy {
-    color: #2bc287 !important;
+    color: #ABE127 !important;
     font-size: 12px !important;
 
 }
 
 .sell {
-    color: #f74b60 !important;
+    color: #f92855 !important;
     font-size: 12px !important;
 }
 
@@ -270,8 +270,9 @@ span.price {
 }
 
 .swap .open .ivu-input {
-    border: 1px solid #eaeaed;
+    background-color: #1d1d1d;
     color: #000;
+    border: none;
     height: 38px;
     text-indent: 35px;
     border-radius: 99999px;
@@ -443,6 +444,10 @@ tr.ivu-table-row-highlight.ivu-table-row-hover td {
 
 .swap .ivu-table td .ivu-btn-warning span {
     color: #fff;
+}
+
+.swap .ivu-table-cell .ivu-table {
+    color: #fff !important;
 }
 
 .swap .ivu-table-cell {
@@ -653,16 +658,14 @@ tr.ivu-table-row-highlight.ivu-table-row-hover td {
     border-bottom: 1px solid #f0f0f0;
 }
 
-.swap .ivu-table {
-    background-color: #fff;
-}
+.swap .ivu-table {}
 
 .swap.day .ivu-table {
     background-color: #fff;
 }
 
 .swap .ivu-table-wrapper .ivu-table .ivu-table-row td {
-    border-bottom: 1px solid #fff;
+    border-bottom: 1px solid #292929;
 }
 
 .swap.day .ivu-table-wrapper .ivu-table .ivu-table-row td {
@@ -1050,7 +1053,7 @@ tr.ivu-table-row-highlight.ivu-table-row-hover td {
 .swap .open-close .open .ivu-radio-group .ivu-radio-wrapper-checked {
     border-color: transparent !important;
     box-shadow: none !important;
-    color: #000 !important;
+    color: #fff !important;
     border-bottom: 2px solid #D0F500;
 }
 
@@ -1114,7 +1117,7 @@ tr.ivu-table-row-highlight.ivu-table-row-hover td {
 }
 
 .swap .open-close .open .open-tips .num {
-    color: #000;
+    color: #fff;
     margin-left: 5px;
 }
 
@@ -1170,7 +1173,7 @@ tr.ivu-table-row-highlight.ivu-table-row-hover td {
 }
 
 .swap .split-panel {
-    background-color: #f8f8f8;
+    background-color: #1d1d1d;
     width: 100%;
     margin-top: 10px;
     display: flex;

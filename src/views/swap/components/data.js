@@ -15,6 +15,7 @@ export default function getData(self) {
 		holderslength: 0,
 		currentlength: 0,
 		leverageAdjustVal: 10,
+		leverageModalValue: 10,
 		checkSellCount: 0,
 		hide: true,
 		checkBuyCount: 0,

@@ -1,7 +1,13 @@
 <template>
     <div class="total-assets-page">
         <div class="page-header">
-            <h1 class="page-title">合约</h1>
+            <div style="display: flex;align-items: center;gap: 10px;">
+                <h1 class="page-title">合约</h1>
+                <div class="visibility-toggle" @click="toggleVisibility">
+                    <img v-if="isVisible" src="../../assets/svg/eye_open.svg" alt="">
+                    <img v-else src="../../assets/svg//eye_closed.svg" alt="">
+                </div>
+            </div>
             <div class="action-buttons">
                 <button class="action-btn primary" @click="navigateTo('/recharge')">
                     充值
@@ -17,10 +23,6 @@
                 <div class="card-header">
                     <div class="title-section">
                         <span class="title">预估总资产</span>
-                        <div class="visibility-toggle" @click="toggleVisibility">
-                            <img v-if="isVisible" src="../../assets/svg/eye_open.svg" alt="">
-                            <img v-else src="../../assets/svg//eye_closed.svg" alt="">
-                        </div>
                     </div>
                 </div>
                 <div class="asset-amount">
@@ -134,7 +136,7 @@ export default {
 
 <style scoped>
 .total-assets-page {
-    padding: 10px;
+    padding: 36px 80px 80px 56px;
     min-height: 100vh;
 }
 
@@ -146,7 +148,7 @@ export default {
 }
 
 .page-title {
-    font-size: 36px;
+    font-size: 24px;
     font-weight: 600;
     color: #333;
     margin: 0;
@@ -158,8 +160,10 @@ export default {
 }
 
 .action-btn {
-    padding: 8px 16px;
-    border-radius: 30px;
+    min-width: 60px;
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 15px;
     border: none;
     font-size: 14px;
     font-weight: 500;
@@ -255,7 +259,8 @@ export default {
 }
 
 .main-amount {
-    font-size: 40px;
+    font-size: 24px;
+    color: #000 !important;
     font-weight: 700;
 }
 
@@ -399,7 +404,8 @@ export default {
 }
 
 .swapAssets_title {
-    font-size: 36px;
+    font-size: 24px;
+    color: #000;
     font-weight: 700;
     padding: 0 0 24px 0;
 }
@@ -407,5 +413,9 @@ export default {
 .swapAssets-box {
     border: 1px solid #eaeaed !important;
     border-radius: 12px;
+}
+
+::v-deep(.ivu-table-wrapper) {
+    border: none !important;
 }
 </style>

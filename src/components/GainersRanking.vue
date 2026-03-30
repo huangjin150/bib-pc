@@ -266,7 +266,7 @@ export default {
 .gainers-ranking {
   border-radius: 16px;
   width: 100%;
-  background: #fff;
+  background: #000;
   border-radius: 8px;
   overflow: hidden;
 
@@ -349,7 +349,7 @@ export default {
 }
 
 .coin-item:hover {
-  background-color: #f8f9fa;
+  background-color: #121213;
 }
 
 .coin-left {
@@ -381,7 +381,7 @@ export default {
 .coin-symbol {
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: #fff;
 }
 
 .coin-volume {

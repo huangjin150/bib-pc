@@ -1,5 +1,5 @@
 <template>
-  <div class="notice">
+  <div class="notice dark-skin">
     <div class="banner">
       <!-- <img class="bannerimg" src="../../assets/images/help_banner.png"> -->
       <span>{{$t("header.service")}}</span>
@@ -38,6 +38,13 @@
   </div>
 </template>
 <style lang="scss" scoped>
+/* 强制深色主题 */
+.dark-skin {
+  background-color: #000;
+  color: #fff;
+  min-height: 100vh;
+}
+
 .notice {
   .banner {
     display: flex;
@@ -52,11 +59,12 @@
   .main {
     width: 70%;
     margin: 0 auto;
-    background-color: #192330;
+    background-color: #0c0c0c;
     color: #fff;
     // box-shadow: 0 0 2px #ccc;
     margin-top: -50px;
     border-radius: 6px;
+    border: 1px solid #1a1a1a;
     padding: 50px 100px;
     margin-bottom: 50px;
     .list {
@@ -64,7 +72,7 @@
       .item {
         line-height: 50px;
         height:50px;
-        border-bottom: 1px solid #27313e;
+        border-bottom: 1px solid #1a1a1a;
         cursor: pointer;
         .iconimg {
           width: 35px;
@@ -84,7 +92,7 @@
           white-space: nowrap;
           width: 70%;
           &:hover{
-            color: #f0a70a;
+            color: #d4ff00;
           }
         }
       }
@@ -92,6 +100,31 @@
     .page {
       text-align: right;
       margin-top: 20px;
+
+      ::v-deep(.ivu-page-item) {
+        background-color: #1a1a1a;
+        border-color: #333;
+        a {
+          color: #888;
+        }
+      }
+      
+      ::v-deep(.ivu-page-item-active) {
+        background-color: #333;
+        border-color: #d4ff00;
+        a {
+          color: #d4ff00;
+        }
+      }
+
+      ::v-deep(.ivu-page-prev),
+      ::v-deep(.ivu-page-next) {
+        background-color: #1a1a1a;
+        border-color: #333;
+        a {
+          color: #888;
+        }
+      }
     }
   }
 }

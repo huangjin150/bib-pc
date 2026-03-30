@@ -1,5 +1,5 @@
 <template>
-  <div class="option">
+  <div class="option dark-skin">
     <div
       style="display:none;background-image: linear-gradient( 135deg, #FD6585 10%, #0D25B9 100%);text-align: center;height:30px;line-height:30px;letter-spacing: 1px;color:#FFF;">
     </div>
@@ -1233,6 +1233,161 @@ export default {
 </script>
 
 <style scoped>
+/* 强制黑色背景布局覆盖 */
+.dark-skin {
+  background-color: #000 !important;
+  color: #fff !important;
+  min-height: 100vh;
+}
+
+.dark-skin .ctc_container h1 {
+  color: #fff !important;
+}
+
+.dark-skin .NewFlex_right {
+  background-color: #0c0c0c !important;
+  border: 1px solid #1a1a1a !important;
+  color: #fff !important;
+}
+
+.dark-skin .NewFlex_right_title {
+  color: #fff !important;
+}
+
+.dark-skin .time_btn {
+  background-color: #1a1a1a !important;
+  color: #888 !important;
+  border: 1px solid #333 !important;
+}
+
+.dark-skin .time_btn.active {
+  background-color: #333 !important;
+  color: #d4ff00 !important;
+  border-color: #d4ff00 !important;
+}
+
+.dark-skin .el-input__inner {
+  background-color: #1a1a1a !important;
+  border: 1px solid #333 !important;
+  color: #fff !important;
+}
+
+.dark-skin .quick-btn {
+  background-color: #1a1a1a !important;
+  color: #888 !important;
+  border: 1px solid #333 !important;
+}
+
+.dark-skin .quick-btn:hover {
+  background-color: #333 !important;
+  color: #fff !important;
+}
+
+.dark-skin .available_banner {
+  color: #888 !important;
+}
+
+.dark-skin .available_banner_num {
+  color: #fff !important;
+}
+
+.dark-skin .table_box {
+  background-color: #0c0c0c !important;
+  border: 1px solid #1a1a1a !important;
+}
+
+.dark-skin .table_title {
+  color: #fff !important;
+  border-bottom: 1px solid #1a1a1a !important;
+}
+
+.dark-skin .ivu-table,
+.dark-skin .ivu-table-wrapper,
+.dark-skin .ivu-table td,
+.dark-skin .ivu-table th {
+  background-color: transparent !important;
+  border-bottom: 1px solid #1a1a1a !important;
+  color: #fff !important;
+}
+
+.dark-skin .ivu-table th {
+  color: #888 !important;
+}
+
+.dark-skin .ivu-table-row:hover td {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.dark-skin .ivu-table-wrapper {
+  border: none !important;
+}
+
+.dark-skin .ivu-table::before,
+.dark-skin .ivu-table::after {
+  display: none !important;
+}
+
+.dark-skin .items-container-box {
+  border: 1px solid #1a1a1a !important;
+  background-color: #0c0c0c !important;
+}
+
+.dark-skin .el-slider__runway {
+  background-color: #333 !important;
+}
+
+.dark-skin .el-slider__bar {
+  background-color: #d4ff00 !important;
+}
+
+.dark-skin .el-slider__button {
+  border-color: #d4ff00 !important;
+}
+
+.dark-skin .up_btn {
+  background-color: #d4ff00 !important;
+  color: #000 !important;
+}
+
+.dark-skin .down_btn {
+  background-color: #f43f5e !important;
+  color: #fff !important;
+}
+
+.dark-skin .ivu-page-item {
+  background-color: #1a1a1a !important;
+  border-color: #333 !important;
+}
+
+.dark-skin .ivu-page-item a {
+  color: #888 !important;
+}
+
+.dark-skin .ivu-page-item-active {
+  background-color: #333 !important;
+  border-color: #d4ff00 !important;
+}
+
+.dark-skin .ivu-page-item-active a {
+  color: #d4ff00 !important;
+}
+
+.dark-skin .ivu-page-prev,
+.dark-skin .ivu-page-next {
+  background-color: #1a1a1a !important;
+  border-color: #333 !important;
+}
+
+.dark-skin .ivu-page-prev a,
+.dark-skin .ivu-page-next a {
+  color: #888 !important;
+}
+
+.dark-skin .current-period {
+  background-color: #0c0c0c !important;
+  border: 1px solid #1a1a1a !important;
+}
+
 .ctc .item-title {
   font-size: 20px;
   text-align: center;
@@ -1467,7 +1622,6 @@ export default {
 
 .option .trade_wrap .ivu-form-item-content input::-webkit-input-placeholder {
   font-size: 14px;
-  color: #515a6e;
   margin-bottom: 10px;
   text-align: left;
 }
@@ -2143,7 +2297,6 @@ export default {
   background-color: #24313c;
   /* 背景颜色 */
   padding: 10px;
-  color: #515a6e;
   border-radius: 10px;
   cursor: pointer;
 
@@ -2659,7 +2812,12 @@ export default {
 }
 
 ::v-deep(.block .el-slider .el-slider__runway) {
+  background-color: #28292a !important;
   height: 4px;
+}
+
+::v-deep(.el-slider__runway) {
+  background-color: #28292a !important;
 }
 
 .items-container-box {
@@ -2986,7 +3144,7 @@ export default {
   width: 12px;
   height: 12px;
   border: 1px solid #fff;
-  background-color: #ebf2fa;
+  background-color: #070808;
   margin-top: -4px;
 }
 
@@ -3043,7 +3201,7 @@ export default {
 .NewFlex_left {
   width: 76%;
   height: 600px;
-  border: 1px solid #eaeaed;
+  border: 1px solid #292929;
   border-radius: 12px;
   padding: 10px;
 }
@@ -3052,7 +3210,7 @@ export default {
   height: 100%;
   width: 23%;
   min-width: 380px;
-  border: 1px solid #eaeaed;
+  border: 1px solid #292929;
   border-radius: 20px;
   padding: 15px 20px;
   box-sizing: border-box;
@@ -3146,5 +3304,30 @@ export default {
     border-radius: 30px;
 
   }
+}
+
+::v-deep(.ivu-table-header th) {
+  background-color: #000 !important;
+  border-bottom: 1px solid #1a1a1a;
+  color: #8e8e92;
+}
+
+::v-deep(.ivu-table-tip td) {
+  background-color: #000 !important;
+  border-bottom: 1px solid #1a1a1a;
+
+}
+
+::v-deep(.ivu-table:before) {
+  background-color: #1a1a1a;
+}
+
+::v-deep(.ivu-table:after) {
+  background-color: #1a1a1a;
+}
+
+::v-deep(.el-input__inner) {
+  border: 1px solid #28292A;
+  background-color: #28292A !important;
 }
 </style>

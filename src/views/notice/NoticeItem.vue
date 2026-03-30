@@ -1,5 +1,5 @@
 <template>
-  <div class="notice">
+  <div class="notice dark-skin">
     <div class="box">
       <h1>公告</h1>
       <div class="market-grid">
@@ -36,6 +36,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+/* 强制深色主题 */
+.dark-skin {
+  background-color: #000;
+  color: #fff;
+  min-height: 100vh;
+}
+
 .flex {
   display: flex;
   align-items: center;
@@ -63,7 +70,7 @@ export default {
   h1 {
     font-size: 36px;
     font-weight: 600;
-    color: #000;
+    color: #fff;
     padding: 48px 0;
   }
 }
@@ -78,14 +85,15 @@ export default {
 
 .market-card {
   border-radius: 14px;
-  border: 1px solid #2C3138;
+  border: 1px solid #1a1a1a;
+  background-color: #0c0c0c;
   padding: 40px 24px;
   cursor: pointer;
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: #f9f9f9;
-
+    background-color: #1a1a1a;
+    border-color: #d4ff00;
   }
 
   .market-icon {
@@ -100,6 +108,7 @@ export default {
     font-size: 20px;
     font-weight: 500;
     line-height: 28px;
+    color: #fff;
   }
 
   .market-desc {
@@ -107,6 +116,7 @@ export default {
     font-size: 14px;
     font-weight: 500;
     line-height: 22px;
+    color: #888;
   }
 }
 </style>

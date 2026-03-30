@@ -1,5 +1,5 @@
 <template>
-	<div class="notice-detail">
+	<div class="notice-detail dark-skin">
 		<div class="box">
 
 			<div class="breadcrumb">
@@ -128,6 +128,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+/* 强制深色主题 */
+.dark-skin {
+  background-color: #000;
+  color: #fff;
+  min-height: 100vh;
+}
+
 .notice-detail {
 	min-height: 100vh;
 }
@@ -140,16 +147,19 @@ export default {
 ::v-deep(.content-body) {
 	font-size: 16px;
 	line-height: 1.6;
+	color: #fff;
 }
 
 ::v-deep(.content-body p) {
 	margin-bottom: 15px;
+	color: #ccc;
 }
 
 ::v-deep(.content-body ul),
 ::v-deep(.content-body ol) {
 	margin-bottom: 16px;
 	padding-left: 20px;
+	color: #ccc;
 }
 
 ::v-deep(.content-body ul li),
@@ -162,15 +172,16 @@ export default {
 	width: 100%;
 	border-collapse: collapse;
 	margin: 20px 0;
+	color: #fff;
 }
 
 ::v-deep(.content-body td) {
-	border: 1px solid #2C3138;
+	border: 1px solid #333;
 	padding: 10px;
 }
 
 ::v-deep(.content-body tr:nth-child(odd)) {
-	background-color: #181A20;
+	background-color: #1a1a1a;
 }
 
 .breadcrumb {
@@ -181,25 +192,26 @@ export default {
 
 	.breadcrumb-item {
 		font-size: 14px;
-		color: #848E9C;
+		color: #888;
 		cursor: pointer;
 
 		&:hover {
-			color: #F0B90B;
+			color: #d4ff00;
 		}
 
 		&.current {
 			cursor: default;
+			color: #fff;
 
 			&:hover {
-				color: #EAECEF;
+				color: #fff;
 			}
 		}
 	}
 
 	.separator {
 		margin: 0 8px;
-		color: #848E9C;
+		color: #888;
 	}
 }
 
@@ -212,16 +224,18 @@ export default {
 	width: 220px;
 	border-radius: 8px;
 	padding: 10px 0;
-	border: 1px solid #eaeaed;
+	border: 1px solid #1a1a1a;
+	background-color: #0c0c0c;
 
 	.back-btn {
 		padding: 10px 20px;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
+		color: #fff;
 
 		&:hover {
-			color: #F0B90B;
+			color: #d4ff00;
 		}
 
 		.icon {
@@ -235,15 +249,17 @@ export default {
 		cursor: pointer;
 		display: flex;
 		align-items: center;
+		color: #888;
 
 		&:hover {
-			background-color: #f9f9f9;
+			background-color: #1a1a1a;
+			color: #fff;
 		}
 
 		&.active {
-			background-color: #2b3139;
-			color: #F0B90B;
-			border-left: 3px solid #F0B90B;
+			background-color: #333;
+			color: #d4ff00;
+			border-left: 3px solid #d4ff00;
 		}
 
 		.icon {
@@ -260,7 +276,8 @@ export default {
 	padding: 20px;
 	height: 700px;
 	overflow-y: auto;
-	border: 1px solid #eaeaed;
+	border: 1px solid #1a1a1a;
+	background-color: #0c0c0c;
 
 	.content-header {
 		margin-bottom: 15px;
@@ -268,16 +285,18 @@ export default {
 		h2 {
 			font-size: 22px;
 			font-weight: 500;
+			color: #fff;
 		}
 	}
 
 	.content-meta {
 		margin-bottom: 20px;
 		padding-bottom: 15px;
-		border-bottom: 1px solid #2C3138;
+		border-bottom: 1px solid #1a1a1a;
 
 		.date {
 			font-size: 14px;
+			color: #888;
 		}
 	}
 

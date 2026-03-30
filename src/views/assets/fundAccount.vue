@@ -1,7 +1,13 @@
 <template>
     <div class="total-assets-page">
         <div class="page-header">
-            <h1 class="page-title">资金账户</h1>
+            <div style="display: flex;align-items: center; gap: 10px;">
+                <h1 class="page-title">资金账户</h1>
+                <div class="visibility-toggle" @click="toggleVisibility">
+                    <img v-if="isVisible" src="../../assets/svg/eye_open.svg" alt="">
+                    <img v-else src="../../assets/svg//eye_closed.svg" alt="">
+                </div>
+            </div>
             <div class="action-buttons">
                 <button class="action-btn primary" @click="navigateTo('/recharge')">
                     充值
@@ -20,11 +26,6 @@
                 <div class="card-header">
                     <div class="title-section">
                         <span class="title">预估总资产</span>
-                        <div class="visibility-toggle" @click="toggleVisibility">
-                            <img v-if="isVisible" src="../../assets/svg/eye_open.svg" alt="">
-                            <img v-else src="../../assets/svg//eye_closed.svg" alt="">
-
-                        </div>
                     </div>
                 </div>
                 <div class="asset-amount">
@@ -109,7 +110,7 @@ export default {
 
 <style scoped>
 .total-assets-page {
-    padding: 10px;
+    padding: 36px 80px 80px 56px;
     min-height: 100vh;
 }
 
@@ -121,7 +122,7 @@ export default {
 }
 
 .page-title {
-    font-size: 32px;
+    font-size: 24px;
     font-weight: 600;
     color: #000;
     margin: 0;
@@ -133,8 +134,10 @@ export default {
 }
 
 .action-btn {
-    padding: 8px 16px;
-    border-radius: 30px;
+    min-width: 60px;
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 15px;
     border: none;
     font-size: 14px;
     font-weight: 500;
@@ -233,7 +236,7 @@ export default {
 }
 
 .main-amount {
-    font-size: 40px;
+    font-size: 24px;
     font-weight: 700;
     color: #000;
 }
@@ -349,7 +352,7 @@ export default {
 }
 
 .moneyIndex_title {
-    font-size: 32px;
+    font-size: 24px;
     padding-bottom: 24px;
     color: #000;
     font-weight: 700;

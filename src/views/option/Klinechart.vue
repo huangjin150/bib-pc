@@ -120,14 +120,14 @@ export default {
                     type: 'candle_solid',
                     bar: {
                         compareRule: 'current_open',
-                        upColor: '#2bc287',
-                        downColor: '#f92855',
+                        upColor: '#f43f5e',
+                        downColor: '#abe127',
                         noChangeColor: '#888888',
-                        upBorderColor: '#2DC08E',
-                        downBorderColor: '#F92855',
+                        upBorderColor: '#f43f5e',
+                        downBorderColor: '#abe127',
                         noChangeBorderColor: '#888888',
-                        upWickColor: '#2DC08E',
-                        downWickColor: '#F92855',
+                        upWickColor: '#f43f5e',
+                        downWickColor: '#abe127',
                         noChangeWickColor: '#888888'
                     },
                     tooltip: {
@@ -164,8 +164,8 @@ export default {
                         last: {
                             show: true,
                             compareRule: 'current_open',
-                            upColor: '#2bc287',
-                            downColor: '#f74b60',
+                            upColor: '#f43f5e',
+                            downColor: '#abe127',
                             noChangeColor: '#888888',
                             line: {
                                 show: true,
@@ -198,26 +198,46 @@ export default {
                     horizontal: {
                         show: true,
                         size: 1,
-                        color: '#eaeaed',
+                        color: '#292929',
                         style: 'solid',
                         dashedValue: [2, 2]
                     },
                     vertical: {
                         show: true,
                         size: 1,
-                        color: '#eaeaed',
+                        color: '#292929',
                         style: 'solid',
                         dashedValue: [2, 2]
                     }
                 },
 
                 indicator: {
+                    ohlc: {
+                        // 'current_open' | 'previous_close'
+                        compareRule: 'current_open',
+                        upColor: '#f43f5e',
+                        downColor: '#abe127',
+                        noChangeColor: '#888888'
+                    },
+                    bars: [{
+                        // 'fill' | 'stroke' | 'stroke_fill'
+                        style: 'fill',
+                        // 'solid' | 'dashed'
+                        borderStyle: 'solid',
+                        borderSize: 1,
+                        borderDashedValue: [2, 2],
+                        upColor: '#f43f5e',
+                        downColor: '#abe127',
+                        noChangeColor: '#888888'
+                    }],
                     tooltip: {
                         offsetLeft: 4,
                         offsetTop: 6,
                         offsetRight: 4,
                         offsetBottom: 6,
+                        // 'always' | 'follow_cross' | 'none'
                         showRule: 'always',
+                        // 'standard' | 'rect'
                         showType: 'standard',
                         showName: false,
                         showParams: true,
@@ -267,7 +287,7 @@ export default {
                 },
                 separator: {
                     size: 1,
-                    color: '#eaeaed',
+                    color: '#353333',
                     fill: true,
                     activeBackgroundColor: 'rgba(230, 230, 230, .15)'
                 },
@@ -852,7 +872,7 @@ export default {
     mounted() {
         this.initchart()
         this.chart.setStyles(this.option);
-        this.chart.setBarSpace(14)
+        this.chart.setBarSpace(8)
         this.chart.createIndicator('VOL');
         this.chart.isZoomEnabled()
         this.chart.setPrecision(7)

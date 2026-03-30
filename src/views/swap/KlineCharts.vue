@@ -395,6 +395,7 @@ export default {
             height: this.autosize ? '100%' : 600,
             locale: 'zh-HK',
         });
+        this.chart.setBarSpace(6)
         const option = {
             crosshair: {
                 show: true,
@@ -419,6 +420,18 @@ export default {
             },
 
             candle: {
+                bar: {
+                    compareRule: 'current_open',
+                    upColor: '#f43f5e',
+                    downColor: '#abe127',
+                    noChangeColor: '#888888',
+                    upBorderColor: '#f43f5e',
+                    downBorderColor: '#abe127',
+                    noChangeBorderColor: '#888888',
+                    upWickColor: '#f43f5e',
+                    downWickColor: '#abe127',
+                    noChangeWickColor: '#888888'
+                },
                 tooltip: {
                     offsetLeft: 4,
                     offsetTop: 6,
@@ -436,6 +449,53 @@ export default {
                     ],
                     features: []
                 },
+                priceMark: {
+                    show: true,
+                    high: {
+                        show: true,
+                        textMargin: 5,
+                        textSize: 10,
+                        textFamily: 'Helvetica Neue',
+                        textWeight: 'normal'
+                    },
+                    low: {
+                        show: true,
+                        textMargin: 5,
+                        textSize: 10,
+                        textFamily: 'Helvetica Neue',
+                        textWeight: 'normal',
+                    },
+                    last: {
+                        show: true,
+                        compareRule: 'current_open',
+                        upColor: '#f43f5e',
+                        downColor: '#abe127',
+                        noChangeColor: '#888888',
+                        line: {
+                            show: true,
+                            style: 'dashed',
+                            dashedValue: [4, 4],
+                            size: 1
+                        },
+                        text: {
+                            show: true,
+                            style: 'fill',
+                            size: 12,
+                            paddingLeft: 4,
+                            paddingTop: 4,
+                            paddingRight: 4,
+                            paddingBottom: 4,
+                            borderStyle: 'solid',
+                            borderSize: 0,
+                            borderColor: 'transparent',
+                            borderDashedValue: [2, 2],
+                            color: '#FFFFFF',
+                            family: 'Helvetica Neue',
+                            weight: 'normal',
+                            borderRadius: 2
+                        }
+                    }
+                },
                 pricePrecision: 4
             },
 
@@ -447,20 +507,38 @@ export default {
                 horizontal: {
                     show: true,
                     size: 1,
-                    color: '#eaeaed',
+                    color: '#292929',
                     style: 'solid',
                     dashedValue: [2, 2]
                 },
                 vertical: {
                     show: true,
                     size: 1,
-                    color: '#eaeaed',
+                    color: '#292929',
                     style: 'solid',
                     dashedValue: [2, 2]
                 }
             },
 
             indicator: {
+                ohlc: {
+                    // 'current_open' | 'previous_close'
+                    compareRule: 'current_open',
+                    upColor: '#f43f5e',
+                    downColor: '#abe127',
+                    noChangeColor: '#888888'
+                },
+                bars: [{
+                    // 'fill' | 'stroke' | 'stroke_fill'
+                    style: 'fill',
+                    // 'solid' | 'dashed'
+                    borderStyle: 'solid',
+                    borderSize: 1,
+                    borderDashedValue: [2, 2],
+                    upColor: '#f43f5e',
+                    downColor: '#abe127',
+                    noChangeColor: '#888888'
+                }],
                 tooltip: {
                     offsetLeft: 4,
                     offsetTop: 6,
@@ -504,7 +582,7 @@ export default {
                 },
                 tickText: {
                     show: true,
-                    color: '#000',
+                    color: '#fff',
                     family: 'Helvetica Neue',
                     weight: 'normal',
                     size: 12,
@@ -521,13 +599,16 @@ export default {
             },
             separator: {
                 size: 1,
-                color: '#eaeaed',
+                color: '#353333',
                 fill: true,
                 activeBackgroundColor: 'rgba(230, 230, 230, .15)'
             },
             xAxis: {
                 show: true,
                 size: 'auto',
+                type: 'normal',
+                inside: false,
+                reverse: false,
                 axisLine: {
                     show: false,
                     color: '#222831',
@@ -535,7 +616,7 @@ export default {
                 },
                 tickText: {
                     show: true,
-                    color: '#000',
+                    color: '#fff',
                     family: 'Helvetica Neue',
                     weight: 'normal',
                     size: 12,
@@ -573,8 +654,8 @@ export default {
 
 .drawing-tool-sidebar {
     width: 50px;
-    background: #fff;
-    border-right: 1px solid #e1e3eb;
+    background: #000;
+    border-right: 1px solid #292929;
     display: flex;
     flex-direction: column;
     align-items: center;

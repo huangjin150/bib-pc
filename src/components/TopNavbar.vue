@@ -76,8 +76,17 @@
 
         </div>
 
+        <!-- 登录按钮 -->
+        <div v-if="!isLogin" class="login-btn" @click="$router.push('/login')">
+          登录
+        </div>
+
+        <div v-if="!isLogin" @click="goToRegister" class="register-btn">
+          注册
+        </div>
+
         <!-- 下载按钮 -->
-        <div style="position: relative;">
+        <div style="position: relative;margin-left: 20px;">
           <button class="download-btn flex_center" @mouseenter="showdownload = true" @mouseleave="showdownload = false">
             <DownloadIcon style="width: 20px; height: 20px;" :size="14" className="download-btn1" />
           </button>
@@ -105,14 +114,6 @@
         </button> -->
 
         <!-- 注册按钮 -->
-        <button v-if="!isLogin" @click="goToRegister" class="register-btn">
-          注册
-        </button>
-
-        <!-- 登录按钮 -->
-        <button v-if="!isLogin" class="login-btn" @click="$router.push('/login')">
-          登录
-        </button>
       </div>
     </div>
   </div>
@@ -254,7 +255,7 @@ export default {
   cursor: pointer;
 
   img {
-    width: 120px;
+    width: 140px;
     height: auto
   }
 }
@@ -351,13 +352,13 @@ export default {
 
 .main-nav {
   display: flex;
-  gap: 20px;
+  gap: 30px;
 }
 
 .nav-item {
   color: #fff;
   text-decoration: none;
-  font-weight: 700;
+  font-size: 14px;
   padding: 8px 0;
   position: relative;
   transition: color 0.3s;
@@ -414,36 +415,36 @@ export default {
 .register-btn {
   background: none;
   border: 1px solid #333;
-  font-weight: 700;
-  color: #fff;
-  padding: 8px 18px;
-  border-radius: 20px;
+  background-color: #fff;
+  color: #000;
+  border-radius: 15px;
+  text-align: center;
   cursor: pointer;
+  line-height: 35px;
+  width: 70px;
   font-size: 14px;
   transition: all 0.3s;
 }
 
 .register-btn:hover {
-  border-color: #555;
-  background: #2a2a2a;
-  color: white;
+  background: #a7a3a3;
 }
 
 .login-btn {
-  background: #c6f700;
   border: none;
-  color: #1a1a1a;
-  padding: 8px 18px;
-  border-radius: 20px;
+  color: #fff;
+  background-color: #37393a;
+  line-height: 35px;
+  width: 70px;
+  border-radius: 15px;
+  text-align: center;
   cursor: pointer;
   font-size: 14px;
-  font-weight: 600;
   transition: all 0.3s;
 }
 
 .login-btn:hover {
-  background: #b8e600;
-  transform: translateY(-1px);
+  background: #424242;
 }
 
 @media (max-width: 768px) {

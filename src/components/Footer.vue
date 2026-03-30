@@ -6,7 +6,7 @@
         <!-- 左侧：Logo和社交媒体 -->
         <div class="footer-left">
           <div class="footer-logo">
-            <img width="100%" src="../assets/images/logo1.png" alt="Abtcoin" class="logo-img" />
+            <img width="100%" src="../assets/images/logo1.png" alt="Bibcoin" class="logo-img" />
           </div>
           <p class="footer-description">解锁通往加密货币宇宙的大门
           </p>
@@ -62,7 +62,7 @@
           <div class="nav-column">
             <h4 class="nav-title">关于我们</h4>
             <ul class="nav-list">
-              <li><a href="/introduce" class="nav-link">关于Abtcoin</a></li>
+              <li><a href="/introduce" class="nav-link">关于Bibcoin</a></li>
               <li><a href="/announcementList/4" class="nav-link">交易对上新</a></li>
               <li><a href="/announcement/0" class="nav-link">平台公告</a></li>
               <li class="nav-link">

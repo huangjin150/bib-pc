@@ -1,44 +1,26 @@
 <template>
-    <div style="margin-bottom: 100px;">
-        <div class="market-page">
-            <div class="market-page-title">
-                <h2>行情</h2>
-            </div>
-            <div class="Gainers_box">
-                <div class="Gainers_item" style="width: 31%;">
-                    <!-- 涨幅榜 -->
-                    <div class="flex" style="padding: 0 20px;">
-                        <div class="title">涨幅榜</div>
-                        <div class="arrow_rg" @click="jumpToClick"><img style="width: 16.8px; height: 16.8px;"
-                                src="../../assets/svg/arrow_right.svg" alt=""></div>
-                    </div>
-                    <GainersRanking :sort-type="'rise'" :default-limit="3" @coin-selected="onCoinSelected" />
+    <div class="market-dark-page">
+        <!-- 顶部 Banner 区域 -->
+        <div class="market-banner">
+            <div class="banner-content">
+                <div class="banner-left">
+                    <h1 class="banner-title">行情</h1>
+                    <p class="banner-subtitle">捕捉行业最新动态</p>
                 </div>
-                <div class="Gainers_item" style="width: 31%;">
-                    <!--跌幅榜 -->
-                    <div class="flex" style="padding: 0 20px;">
-                        <div class="title">跌幅榜</div>
-                        <div class="arrow_rg" @click="jumpToClick"><img style="width: 16.8px; height: 16.8px;"
-                                src="../../assets/svg/arrow_right.svg" alt=""></div>
-                    </div>
-                    <GainersRanking :sort-type="'fall'" :default-limit="3" @coin-selected="onCoinSelected" />
-                </div>
-                <div class="Gainers_item" style="width: 31%;">
-                    <!-- 成交额 -->
-                    <div class="flex" style="padding: 0 20px;">
-                        <div class="title">成交额</div>
-                        <div class="arrow_rg" @click="jumpToClick"><img style="width: 16.8px; height: 16.8px;"
-                                src="../../assets/svg/arrow_right.svg" alt=""></div>
-                    </div>
-                    <GainersRanking :sort-type="'volume'" :default-limit="3" @coin-selected="onCoinSelected" />
+                <div class="banner-right">
+                    <!-- 这里留出位置，由您来放置右侧图片 -->
+                    <div class="banner-image-placeholder"></div>
                 </div>
             </div>
-        </div>
-        <div class="Market">
-            <Market />
         </div>
 
-        <div class="faq-section">
+        <div class="market-page">
+            <div class="Market">
+                <Market :is-market-page="true" />
+            </div>
+        </div>
+
+        <!-- <div class="faq-section">
             <h2 class="faq-title">了解我们的工作方式</h2>
             <div class="faq-list">
                 <div class="faq-item" v-for="(faq, idx) in faqList" :key="idx">
@@ -53,19 +35,16 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 </template>
 
 <script>
-import GainersRanking from '@/components/GainersRanking.vue'
 import Market from '@/views/index/components/Market.vue';
 
 export default {
     components: {
-        GainersRanking,
         Market
-
     },
     name: 'MarketView',
     data() {
@@ -112,11 +91,6 @@ export default {
         }
     },
     methods: {
-        onCoinSelected(coin) {
-        },
-        jumpToClick() {
-            this.$router.push("/market/popular");
-        },
         toggleFaq(index) {
             this.activeFaqIndex = this.activeFaqIndex === index ? -1 : index
         }
@@ -127,70 +101,76 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.market-page {
-    padding: 0 0 80px 0;
-    width: 1260px;
-    margin: auto;
+.market-dark-page {
+    background-color: #000;
+    min-height: 100vh;
+    padding-bottom: 100px;
+    color: #fff;
+}
 
-    .market-page-title {
-        margin-top: 80px;
-        color: #000;
+/* 顶部 Banner 样式 */
+.market-banner {
+    width: 100%;
+    background-color: #000;
+    border-bottom: 1px solid #1a1a1a;
+    padding: 60px 0;
+}
 
-        h2 {
-            font-size: 36px;
-        }
+.banner-content {
+    max-width: 1260px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.banner-left {
+    .banner-title {
+        font-size: 48px;
+        font-weight: bold;
+        color: #fff;
+        margin: 0 0 16px 0;
+        letter-spacing: 2px;
     }
 
-
-    .Gainers_box {
-        padding-top: 25px;
-        width: 1260px;
-        margin: 0 auto;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-        .Gainers_item {
-            height: 260px;
-            padding: 20px 0;
-            border: 1px solid #eaeaed;
-            border-radius: 16px;
-
-            .title {
-                font-size: 20px;
-                font-weight: 700;
-            }
-
-            .arrow_rg {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 32px;
-                height: 32px;
-                border-radius: 9999px;
-                border: 1px solid #eaeaed;
-                cursor: pointer;
-
-                &:hover {
-                    background-color: #d0f500;
-                }
-            }
-        }
+    .banner-subtitle {
+        font-size: 16px;
+        color: #999;
+        margin: 0;
     }
 }
 
-.Market {
+.banner-right {
+    .banner-image-placeholder {
+        width: 300px;
+        height: 200px;
+        /* 在这里替换为您的图片背景，或者直接在模板里放 img 标签 */
+        background-image: url('../../assets/images/illustration-1.png');
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+}
+
+.market-page {
     width: 1260px;
-    padding: 20px;
-    border-radius: 20px;
     margin: 0 auto;
-    border: 1px solid #eaeaed;
+    padding-top: 40px;
+}
+
+.Market {
+    width: 100%;
+    margin: 0;
 }
 
 .Market ::v-deep .page2 {
     display: none;
 }
 
+.Market ::v-deep .market-container {
+    padding: 0;
+}
 
 .section {
     border: none !important;
@@ -205,11 +185,13 @@ export default {
         font-size: 30px;
         font-weight: 700;
         margin-bottom: 36px;
-        color: #000;
+        color: #fff;
     }
 
     .faq-list {
-        .faq-item {}
+        .faq-item {
+            border-bottom: 1px solid #1a1a1a;
+        }
 
         .faq-header {
             width: 100%;
@@ -224,8 +206,9 @@ export default {
 
             .faq-question {
                 font-size: 22px;
-                color: #000;
+                color: #fff;
                 text-align: left;
+                font-weight: 500;
             }
 
             .faq-arrow {
@@ -241,11 +224,7 @@ export default {
                     width: 16px;
                     height: 16px;
                     transition: transform .2s ease;
-                }
-
-                &:hover {
-
-                    img {}
+                    filter: invert(1);
                 }
 
                 &.open img {
@@ -256,11 +235,11 @@ export default {
 
         .faq-content {
             padding: 0 8px 22px 8px;
-            color: #333;
+            color: #999;
             line-height: 1.8;
 
             a {
-                color: #0068ff;
+                color: #d4ff00;
                 text-decoration: none;
             }
         }
