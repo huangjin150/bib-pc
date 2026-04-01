@@ -75,7 +75,8 @@
                                     <div
                                       style="display: flex;align-items: center; justify-content: space-between; margin-top: 7px; padding:  0 10px;">
                                       <div class="available_banner">支付金额</div>
-                                      <div class="available_banner_num">{{ buyNumber * symbolList.upRate || 0 }} USDT
+                                      <div class="available_banner_num">{{ (buyNumber * symbolList.upRate).toFixed(2) ||
+                                        0 }} USDT
                                       </div>
                                     </div>
                                   </div>
@@ -90,7 +91,8 @@
                                     <div
                                       style="display: flex;align-items: center; justify-content: space-between; margin-top: 7px; padding:  0 10px;">
                                       <div class="available_banner">支付金额</div>
-                                      <div class="available_banner_num">{{ buyNumber * symbolList.downRate || 0 }} USDT
+                                      <div class="available_banner_num">{{ (buyNumber * symbolList.downRate).toFixed(2)
+                                        || 0 }} USDT
                                       </div>
                                     </div>
                                   </div>
@@ -726,7 +728,11 @@ export default {
       this.styleAdd()
     },
     formatTooltip(val) {
-      return val.toFixed(2) + '%';
+      const safeVal = Number(val);
+      if (!Number.isFinite(safeVal)) {
+        return '0.00%';
+      }
+      return safeVal.toFixed(2) + '%';
     },
     //输入下注额度
     handleInput(value) {
@@ -2429,7 +2435,7 @@ export default {
 }
 
 ::v-deep(.el-slider__bar) {
-  background-color: #000;
+  background-color: #fff;
 }
 
 
@@ -3136,24 +3142,23 @@ export default {
   // background-color: ;
 }
 
-::v-deep(.slider .el-slider__button) {
-  border: 2px solid #000 !important;
-}
-
 ::v-deep(.slider .el-slider__stop) {
   width: 12px;
   height: 12px;
-  border: 1px solid #fff;
+  border: 2px solid #28292a;
   background-color: #070808;
-  margin-top: -4px;
+  margin-top: -3px;
 }
 
 ::v-deep(.slider .color-red) {
   background-color: #000;
-  border: none;
+  border: 2px solid #fff !important;
 }
 
-
+::v-deep(.el-tooltip) {
+  border: 2px solid #fff !important;
+  background-color: #000 !important;
+}
 
 .stop-active {}
 
@@ -3247,8 +3252,6 @@ export default {
 
 .placeOrder_input_box {
   margin-top: 20px;
-  border: 1px solid #ececec;
-  background-color: #f5f6f7;
   height: 40px;
   border-radius: 30px;
   display: flex;

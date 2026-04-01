@@ -38,10 +38,9 @@
             <div v-if="showUserMenu">
               <div class="reserveaSeat"></div>
               <div class="user-dropdown">
-                <div class="user-dropdown"></div>
-                <div class="user-header">
+                <div class="user-header-card">
                   <div class="user-avatar">
-                    <UserInfoIcon style="width: 24px; height: 24px;" :size="16" />
+                    <UserInfoIcon style="width: 22px; height: 22px;" :size="16" />
                   </div>
                   <div class="user-details">
                     <div class="user-email">{{ userEmail }}</div>
@@ -52,23 +51,23 @@
                 <!-- 菜单 -->
                 <div class="menu-items">
                   <div class="menu-item" @click="navigateTo('/account/overview')">
-                    <div class="menu-icon"><img src="../assets/svg/all.svg" alt=""></div>
+                    <div class="menu-icon"><img src="../assets/svg/asset.svg" alt=""></div>
                     <span>总览</span>
                   </div>
 
                   <div class="menu-item" @click="navigateTo('/cards')">
-                    <div class="menu-icon"><img src="../assets/svg/cardCoupons.svg" alt=""></div>
+                    <div class="menu-icon"><img src="../assets/svg/coupon.svg" alt=""></div>
                     <span>卡券中心</span>
                   </div>
 
                   <div class="menu-item" @click="navigateTo('/invite')">
-                    <div class="menu-icon"><img src="../assets/svg/invite.svg" alt=""></div>
+                    <div class="menu-icon"><img src="../assets/svg/invitation.svg" alt=""></div>
                     <span>邀请好友</span>
                   </div>
                 </div>
 
                 <div class="logout-section">
-                  <button class="logout-btn" @click="handleLogout">退出</button>
+                  <button class="logout-btn" @click="handleLogout">退出登录</button>
                 </div>
               </div>
             </div>
@@ -497,103 +496,124 @@ export default {
 .user_po {
   position: absolute;
   top: 30px;
-  right: -0;
+  right: 0;
 }
 
 .user-dropdown {
-  background-color: #fff;
-  border-radius: 8px;
-  min-width: 280px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  width: 320px;
+  background: #161616;
+  border: 1px solid #2a2a2a;
+  border-radius: 18px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
   z-index: 1001;
   margin-top: 8px;
   overflow: hidden;
+  padding: 12px;
 }
 
-.user-header {
+.user-header-card {
   display: flex;
   align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid #cccaca;
+  padding: 12px;
+  border-radius: 16px;
+  background: linear-gradient(250deg, rgba(192, 195, 215, .6) 4.54%, rgba(106, 107, 118, .6) 34.29%, rgba(89, 93, 105, .6) 41.53%, rgba(62, 63, 67, .6) 102.52%);
+  margin-bottom: 12px;
 }
 
 .user-avatar {
-  width: 40px;
-  height: 40px;
-  background: #c6f700;
-  border-radius: 8px;
+  width: 44px;
+  height: 44px;
+  background: #f2f2f2;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 12px;
+  color: #9ed321;
+  flex-shrink: 0;
 }
 
 .user-details {
   flex: 1;
+  min-width: 0;
 }
 
 .user-email {
-  color: #000;
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 4px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  word-break: break-all;
 }
 
 .user-uid {
-  color: #999;
-  font-size: 12px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 13px;
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
 .menu-items {
-  padding: 8px 0;
+  padding: 4px 0 10px;
 }
 
 .menu-item {
-  color: #000;
   display: flex;
   align-items: center;
-  padding: 12px 16px;
+  padding: 12px 10px;
   cursor: pointer;
-  transition: background 0.3s;
-  gap: 12px;
+  transition: background 0.2s;
+  gap: 14px;
+  border-radius: 12px;
 }
 
 .menu-item:hover {
-  background: #f5f5f5;
+  background: #1f1f1f;
 }
 
 .menu-icon {
-  width: 20px;
-  height: 20px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.menu-icon img {
+  width: 18px;
+  height: 18px;
+}
+
+.menu-item span {
+  color: #f5f5f5;
   font-size: 16px;
+  font-weight: 500;
 }
 
 .logout-section {
-  padding: 12px 16px;
-  border-top: 1px solid #cccaca;
+  padding-top: 10px;
 }
 
 .logout-btn {
   width: 100%;
-  background: none;
-  border: none;
-  color: #ff4757;
-  font-weight: 700;
-  padding: 2px;
-  border-radius: 4px;
+  height: 44px;
+  background: transparent;
+  border: 1px solid #2b2b2b;
+  color: #fff;
+  font-weight: 600;
+  padding: 0;
+  border-radius: 14px;
   cursor: pointer;
-  font-size: 14px;
-  transition: background 0.3s;
+  font-size: 18px;
+  transition: all 0.2s ease;
 }
 
 .logout-btn:hover {
-  background: rgba(255, 71, 87, 0.1);
+  background: #1f1f1f;
+  border-color: #3a3a3a;
 }
 
 .reserveaSeat {

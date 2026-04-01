@@ -1,11 +1,20 @@
 
 export default function getData(self) {
 	return {
-        currentConnectionId: null,
+		currentConnectionId: null,
 		// buyLeverage: "10",
 		// sellLeverage: "10",
 		showMarginTip: false,
 		leverage: "10",
+		marks: {
+			0: '',
+			20: '',
+			40: '',
+			60: '',
+			80: '',
+			100: ''
+		},
+		value1: 0,
 		showPopup: false,
 		changeLeverageType: 1, // 多仓：1，空仓：2
 		leverageList: [],
@@ -49,7 +58,6 @@ export default function getData(self) {
 		symbolFee: 0.001,
 		dataIndex: [],
 		searchKey: "",
-		member: {},
 		coinInfo: {
 
 		},

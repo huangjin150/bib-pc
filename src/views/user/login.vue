@@ -1,179 +1,174 @@
 <template>
-  <div class="container flex_between " style="padding: 70px 0; ">
-    <div class="flex_between " style="gap: 48px; margin: 0 auto;">
+  <div class="login-page">
+    <div class="login-layout">
       <div class="left-section">
         <div class="animation-area">
           <div class="welcome-text">
-            <p>邀请朋友进行交易，您和您的朋友</p>
-            <p>共享20%佣金</p>
-            <div style="font-size: 16px; color:rgba(142, 142, 146);margin-bottom: 25px; ">安全、流畅、简单！</div>
+            <h2>邀请朋友进行交易，您和您的朋友</h2>
+            <h2>共享20%佣金</h2>
+            <p>安全、流畅、简单</p>
           </div>
           <div class="animation-graphic">
-            <img src="../../assets/svg/login_logo.svg" alt="">
+            <img class="poster-image" src="../../assets/images/login-poster.png" alt="">
+            <img class="aperture-image" src="../../assets/images/aperture.png" alt="">
           </div>
         </div>
       </div>
 
-      <div v-if="!registrationStatus" class="right-section">.
-        <div class="login-form-container">
-          <h1 style="text-align: start; font-size: 32px; font-weight: 700;color: #000;">欢迎来到 Abtcoin</h1>
-          <div class="form-content">
-            <!-- 登录表单 -->
-            <div class="login-form">
-              <div class="input-group">
-                <label>账号</label>
-                <input type="email" v-model="loginForm.username" placeholder="请输入账号" class="form-input" />
-              </div>
+      <div class="auth-panel">
+        <div v-if="!registrationStatus" class="right-section">
+          <div class="login-form-container">
+            <div class="panel-header">
+              <h1 class="panel-title">欢迎来到 Bibcoin</h1>
+              <button class="switch-btn" @click="registrationJump">立即注册</button>
+            </div>
+            <div class="form-content">
+              <div class="login-form">
+                <div class="tab-buttons">
+                  <button class="tab-btn active">账号</button>
+                </div>
 
-              <div class="input-group">
-                <label>密码</label>
-                <div class="password-input">
-                  <input :type="showPassword ? 'text' : 'password'" v-model="loginForm.password" placeholder="请输入密码"
-                    class="form-input" />
-                  <button v-if="showPassword" type="button" @click="showPassword = !showPassword"
-                    class="password-toggle">
-                    <img src="../../assets/svg/eye_closed.svg" alt="">
-                  </button>
-                  <button v-else type="button" @click="showPassword = !showPassword" class="password-toggle">
-                    <img src="../../assets/svg/eye_open.svg" alt="">
-                  </button>
+                <div class="input-group">
+                  <input type="email" v-model="loginForm.username" placeholder="输入您的账号" class="form-input" />
+                </div>
+
+                <div class="input-group">
+                  <div class="password-input">
+                    <input :type="showPassword ? 'text' : 'password'" v-model="loginForm.password" placeholder="输入您的密码"
+                      class="form-input" />
+                    <button v-if="showPassword" type="button" @click="showPassword = !showPassword"
+                      class="password-toggle">
+                      <img src="../../assets/svg/eye_closed.svg" alt="">
+                    </button>
+                    <button v-else type="button" @click="showPassword = !showPassword" class="password-toggle">
+                      <img src="../../assets/svg/eye_open.svg" alt="">
+                    </button>
+                  </div>
+                </div>
+
+                <div class="form-footer">
+                  <a @click.prevent="forgotPassword" href="#" class="forgot-password">忘记密码?</a>
+                </div>
+
+                <button class="login-btn" @click="handleLogin">
+                  登录
+                </button>
+
+                <div class="bottom-tip">
+                  <span class="muted-text">没有账户?</span>
+                  <span class="register_btn" @click="registrationJump">立即注册</span>
                 </div>
               </div>
-              <div class="form-footer">
-                <a @click="forgotPassword" href="#" class="forgot-password">忘记密码？</a>
-              </div>
-
-              <button class="login-btn" @click="handleLogin">
-                登录
-              </button>
-
-              <div>
-                <span style="color: rgba(142, 142, 146)">没有账户? </span>
-                <span class="register_btn" @click="registrationJump">注册</span>
-              </div>
-
             </div>
           </div>
         </div>
-      </div>
-      <div v-else class="register-section">
-        <div class="register-container">
-          <!-- 标题 -->
-          <h1 class="register-title">立即开始</h1>
 
-          <!-- 选项卡 -->
-          <div class="register-tabs">
-            <button :class="['register-tab-btn', { active: registerTab === 'email' }]" @click="registerTab = 'email'">
-              邮箱
-            </button>
-            <button :class="['register-tab-btn', { active: registerTab === 'phone' }]" @click="registerTab = 'phone'">
-              手机号码
-            </button>
-          </div>
-
-          <!-- 邮箱注册表单 -->
-          <div v-if="registerTab === 'email'" class="register-form">
-            <div class="register-input-group">
-              <label class="register-label">邮箱</label>
-              <input type="email" v-model="registerForm.email" placeholder="请输入邮箱" class="form-input"
-                :class="{ 'error': emailError }" />
-              <div v-if="emailError" class="error-message">{{ emailError }}</div>
+        <div v-else class="register-section">
+          <div class="register-container">
+            <div class="panel-header">
+              <h1 class="panel-title">欢迎来到 EasiCoin</h1>
+              <button class="switch-btn" @click="registrationStatus = false">返回登录</button>
             </div>
 
-            <div class="register-input-group">
-              <label class="register-label">验证码</label>
-              <div class="verification-wrapper">
-                <input type="text" v-model="registerForm.emailVerificationCode" placeholder="请输入验证码" class="form-input"
-                  :class="{ 'error': verificationCodeError }" />
-                <button class="verification-btn" @click="sendEmailVerificationCode" :disabled="emailCountdown > 0">
-                  {{ emailCountdown > 0 ? `${emailCountdown}s` : '获取验证码' }}
-                </button>
+            <div class="register-tabs">
+              <button :class="['register-tab-btn', { active: registerTab === 'email' }]" @click="registerTab = 'email'">
+                邮箱
+              </button>
+              <button :class="['register-tab-btn', { active: registerTab === 'phone' }]" @click="registerTab = 'phone'">
+                手机号
+              </button>
+            </div>
+
+            <div v-if="registerTab === 'email'" class="register-form">
+              <div class="register-input-group">
+                <input type="email" v-model="registerForm.email" placeholder="电子邮件地址" class="form-input"
+                  :class="{ 'error': emailError }" />
+                <div v-if="emailError" class="error-message">{{ emailError }}</div>
               </div>
-              <div v-if="verificationCodeError" class="error-message">{{ verificationCodeError }}</div>
-            </div>
 
-            <div class="register-input-group">
-              <label class="register-label">密码</label>
-              <div class="register-password-wrapper">
-                <input :type="showRegisterPassword ? 'text' : 'password'" v-model="registerForm.password"
-                  placeholder="请输入密码" class="form-input" :class="{ 'error': passwordError }" />
-                <button type="button" class="register-password-toggle"
-                  @click="showRegisterPassword = !showRegisterPassword">
-                  <img v-if="showRegisterPassword" src="../../assets/svg/eye_closed.svg" alt="">
-                  <img v-else src="../../assets/svg/eye_open.svg" alt="">
-                </button>
+              <div class="register-input-group">
+                <div class="verification-wrapper">
+                  <input type="text" v-model="registerForm.emailVerificationCode" placeholder="请输入验证码"
+                    class="form-input" :class="{ 'error': verificationCodeError }" />
+                  <button class="verification-btn" @click="sendEmailVerificationCode" :disabled="emailCountdown > 0">
+                    {{ emailCountdown > 0 ? `${emailCountdown}s` : '获取验证码' }}
+                  </button>
+                </div>
+                <div v-if="verificationCodeError" class="error-message">{{ verificationCodeError }}</div>
               </div>
-              <div v-if="passwordError" class="error-message">{{ passwordError }}</div>
-            </div>
 
-            <!-- 邀请码 -->
-            <div class="register-input-group">
-              <div class="invite-label-row">
-                <label class="register-label">邀请码</label>
+              <div class="register-input-group">
+                <div class="register-password-wrapper">
+                  <input :type="showRegisterPassword ? 'text' : 'password'" v-model="registerForm.password"
+                    placeholder="输入您的密码" class="form-input" :class="{ 'error': passwordError }" />
+                  <button type="button" class="register-password-toggle"
+                    @click="showRegisterPassword = !showRegisterPassword">
+                    <img v-if="showRegisterPassword" src="../../assets/svg/eye_closed.svg" alt="">
+                    <img v-else src="../../assets/svg/eye_open.svg" alt="">
+                  </button>
+                </div>
+                <div v-if="passwordError" class="error-message">{{ passwordError }}</div>
               </div>
-              <input type="text" :disabled="promotionStatus" v-model="registerForm.inviteCode" placeholder=""
-                class="form-input" />
-            </div>
-            <button class="register-submit-btn" @click="handleEmailRegister">
-              注册
-            </button>
 
-            <div class="login-redirect">
-              <span class="login-text">已有账户？</span>
-              <a href="#" class="login-link" @click="registrationStatus = false">登录</a>
-            </div>
-          </div>
-
-          <!-- 手机号注册表单 -->
-          <div v-else class="register-form">
-            <div class="register-input-group">
-              <label class="register-label">手机号</label>
-              <input type="tel" v-model="registerForm.phone" placeholder="请输入手机号" class="form-input"
-                :class="{ 'error': phoneError }" />
-              <div v-if="phoneError" class="error-message">{{ phoneError }}</div>
-            </div>
-
-            <div class="register-input-group">
-              <label class="register-label">密码</label>
-              <div class="register-password-wrapper">
-                <input :type="showRegisterPassword ? 'text' : 'password'" v-model="registerForm.password"
-                  placeholder="请输入密码" class="form-input" :class="{ 'error': phonePasswordError }" />
-                <button type="button" class="register-password-toggle"
-                  @click="showRegisterPassword = !showRegisterPassword">
-                  <img v-if="showRegisterPassword" src="../../assets/svg/eye_closed.svg" alt="">
-                  <img v-else src="../../assets/svg/eye_open.svg" alt="">
-                </button>
+              <div class="register-input-group">
+                <input type="text" :disabled="promotionStatus" v-model="registerForm.inviteCode" placeholder="邀请码"
+                  class="form-input" />
               </div>
-              <div v-if="phonePasswordError" class="error-message">{{ phonePasswordError }}</div>
-            </div>
 
-            <div class="register-input-group">
-              <label class="register-label">验证码</label>
-              <div class="verification-wrapper">
-                <input type="text" v-model="registerForm.verificationCode" placeholder="请输入验证码" class="form-input"
-                  :class="{ 'error': phoneVerificationCodeError }" />
-                <button class="verification-btn" @click="sendEmailVerificationCode" :disabled="countdown > 0">
-                  {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
-                </button>
+              <button class="register-submit-btn" @click="handleEmailRegister">
+                注册
+              </button>
+
+              <div class="login-redirect">
+                <span class="login-text">已有账户？</span>
+                <a href="#" class="login-link" @click.prevent="registrationStatus = false">登录</a>
               </div>
-              <div v-if="phoneVerificationCodeError" class="error-message">{{ phoneVerificationCodeError }}</div>
             </div>
 
-            <div class="register-input-group">
-              <div class="invite-label-row">
-                <label class="register-label">邀请码</label>
+            <div v-else class="register-form">
+              <div class="register-input-group">
+                <input type="tel" v-model="registerForm.phone" placeholder="请输入手机号" class="form-input"
+                  :class="{ 'error': phoneError }" />
+                <div v-if="phoneError" class="error-message">{{ phoneError }}</div>
               </div>
-              <input type="text" :disabled="promotionStatus" v-model="registerForm.inviteCode" placeholder=""
-                class="form-input" />
-            </div>
 
-            <button class="register-submit-btn" @click="handlePhoneRegister">
-              注册
-            </button>
+              <div class="register-input-group">
+                <div class="register-password-wrapper">
+                  <input :type="showRegisterPassword ? 'text' : 'password'" v-model="registerForm.password"
+                    placeholder="输入您的密码" class="form-input" :class="{ 'error': phonePasswordError }" />
+                  <button type="button" class="register-password-toggle"
+                    @click="showRegisterPassword = !showRegisterPassword">
+                    <img v-if="showRegisterPassword" src="../../assets/svg/eye_closed.svg" alt="">
+                    <img v-else src="../../assets/svg/eye_open.svg" alt="">
+                  </button>
+                </div>
+                <div v-if="phonePasswordError" class="error-message">{{ phonePasswordError }}</div>
+              </div>
 
-            <div class="login-redirect">
-              <span class="login-text">已有账户？</span>
-              <a href="#" class="login-link" @click="registrationStatus = false">登录</a>
+              <div class="register-input-group">
+                <div class="verification-wrapper">
+                  <input type="text" v-model="registerForm.verificationCode" placeholder="请输入验证码" class="form-input"
+                    :class="{ 'error': phoneVerificationCodeError }" />
+                  <button class="verification-btn" @click="sendEmailVerificationCode" :disabled="countdown > 0">
+                    {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
+                  </button>
+                </div>
+                <div v-if="phoneVerificationCodeError" class="error-message">{{ phoneVerificationCodeError }}</div>
+              </div>
+
+              <div class="register-input-group">
+                <input type="text" :disabled="promotionStatus" v-model="registerForm.inviteCode" placeholder="邀请码"
+                  class="form-input" />
+              </div>
+
+              <button class="register-submit-btn" @click="handlePhoneRegister">
+                注册
+              </button>
+
+              <div class="login-redirect">
+                <span class="login-text">已有账户？</span>
+                <a href="#" class="login-link" @click.prevent="registrationStatus = false">登录</a>
+              </div>
             </div>
           </div>
         </div>
@@ -547,436 +542,220 @@ export default {
 </script>
 
 <style scoped>
-.login-container {
-  display: flex;
+.login-page {
   min-height: 100vh;
+  background: #000;
+  padding: 80px 32px 40px;
+  box-sizing: border-box;
+}
+
+.login-layout {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 72px;
 }
 
 .left-section {
-  border-radius: 20px;
-  background-image: url('../../assets/svg/bg_line.svg');
-  background-position: center bottom;
-  background-repeat: no-repeat;
-  background-size: 100%;
-  opacity: 1;
-  border: 1px solid #eaeaed;
+  flex: 1;
+  min-width: 0;
 }
 
 .animation-area {
-  width: 436px;
-  height: 548px;
-  padding: 32px;
-  padding-top: 58px;
-  text-align: center;
+  max-width: 520px;
+  padding: 20px 10px 20px 0;
 }
 
-.welcome-text h1 {
-  font-size: 2.5rem;
-  font-weight: bold;
-  margin-bottom: 20px;
-  background: linear-gradient(45deg, #fff, #f0f8ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.welcome-text h2 {
+  text-align: center;
+  margin: 0;
+  color: #fff;
+  font-size: 32px;
+  line-height: 1.16;
+  font-weight: 700;
+}
+
+.welcome-text h2 span {
+  color: #d4ff00;
 }
 
 .welcome-text p {
-  margin: 8px 0;
-  opacity: 0.9;
-  color: #000;
-  font-size: 24px;
-  font-weight: 700;
-}
-
-
-.bitcoin-icon {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 3rem;
-  color: #f7931a;
-  animation: float 3s ease-in-out infinite;
-}
-
-.shield-icon {
-  position: absolute;
-  top: 30%;
-  right: 20%;
-  font-size: 2rem;
-  animation: pulse 2s infinite;
-}
-
-.orbit-ring {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 200px;
-  height: 200px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  animation: rotate 10s linear infinite;
-}
-
-.floating-elements {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
-
-.element {
-  position: absolute;
-  font-size: 1.5rem;
-  animation: float 4s ease-in-out infinite;
-}
-
-.element:nth-child(1) {
-  top: 20%;
-  left: 20%;
-  animation-delay: -1s;
-}
-
-.element:nth-child(2) {
-  bottom: 20%;
-  right: 30%;
-  animation-delay: -2s;
-}
-
-.element:nth-child(3) {
-  top: 60%;
-  left: 10%;
-  animation-delay: -3s;
-}
-
-.feature-tags {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 30px;
-}
-
-.tag {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  backdrop-filter: blur(10px);
-}
-
-.right-section {
-  width: 450px;
-  background: white;
-  display: flex;
-}
-
-.login-form-container {
-  width: 100%;
-
-}
-
-.tab-buttons {
-  margin-top: 20px;
-  display: flex;
-  margin-bottom: 30px;
-}
-
-.tab-btn {
+  margin: 18px 0 0;
   text-align: center;
-  width: 100px;
-  border: none;
-  padding: 8px 10px;
-  border-radius: 20px;
-  font-size: 12px;
+  font-size: 18px;
+  color: #8e8e92;
+}
+
+.animation-graphic {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 42px;
+  position: relative;
+}
+
+.animation-graphic img {
+  display: block;
+  width: min(100%, 420px);
+  height: auto;
+}
+
+.poster-image {
+  width: 250px !important;
+  position: relative;
+  z-index: 2;
+  animation: loginPosterFloat 3.6s ease-in-out infinite;
+}
+
+.aperture-image {
+  width: 220px !important;
+  margin-top: 12px;
+  transform-origin: center center;
+  animation: loginAperturePulse 3.6s ease-in-out infinite;
+}
+
+@keyframes loginPosterFloat {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-18px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes loginAperturePulse {
+  0% {
+    transform: scaleX(0.92);
+    opacity: 0.72;
+  }
+
+  50% {
+    transform: scaleX(1.1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scaleX(0.92);
+    opacity: 0.72;
+  }
+}
+
+.auth-panel {
+  width: 100%;
+  max-width: 460px;
+  flex-shrink: 0;
+}
+
+.right-section,
+.register-section {
+  width: 100%;
+}
+
+.login-form-container,
+.register-container {
+  width: 100%;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.panel-title {
+  margin: 0;
+  color: #fff;
+  font-size: 38px;
   font-weight: 700;
+  line-height: 1.2;
+}
+
+.switch-btn {
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid #2d2d2d;
+  background: #151515;
+  color: #fff;
+  font-size: 14px;
   cursor: pointer;
 }
 
-.tab-btn.active {
-  background-color: #D0f500;
+.form-content {
+  margin-top: 0;
 }
 
-.input-group {
-  margin-bottom: 20px;
+.tab-buttons,
+.register-tabs {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #1d1d1d;
+  margin-bottom: 22px;
 }
 
-.input-group label {
-  display: block;
-  text-align: start;
-  margin-bottom: 8px;
+.tab-btn,
+.register-tab-btn {
+  padding: 0 0 8px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: #8e8e92;
+  font-size: 15px;
   font-weight: 500;
-  color: #333;
+  cursor: pointer;
+}
+
+.tab-btn.active,
+.register-tab-btn.active {
+  color: #d4ff00;
+  border-bottom: 2px solid #d4ff00;
+}
+
+.input-group,
+.register-input-group {
+  margin-bottom: 18px;
 }
 
 .form-input {
   width: 100%;
-  padding: 12px 16px;
-  border: 1px solid #eaeaed;
-  border-radius: 20px;
-  font-size: 1rem;
-  transition: border-color 0.3s;
+  height: 54px;
+  padding: 0 18px;
+  border: 1px solid #1f1f1f;
+  border-radius: 12px;
+  font-size: 15px;
+  color: #fff;
+  background: #050505;
+  box-sizing: border-box;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.form-input::placeholder {
+  color: #555;
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #D0f500;
+  border-color: #2f2f2f;
+  background: #090909;
 }
 
 .password-input,
-.verification-input {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.password-toggle {
-  position: absolute;
-  right: 12px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.2rem;
-}
-
-.verify-btn {
-  margin-left: 10px;
-  padding: 12px 20px;
-  background: #667eea;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  white-space: nowrap;
-  font-size: 0.9rem;
-}
-
-.login-btn {
-  width: 100%;
-  padding: 10px 15px;
-  background: #000;
-  color: white;
-  border: none;
-  border-radius: 20px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin: 20px 0;
-  transition: background 0.3s;
-}
-
-
-.forgot-password {
-  color: #84cc16;
-  text-decoration: none;
-  font-size: 0.9rem;
-}
-
-.social-login {
-  margin-top: 30px;
-}
-
-.divider {
-  text-align: center;
-  margin: 20px 0;
-  position: relative;
-}
-
-.divider::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: #eee;
-}
-
-.divider span {
-  background: white;
-  padding: 0 15px;
-  color: #999;
-  position: relative;
-}
-
-.social-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-}
-
-.social-btn {
-  width: 50px;
-  height: 50px;
-  border: 1px solid #ddd;
-  border-radius: 50%;
-  background: white;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s;
-}
-
-.social-btn:hover {
-  border-color: #667eea;
-  transform: translateY(-2px);
-}
-
-.social-icon {
-  font-size: 1.2rem;
-}
-
-/* 动画效果 */
-@keyframes float {
-
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-20px);
-  }
-}
-
-@keyframes pulse {
-
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.1);
-  }
-}
-
-@keyframes rotate {
-  from {
-    transform: translate(-50%, -50%) rotate(0deg);
-  }
-
-  to {
-    transform: translate(-50%, -50%) rotate(360deg);
-  }
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .login-container {
-    flex-direction: column;
-  }
-
-  .left-section {
-    min-height: 40vh;
-  }
-
-  .right-section {
-    width: 100%;
-  }
-}
-
-.form-footer {
-  text-align: start;
-}
-
-/* 注册页面样式 */
-.register-section {
-  width: 450px;
-  background: white;
-  display: flex;
-}
-
-.register-container {
-  width: 100%;
-  padding: 0;
-}
-
-.register-title {
-  font-size: 32px;
-  font-weight: 700;
-  color: #1a1a1a;
-  text-align: left;
-}
-
-.register-tabs {
-  display: flex;
-  gap: 8px;
-  margin-top: 20px;
-  margin-bottom: 30px;
-}
-
-.register-tab-btn {
-  padding: 8px 10px;
-  width: 100px;
-  border: none;
-  border-radius: 24px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background-color: #f5f5f5;
-  color: #666;
-}
-
-.register-tab-btn.active {
-  background-color: #d0f500;
-  color: #1a1a1a;
-}
-
-.register-form {
-  width: 100%;
-}
-
-.register-input-group {
-  margin-bottom: 24px;
-}
-
-.invite-label-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.register-label {
-  display: block;
-  text-align: start;
-  font-size: 14px;
-  font-weight: 500;
-  color: #1a1a1a;
-}
-
-.optional-text {
-  font-size: 12px;
-  color: #999;
-  font-weight: 400;
-}
-
-.register-input {
-  width: 100%;
-  padding: 16px;
-  border: 1px solid #e5e5e5;
-  border-radius: 12px;
-  font-size: 16px;
-  color: #1a1a1a;
-  background-color: #fff;
-  transition: border-color 0.3s ease;
-  box-sizing: border-box;
-}
-
-.register-input:focus {
-  outline: none;
-  border-color: #d0f500;
-}
-
-.register-input::placeholder {
-  color: #999;
-}
-
 .register-password-wrapper {
   position: relative;
 }
 
+.password-toggle,
 .register-password-toggle {
   position: absolute;
   right: 16px;
@@ -986,216 +765,156 @@ export default {
   border: none;
   cursor: pointer;
   padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.password-toggle img,
 .register-password-toggle img {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
+  opacity: 0.7;
+}
+
+.form-footer {
+  text-align: right;
+  margin-top: 4px;
+}
+
+.forgot-password,
+.login-link,
+.register_btn {
+  color: #fff;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.forgot-password {
+  font-size: 14px;
+  color: #b7b7b7;
+}
+
+.login-btn,
+.register-submit-btn {
+  width: 100%;
+  height: 54px;
+  margin-top: 28px;
+  border: none;
+  border-radius: 12px;
+  background: #f2f2f2;
+  color: #111;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.login-btn:hover,
+.register-submit-btn:hover {
+  opacity: 0.92;
+}
+
+.bottom-tip,
+.login-redirect {
+  margin-top: 18px;
+  text-align: center;
+}
+
+.muted-text,
+.login-text {
+  color: #8e8e92;
+  font-size: 14px;
+  margin-right: 6px;
+}
+
+.register_btn,
+.login-link {
+  color: #d4ff00;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .verification-wrapper {
-  height: 42px;
   display: flex;
-  gap: 11px;
-  align-items: stretch;
+  gap: 10px;
+  align-items: center;
 }
 
-.verification-input {
+.verification-wrapper .form-input {
   flex: 1;
 }
 
 .verification-btn {
-  padding: 12px 16px;
-  background-color: #f5f5f5;
-  border: 1px solid #e5e5e5;
+  height: 54px;
+  padding: 0 16px;
   border-radius: 12px;
+  border: 1px solid #242424;
+  background: #111;
+  color: #fff;
   font-size: 14px;
-  font-weight: 500;
-  color: #666;
-  cursor: pointer;
   white-space: nowrap;
-  transition: all 0.3s ease;
-}
-
-.verification-btn:hover:not(:disabled) {
-  background-color: #e8e8e8;
+  cursor: pointer;
 }
 
 .verification-btn:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.agreement-wrapper {
-  margin-bottom: 32px;
-}
-
-.agreement-checkbox {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  cursor: pointer;
-  line-height: 1.5;
-}
-
-.checkbox-input {
-  display: none;
-}
-
-.checkbox-mark {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #e5e5e5;
-  border-radius: 4px;
-  background-color: #fff;
-  position: relative;
-  flex-shrink: 0;
-  margin-top: 2px;
-  transition: all 0.3s ease;
-}
-
-.checkbox-input:checked+.checkbox-mark {
-  background-color: #d0f500;
-  border-color: #d0f500;
-}
-
-.checkbox-input:checked+.checkbox-mark::after {
-  content: '✓';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #1a1a1a;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.agreement-text {
-  font-size: 14px;
-  color: #666;
-  line-height: 1.5;
-}
-
-.agreement-link {
-  color: #d0f500;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.agreement-link:hover {
-  text-decoration: underline;
-}
-
-.register-submit-btn {
-  width: 100%;
-  padding: 12px 16px;
-  background-color: #1a1a1a;
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-bottom: 24px;
-}
-
-.register-submit-btn:hover {
-  background-color: #333;
-}
-
-.login-redirect {
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.login-text {
-  font-size: 14px;
-  color: #999;
-  margin-right: 8px;
-}
-
-.login-link {
-  font-size: 14px;
-  color: #1a1a1a;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.login-link:hover {
-  text-decoration: underline;
-}
-
-.social-login-wrapper {
-  text-align: center;
-}
-
-.social-divider {
-  font-size: 14px;
-  color: #999;
-  margin-bottom: 20px;
-}
-
-.social-icons {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-}
-
-.social-icon-btn {
-  width: 48px;
-  height: 48px;
-  border: 1px solid #e5e5e5;
-  border-radius: 12px;
-  background-color: #fff;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  transition: all 0.3s ease;
-}
-
-.social-icon-btn:hover {
-  border-color: #d0f500;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.social-icon-btn.google {
-  color: #4285f4;
-}
-
-.social-icon-btn.telegram {
-  color: #0088cc;
-}
-
-.social-icon-btn.apple {
-  color: #000;
-}
-
-.form-content {
-  margin-top: 40px;
-}
-
-.register_btn {
-  cursor: pointer;
 }
 
 .form-input.error {
-  border-color: #ff4757;
+  border-color: #ff4d4f;
 }
 
 .error-message {
-  color: #ff4757;
+  color: #ff4d4f;
   font-size: 12px;
-  margin-top: 4px;
-  margin-left: 4px;
+  margin-top: 6px;
+  margin-left: 2px;
 }
 
-.verification-btn:disabled {
-  background-color: #f5f5f5;
-  color: #999;
-  cursor: not-allowed;
+@media (max-width: 1100px) {
+  .login-layout {
+    gap: 36px;
+  }
+
+  .welcome-text h2 {
+    font-size: 44px;
+  }
+}
+
+@media (max-width: 900px) {
+  .login-page {
+    padding: 40px 20px;
+  }
+
+  .login-layout {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .left-section {
+    display: none;
+  }
+
+  .auth-panel {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .panel-title {
+    font-size: 30px;
+  }
+
+  .verification-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 </style>

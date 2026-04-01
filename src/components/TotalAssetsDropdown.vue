@@ -1,14 +1,10 @@
 <template>
     <div class="total-assets-container" @mouseenter="handleMouseEnter" @mouseleave="showAssetsMenu = false">
-        <!-- 总资产按钮 -->
         <div class="download-btn flex_center">
             <TotalAssetsIcon style="width: 20px; height: 20px;" :size="14" className="download-btn1" />
         </div>
-        <!-- 总资产下拉菜单 -->
-        <div v-if="showAssetsMenu" style="position: absolute; top: 35px; right: -50px;">
-            <!-- 资产信息头部 -->
+        <div v-if="showAssetsMenu" class="dropdown-position">
             <div class="dropdown-arrow"></div>
-
             <div class="assets-dropdown">
                 <div class="assets-header">
                     <div class="assets-title">
@@ -24,55 +20,47 @@
                     </div>
                 </div>
 
-                <!-- 操作按钮 -->
                 <div class="action-buttons">
                     <div class="action-btn" @click="navigateTo('/recharge')">
                         <div class="action-icon">
-                            <img style="width: 32px; height: 32px;" src="../assets/svg/xiazai.svg" alt="">
+                            <img style="width: 24px; height: 24px;" src="../assets/svg/xiazai.svg" alt="">
                         </div>
                         <span>充值</span>
                     </div>
-
                     <div class="action-btn" @click="navigateTo('/withdraw')">
                         <div class="action-icon">
-                            <img style="width: 32px; height: 32px;" src="../assets/svg/withdrawal.svg" alt="">
-
+                            <img style="width: 24px; height: 24px;" src="../assets/svg/withdrawal.svg" alt="">
                         </div>
                         <span>提现</span>
                     </div>
-
                     <div class="action-btn" @click="navigateTo('/assets/transfer')">
                         <div class="action-icon">
-                            <img style="width: 32px; height: 32px;" src="../assets/svg/transfer.svg" alt="">
+                            <img style="width: 24px; height: 24px;" src="../assets/svg/transfer.svg" alt="">
                         </div>
                         <span>划转</span>
                     </div>
                 </div>
 
-                <!-- 我的资产 -->
                 <div class="my-assets-section">
                     <div class="section-title">我的资产</div>
                 </div>
 
-                <!-- 菜单项 -->
                 <div class="menu-items">
-                    <div class="menu-item" @click="navigateTo('/assets')">
+                    <div class="menu-item" @click="navigateTo('/assets/overview')">
                         <div class="menu-icon">
-                            <img src="../assets/svg/property.svg" alt="">
+                            <img src="../assets/svg/asset.svg" alt="">
                         </div>
                         <span>资产总览</span>
                     </div>
-
                     <div class="menu-item" @click="navigateTo('/assets/spot')">
                         <div class="menu-icon">
-                            <img src="../assets/svg/instock.svg" alt="">
+                            <img src="../assets/svg/spot_order.svg" alt="">
                         </div>
-                        <span>现货账户</span>
+                        <span>资金账户</span>
                     </div>
-
                     <div class="menu-item" @click="navigateTo('/assets/contract')">
                         <div class="menu-icon">
-                            <img src="../assets/svg/contract.svg" alt="">
+                            <img src="../assets/svg/contract_order.svg" alt="">
                         </div>
                         <span>合约账户</span>
                     </div>
@@ -105,13 +93,13 @@ export default {
             if (!this.isVisible) {
                 return '****'
             }
-            return `${this.MathFloor(this.userinfo.balance + this.contractWallet.usdtBalance)}USDT`
+            return `${this.MathFloor((this.userinfo.balance || 0) + (this.contractWallet.usdtBalance || 0))} USDT`
         },
         displayTotalAssetsUsd() {
             if (!this.isVisible) {
                 return '≈ $****'
             }
-            return `≈ $ ${this.MathFloor(this.userinfo.balance + this.contractWallet.usdtBalance)} `
+            return `≈ $ ${this.MathFloor((this.userinfo.balance || 0) + (this.contractWallet.usdtBalance || 0))}`
         },
     },
     methods: {
@@ -125,31 +113,25 @@ export default {
         handleMouseEnter() {
             this.init()
             this.showAssetsMenu = true
-
         },
         getWalletInfo() {
-            //获取合约账户
-            var self = this;
             this.$http
                 .post(this.swapHost + "/wallet/list")
                 .then(response => {
                     var resp = response.body;
-                    this.contractWallet = resp.data
+                    this.contractWallet = resp.data || {}
                 });
         },
         getAssetWallet() {
-            //获取资金账户
-            var self = this;
             this.$http
                 .post(this.host + "/asset/wallet")
                 .then(response => {
                     var resp = response.body;
-                    this.userinfo = resp.data[0]
-                    console.log('this.userinfo', this.userinfo)
+                    this.userinfo = (resp.data && resp.data[0]) || {}
                 });
         },
         MathFloor(num) {
-            return Math.floor(num * 1000) / 1000;
+            return Math.floor((Number(num) || 0) * 1000) / 1000;
         },
         init() {
             this.getWalletInfo()
@@ -163,6 +145,12 @@ export default {
 .total-assets-container {
     position: relative;
     display: inline-block;
+}
+
+.dropdown-position {
+    position: absolute;
+    top: 35px;
+    right: -40px;
 }
 
 .download-btn {
@@ -191,14 +179,15 @@ export default {
 }
 
 .assets-dropdown {
-    background: #fff;
-    border: 1px solid #e5e5e5;
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    min-width: 320px;
+    width: 340px;
+    background: #161616;
+    border: 1px solid #2a2a2a;
+    border-radius: 18px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
     z-index: 1000;
     overflow: hidden;
     animation: fadeInDown 0.2s ease-out;
+    padding: 10px;
 }
 
 .dropdown-arrow {
@@ -218,54 +207,55 @@ export default {
     }
 }
 
-.assets-header {
-    padding: 20px;
-    border-bottom: 1px solid #f0f0f0;
+.visibility-toggle {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
 
+.visibility-toggle img {
+    width: 16px;
+    height: 16px;
+}
+
+.assets-header {
+    padding: 12px 12px 16px;
+    border-bottom: 1px solid #2a2a2a;
+}
 
 .assets-title {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 12px;
-
-    .title-text {
-        font-size: 14px;
-        color: #666;
-        font-weight: 500;
-    }
-
-    .visibility-toggle {
-        cursor: pointer;
-        color: #999;
-        transition: color 0.2s;
-
-        &:hover {
-            color: #666;
-        }
-    }
 }
 
-.assets-amount {
-    .amount-value {
-        font-size: 24px;
-        font-weight: 700;
-        color: #333;
-        margin-bottom: 4px;
-    }
+.title-text {
+    font-size: 14px;
+    color: #8e8e92;
+    font-weight: 500;
+}
 
-    .amount-usd {
-        font-size: 14px;
-        color: #999;
-    }
+.amount-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+}
+
+.amount-usd {
+    font-size: 14px;
+    color: #8e8e92;
 }
 
 .action-buttons {
     display: flex;
-    padding: 16px 20px;
-    gap: 12px;
-    border-bottom: 1px solid #f0f0f0;
+    gap: 10px;
+    padding: 16px 8px;
+    border-bottom: 1px solid #2a2a2a;
 }
 
 .action-btn {
@@ -273,80 +263,86 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 8px;
-    border-radius: 8px;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 6px;
+    border-radius: 12px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: 0.2s;
+}
 
-    .action-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 8px;
-        color: #fff;
+.action-btn:hover {
+    background: #1f1f1f;
+}
 
-        &:hover {
-            background-color: #c6f700;
-        }
+.action-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #232323;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-    }
-
-    span {
-        font-size: 12px;
-        color: #333;
-        font-weight: 500;
-    }
+.action-btn span {
+    font-size: 13px;
+    color: #f5f5f5;
 }
 
 .my-assets-section {
-    padding: 16px 20px 8px;
+    padding: 14px 10px 8px;
+}
 
-    .section-title {
-        font-size: 14px;
-        color: #666;
-        font-weight: 500;
-    }
+.section-title {
+    font-size: 14px;
+    color: #8e8e92;
+    font-weight: 500;
 }
 
 .menu-items {
-    padding: 0 0 8px;
+    padding: 4px 0 10px;
 }
 
 .menu-item {
     display: flex;
     align-items: center;
-    padding: 12px 20px;
+    padding: 12px 10px;
     cursor: pointer;
-    transition: background-color 0.2s;
-    color: #333;
+    transition: 0.2s;
+    color: #fff;
+    border-radius: 12px;
 
     &:hover {
-        background-color: #f8f9fa;
+        background-color: #1f1f1f;
     }
 
     .menu-icon {
-        width: 20px;
-        height: 20px;
-        margin-right: 12px;
+        width: 32px;
+        height: 32px;
+        margin-right: 14px;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #666;
+        border-radius: 8px;
+        flex-shrink: 0;
+    }
+
+    .menu-icon img {
+        width: 18px;
+        height: 18px;
     }
 
     span {
-        font-size: 14px;
+        font-size: 16px;
         font-weight: 500;
+        color: #f5f5f5;
     }
 }
 
 @media (max-width: 768px) {
     .assets-dropdown {
-        min-width: 280px;
-        right: -20px;
+        width: 300px;
     }
 }
 </style>

@@ -214,6 +214,17 @@
                 @click="$router.push('/assets/transfer')">⇌</span></span>
           </div>
 
+          <div class="open-amount-row">
+            <div class="open-amount-item buy">
+              <span class="label">{{ $t('swap.canup') }}</span>
+              <span class="value">{{ Number(avaOpenBuy()).toFixed(4) }} {{ currentCoin.coin }}</span>
+            </div>
+            <div class="open-amount-item sell">
+              <span class="label">{{ $t('swap.candown') }}</span>
+              <span class="value">{{ Number(avaOpenSell()).toFixed(4) }} {{ currentCoin.coin }}</span>
+            </div>
+          </div>
+
           <!-- 表单区域 (只保留开仓逻辑) -->
           <div class="trade-form">
             <!-- 委托价格 (如果非市价单) -->
@@ -237,28 +248,19 @@
             <!-- 保证金/数量 输入框 -->
             <div class="input-box-wrapper margin-input-wrapper">
               <div class="input-box">
-                <input type="text" placeholder="保证金" v-model="form.volume"
-                  @keyup="form.volume = form.volume.replace(/[^\d^\.]+/g, '')" />
+                <input type="text" placeholder="开仓数量" v-model="form.volume" @focus="onOpenAmountFocus"
+                  @keyup="handleOpenVolumeInput" />
                 <div class="suffix">
-                  <span>保证金</span>
+                  <span>BTC</span>
                 </div>
               </div>
             </div>
 
             <!-- 滑块 -->
-            <div class="slider-wrapper">
-              <el-slider class="open-percent-slider" v-model="sliderOpenPercent" :step="25" :show-tooltip="false"
-                :show-stops="true" @input="onChangeOpenPercent"></el-slider>
-              <div class="slider-labels">
-                <span>0%</span>
-                <span>25%</span>
-                <span>50%</span>
-                <span>75%</span>
-                <span>100%</span>
-              </div>
+            <div style="width: 94%; margin:  0 auto;">
+              <el-slider class="slider" :step="0.0001" @input="updatePercentage(value1)" :marks="marks"
+                :format-tooltip="formatTooltip" v-model="value1"></el-slider>
             </div>
-
-
 
             <!-- 充值/开仓 按钮 -->
             <div class="submit-btn-row">
@@ -266,8 +268,8 @@
               <button v-else-if="contractWalletInfo && contractWalletInfo.usdtBalance === 0" class="submit-btn green-bg"
                 @click="$router.push('/assets/transfer')">充值</button>
               <div v-else style="display: flex; gap: 10px; width: 100%;">
-                <button class="submit-btn green-bg" style="flex: 1; padding: 12px 0;" @click="onOpen(0)">买入开多</button>
-                <button class="submit-btn red-bg" style="flex: 1; padding: 12px 0;" @click="onOpen(1)">卖出开空</button>
+                <button class="submit-btn green-bg" style="flex: 1; padding: 6px 0;" @click="onOpen(0)">买入开多</button>
+                <button class="submit-btn red-bg" style="flex: 1; padding: 6px 0;" @click="onOpen(1)">卖出开空</button>
               </div>
             </div>
           </div>
@@ -280,7 +282,7 @@
             </div>
             <div class="assets-list">
               <div class="asset-item"><span class="label">可用保证金</span><span class="value">{{ freeMargin() | fixed4
-                  }}</span></div>
+              }}</span></div>
               <div class="asset-item"><span class="label">持仓保证金</span><span class="value">{{ bonds() | fixed4 }}</span>
               </div>
               <div class="asset-item"><span class="label">未实现盈亏</span><span class="value">{{ unrealizedProfitAndLoss() |
@@ -605,7 +607,7 @@ export default {
       return this.$store.getters.isLogin;
     },
     member: function () {
-      return this.$store.getters.member;
+      return this.$store.getters.member || JSON.parse(localStorage.getItem("MEMBER") || "null");
     },
     lang: function () {
       return this.$store.state.lang;
@@ -652,7 +654,6 @@ export default {
     this.changePlate('all')
     window.addEventListener('focus', this.onWindowFocus);
     window.addEventListener('blur', this.onWindowBlur);
-    this.member = JSON.parse(localStorage.getItem("MEMBER") || "{}");
   },
   beforeDestroy() {
     this.stopWebsock();
@@ -736,11 +737,17 @@ export default {
     },
     avaOpenBuy: function () { // 可开多
       if (!this.isLogin || this.contractWalletInfo == null) return 0;
-      return this.leverage * this.freeMargin() / this.currentCoin.close
+      const price = Number(this.currentCoin.close);
+      const leverage = Number(this.leverage);
+      if (!Number.isFinite(price) || price <= 0 || !Number.isFinite(leverage) || leverage <= 0) return 0;
+      return leverage * this.freeMargin() / price
     },
     avaOpenSell: function () { // 可开空
       if (!this.isLogin || this.contractWalletInfo == null) return 0;
-      return this.leverage * this.freeMargin() / this.currentCoin.close
+      const price = Number(this.currentCoin.close);
+      const leverage = Number(this.leverage);
+      if (!Number.isFinite(price) || price <= 0 || !Number.isFinite(leverage) || leverage <= 0) return 0;
+      return leverage * this.freeMargin() / price
     },
     editStopLimit() {//设置止盈止损
       this.profitLossModel = true
@@ -1093,6 +1100,8 @@ export default {
           var resp = response.body;
           if (resp != null) {
             this.contractWalletInfo = resp.data;
+            console.log('contractWalletInfo', this.contractWalletInfo)
+
             if (this.contractWalletInfo == null) {
               return;
             }
@@ -1104,6 +1113,51 @@ export default {
             this.getHistoryOrderHolders()
           }
         });
+    },
+
+    updatePercentage(value1) {
+      const percent = Number(value1) || 0;
+      this.value1 = percent;
+      this.sliderOpenPercent = percent;
+      const maxVolume = this.avaOpenBuy();
+      if (!Number.isFinite(maxVolume) || maxVolume <= 0 || percent <= 0) {
+        this.form.volume = "";
+        this.styleAdd();
+        return;
+      }
+      this.form.volume = this.formattedNumber(maxVolume * percent / 100).toString();
+      this.styleAdd()
+    },
+
+    styleAdd() {
+      const sliderStops = document.querySelectorAll('.slider .el-slider__stop');
+      sliderStops.forEach(stop => {
+        stop.classList.remove('color-red');
+      });
+      if (this.value1 === 0) return;
+      const marks = Object.keys(this.marks).map(Number).sort((a, b) => a - b);
+
+      sliderStops.forEach((stop, index) => {
+        if (index < marks.length && marks[index] <= this.value1) {
+          stop.classList.add('color-red');
+        }
+      });
+    },
+
+    handleOpenVolumeInput() {
+      this.form.volume = this.form.volume.replace(/[^\d^\.]+/g, '');
+      const currentVolume = Number(this.form.volume);
+      const maxVolume = this.avaOpenBuy();
+      if (!Number.isFinite(currentVolume) || currentVolume <= 0 || !Number.isFinite(maxVolume) || maxVolume <= 0) {
+        this.value1 = 0;
+        this.sliderOpenPercent = 0;
+        this.styleAdd();
+        return;
+      }
+      const percent = Math.min(100, Math.max(0, currentVolume / maxVolume * 100));
+      this.value1 = Number(percent.toFixed(4));
+      this.sliderOpenPercent = this.value1;
+      this.styleAdd();
     },
 
     initKlineResizeObserver() {
@@ -1603,6 +1657,13 @@ export default {
       }
       this.leverageModalValue = nextValue;
     },
+    formatTooltip(val) {
+      const safeVal = Number(val);
+      if (!Number.isFinite(safeVal)) {
+        return '0.00%';
+      }
+      return safeVal.toFixed(2) + '%';
+    },
     adjustLeverage() { // 连续模式，确认选择杠杆
       if (!this.isLogin) return;
       var levArr = this.contractCoinInfo.leverage.split(",");
@@ -1672,9 +1733,11 @@ export default {
     },
     onOpenAmountFocus() {
       this.sliderOpenPercent = 0;
+      this.value1 = 0;
     },
     onChangeOpenPercent(val) {
       this.sliderOpenPercent = val;
+      this.value1 = val;
     },
     onCloseAmountFocus() {
       this.sliderClosePercent = 0;
@@ -2304,13 +2367,13 @@ $popper-background-color: #192330;
 
     .order-handler {
       padding: 10px;
-      background-color: #fff;
       display: flex;
       align-items: center;
       gap: 20px;
 
       >span {
         font-size: 12px;
+        padding: 4px 10px;
         cursor: pointer;
         color: #8e8e92;
 
@@ -2320,6 +2383,7 @@ $popper-background-color: #192330;
           background-color: #2bc287;
           padding: 4px 10px;
           border-radius: 12px;
+          box-sizing: border-box;
         }
       }
     }
@@ -2516,7 +2580,6 @@ $popper-background-color: #192330;
   position: absolute;
   left: 40px;
   width: 400px;
-  box-shadow: 0 2px 10px #f5f5f5;
   background-color: #fff;
   z-index: 1000;
   padding: 10px;
@@ -2999,7 +3062,6 @@ $popper-background-color: #192330;
 }
 
 .dark-skin .order-handler>span {
-  background-color: #1a1a1a !important;
   color: #fff !important;
   box-shadow: none !important;
 }
@@ -3090,7 +3152,6 @@ $popper-background-color: #192330;
 }
 
 .dark-skin .order-handler span {
-  background-color: #1a1a1a !important;
   color: #fff !important;
   border: none !important;
 }
@@ -3288,6 +3349,42 @@ $popper-background-color: #192330;
   font-weight: bold;
 }
 
+.open-amount-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.open-amount-item {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background-color: #1a1a1a;
+}
+
+.open-amount-item .label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: #888;
+}
+
+.open-amount-item .value {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  word-break: break-all;
+}
+
+.open-amount-item.buy .value {
+  color: #d4ff00;
+}
+
+.open-amount-item.sell .value {
+  color: #ff5a7a;
+}
+
 .input-box-wrapper {
   margin-bottom: 15px;
 }
@@ -3329,47 +3426,57 @@ $popper-background-color: #192330;
   padding: 10px 0;
 }
 
-.open-percent-slider {
-  padding: 2px 0 0;
+.slider {
+  padding: 0;
 }
 
-.open-percent-slider ::v-deep .el-slider__runway {
+.slider ::v-deep .el-slider__runway {
   margin: 8px 0;
   height: 4px;
-  background-color: #2a2a2a;
+  background-color: #333;
 }
 
-.open-percent-slider ::v-deep .el-slider__bar {
+.slider ::v-deep .el-slider__bar {
   height: 4px;
-  background-color: #b5d820;
+  background-color: #fff;
 }
 
-.open-percent-slider ::v-deep .el-slider__button-wrapper {
+.slider ::v-deep .el-slider__button-wrapper {
   top: -16px;
   z-index: 3;
 }
 
-.open-percent-slider ::v-deep .el-slider__button {
+.slider ::v-deep .el-slider__button {
   width: 12px;
   height: 12px;
-  border: 3px solid #b5d820;
-  background-color: #fff;
+  border: 2px solid #fff;
+  background-color: #000;
 }
 
-.open-percent-slider ::v-deep .el-slider__stop {
-  width: 12px;
-  height: 12px;
-  margin-top: -4px;
-  border: 3px solid #0b0e11;
-  background-color: #2a2a2a;
+.slider ::v-deep .el-slider__stop {
+  width: 8px;
+  height: 8px;
+  margin-top: -1px;
+  border: 2px solid #28292a;
+  background-color: #070808;
 }
 
-.open-percent-slider ::v-deep .el-slider__stop:first-child {
+.slider ::v-deep .el-slider__stop:first-child {
   margin-left: 0;
 }
 
-.open-percent-slider ::v-deep .el-slider__marks {
+.slider ::v-deep .el-slider__stop.is-active {
+  background-color: #000;
+  border: 2px solid #fff !important;
+}
+
+.slider ::v-deep .el-slider__marks {
   display: none;
+}
+
+.slider ::v-deep .color-red {
+  background-color: #000;
+  border: 2px solid #fff !important;
 }
 
 .slider-labels {
@@ -3427,15 +3534,15 @@ $popper-background-color: #192330;
 }
 
 .submit-btn-row {
+  margin-top: 20px;
   margin-bottom: 20px;
 }
 
 .submit-btn {
   width: 100%;
-  padding: 12px;
+  padding: 6px 12px;
   border-radius: 6px;
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 14px;
   border: none;
   cursor: pointer;
   color: #000;

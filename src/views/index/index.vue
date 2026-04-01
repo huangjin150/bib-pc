@@ -173,7 +173,7 @@
             </div>
         </div>
 
-        <div class="bottom-banner-section">
+        <div v-if="!isLogin" class="bottom-banner-section">
             <div class="bottom-text">福利尽在掌握，奖励真实可见。</div>
             <router-link to="/login" class="bottom-btn-link">
                 <div class="bottom-btn">登录/注册</div>
@@ -1193,8 +1193,8 @@ export default {
 
 .faq-section {
     max-width: 1200px;
-    margin: 160px auto 60px;
-    padding: 0 20px;
+    margin: 160px auto 0;
+    padding: 0 20px 60px 20px;
 
     .faq-title {
         text-align: center;

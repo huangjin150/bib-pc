@@ -1,9 +1,11 @@
 <template>
-	<div class="notice-detail dark-skin">
+	<div class="notice-detail-page dark-skin">
 		<div class="box">
-
+			<!-- 面包屑导航 -->
 			<div class="breadcrumb">
 				<span class="breadcrumb-item" @click="goToHome">首页</span>
+				<span class="separator">/</span>
+                <span class="breadcrumb-item" @click="$router.push('/announcement/1')">公告中心</span>
 				<span class="separator">/</span>
 				<span class="breadcrumb-item" @click="goToCategory(notice.announcementClassification)">{{
 					getCategoryTitle(notice.announcementClassification) }}</span>
@@ -12,24 +14,27 @@
 			</div>
 
 			<div class="detail-container">
-				<!-- 左侧导航栏 -->
-				<!-- <div class="sidebar">
-					<div v-for="(item, index) in sidebarItems" :key="index" class="sidebar-item"
-						:class="{ active: notice.categoryId === item.id }" @click="goToCategory(item.id)">
-						<span class="icon" v-html="item.icon"></span>
-						<span class="text">{{ item.title }}</span>
-					</div>
-				</div> -->
-
 				<!-- 中间内容区域 -->
-				<div class="content">
-					<div class="content-header">
-						<h2>{{ notice.title }}</h2>
-					</div>
-					<div class="content-meta">
-						<span class="date">{{ notice.createTime }}</span>
-					</div>
-					<div class="content-body" v-html="notice.content"></div>
+				<div class="content-wrapper">
+                    <div class="content">
+                        <div class="content-header">
+                            <h1 class="article-title">{{ notice.title }}</h1>
+                            <div class="content-meta">
+                                <span class="date">{{ notice.createTime }}</span>
+                            </div>
+                        </div>
+                        <div class="content-body" v-html="notice.content"></div>
+                        
+                        <div class="content-footer">
+                            <div class="back-btn" @click="$router.go(-1)">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                                    <polyline points="12 19 5 12 12 5"></polyline>
+                                </svg>
+                                <span>返回列表</span>
+                            </div>
+                        </div>
+                    </div>
 				</div>
 			</div>
 		</div>
@@ -128,220 +133,211 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-/* 强制深色主题 */
 .dark-skin {
-  background-color: #000;
-  color: #fff;
-  min-height: 100vh;
-}
-
-.notice-detail {
+	background-color: #000;
+	color: #fff;
 	min-height: 100vh;
+    padding-bottom: 60px;
 }
 
 .box {
-	max-width: 1200px;
+	max-width: 1000px;
 	margin: 0 auto;
+    padding: 0 24px;
 }
 
-::v-deep(.content-body) {
-	font-size: 16px;
-	line-height: 1.6;
-	color: #fff;
-}
-
-::v-deep(.content-body p) {
-	margin-bottom: 15px;
-	color: #ccc;
-}
-
-::v-deep(.content-body ul),
-::v-deep(.content-body ol) {
-	margin-bottom: 16px;
-	padding-left: 20px;
-	color: #ccc;
-}
-
-::v-deep(.content-body ul li),
-::v-deep(.content-body ol li) {
-	margin-left: 20px;
-	margin-bottom: 8px;
-}
-
-::v-deep(.content-body table) {
-	width: 100%;
-	border-collapse: collapse;
-	margin: 20px 0;
-	color: #fff;
-}
-
-::v-deep(.content-body td) {
-	border: 1px solid #333;
-	padding: 10px;
-}
-
-::v-deep(.content-body tr:nth-child(odd)) {
-	background-color: #1a1a1a;
-}
-
+/* 面包屑导航 */
 .breadcrumb {
+	padding: 32px 0;
 	display: flex;
 	align-items: center;
-	margin-bottom: 20px;
-	padding: 20px 0;
+	font-size: 14px;
+	color: #888;
 
 	.breadcrumb-item {
-		font-size: 14px;
-		color: #888;
 		cursor: pointer;
+		transition: color 0.3s ease;
 
 		&:hover {
 			color: #d4ff00;
 		}
+	}
 
-		&.current {
-			cursor: default;
-			color: #fff;
-
-			&:hover {
-				color: #fff;
-			}
-		}
+	.current {
+		color: #fff;
+		font-weight: 500;
 	}
 
 	.separator {
-		margin: 0 8px;
-		color: #888;
+		margin: 0 12px;
+		color: #444;
 	}
 }
 
 .detail-container {
 	display: flex;
-	gap: 20px;
+	justify-content: center;
 }
 
-.sidebar {
-	width: 220px;
-	border-radius: 8px;
-	padding: 10px 0;
-	border: 1px solid #1a1a1a;
-	background-color: #0c0c0c;
+.content-wrapper {
+    width: 100%;
+    background: #0c0c0c;
+    border: 1px solid #1a1a1a;
+    border-radius: 16px;
+    padding: 60px;
+    margin-bottom: 40px;
+}
 
-	.back-btn {
-		padding: 10px 20px;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
+.content-header {
+	margin-bottom: 40px;
+	border-bottom: 1px solid #1a1a1a;
+	padding-bottom: 30px;
+
+	.article-title {
+		font-size: 32px;
+		font-weight: 600;
 		color: #fff;
-
-		&:hover {
-			color: #d4ff00;
-		}
-
-		.icon {
-			font-size: 20px;
-			margin-right: 10px;
-		}
+		line-height: 1.4;
+		margin: 0 0 20px 0;
 	}
+}
 
-	.sidebar-item {
-		padding: 12px 20px;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
+.content-meta {
+	display: flex;
+	align-items: center;
+	
+	.date {
+		font-size: 14px;
 		color: #888;
+        display: flex;
+        align-items: center;
+        gap: 8px;
 
-		&:hover {
-			background-color: #1a1a1a;
-			color: #fff;
+        &::before {
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="%23888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 6V12L16 14" stroke="%23888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+            background-size: cover;
+        }
+	}
+}
+
+.content-body {
+	font-size: 16px;
+	line-height: 1.8;
+	color: #e0e0e0;
+    min-height: 300px;
+
+	::v-deep {
+		p {
+			margin-bottom: 1.5em;
 		}
 
-		&.active {
-			background-color: #333;
+		h1, h2, h3, h4, h5, h6 {
+			color: #fff;
+			margin-top: 2em;
+			margin-bottom: 1em;
+			font-weight: 600;
+		}
+
+		a {
 			color: #d4ff00;
-			border-left: 3px solid #d4ff00;
-		}
-
-		.icon {
-			margin-right: 10px;
-			display: flex;
-			align-items: center;
-		}
-	}
-}
-
-.content {
-	flex: 1;
-	border-radius: 8px;
-	padding: 20px;
-	height: 700px;
-	overflow-y: auto;
-	border: 1px solid #1a1a1a;
-	background-color: #0c0c0c;
-
-	.content-header {
-		margin-bottom: 15px;
-
-		h2 {
-			font-size: 22px;
-			font-weight: 500;
-			color: #fff;
-		}
-	}
-
-	.content-meta {
-		margin-bottom: 20px;
-		padding-bottom: 15px;
-		border-bottom: 1px solid #1a1a1a;
-
-		.date {
-			font-size: 14px;
-			color: #888;
-		}
-	}
-
-	.content-body {}
-}
-
-.latest-news {
-	width: 280px;
-	background-color: #1E2329;
-	border-radius: 8px;
-	padding: 20px;
-
-	.latest-header {
-		padding-bottom: 15px;
-		border-bottom: 1px solid #2C3138;
-		margin-bottom: 20px;
-
-		h3 {
-			font-size: 16px;
-			font-weight: 500;
-		}
-	}
-
-	.latest-list {
-		.latest-item {
-			padding: 12px 0;
-			border-bottom: 1px solid #2C3138;
-			cursor: pointer;
-
+			text-decoration: none;
+			
 			&:hover {
-				.latest-title {
-					color: #F0B90B;
-				}
-			}
-
-			.latest-title {
-				font-size: 14px;
-				margin-bottom: 6px;
-				line-height: 1.4;
-			}
-
-			.latest-date {
-				font-size: 12px;
+				text-decoration: underline;
 			}
 		}
+
+		img {
+			max-width: 100%;
+			height: auto;
+			border-radius: 8px;
+			margin: 1.5em 0;
+		}
+
+		ul, ol {
+			margin-bottom: 1.5em;
+			padding-left: 2em;
+			
+			li {
+				margin-bottom: 0.5em;
+			}
+		}
+        
+        strong, b {
+            color: #fff;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2em 0;
+            color: #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            border-style: hidden;
+            box-shadow: 0 0 0 1px #1a1a1a;
+            
+            th, td {
+                padding: 12px 16px;
+                border: 1px solid #1a1a1a;
+                text-align: left;
+            }
+            
+            th {
+                background-color: #111113;
+                font-weight: 600;
+                color: #fff;
+            }
+            
+            tr:nth-child(even) {
+                background-color: rgba(255, 255, 255, 0.02);
+            }
+        }
 	}
+}
+
+.content-footer {
+    margin-top: 60px;
+    padding-top: 30px;
+    border-top: 1px solid #1a1a1a;
+    display: flex;
+    justify-content: flex-start;
+    
+    .back-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #888;
+        cursor: pointer;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        padding: 10px 20px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.03);
+        
+        &:hover {
+            color: #000;
+            background: #d4ff00;
+            transform: translateX(-4px);
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .content-wrapper {
+        padding: 30px 20px;
+    }
+    
+	.content-header .article-title {
+		font-size: 24px;
+	}
+    
+    .box {
+        padding: 0 16px;
+    }
 }
 </style>

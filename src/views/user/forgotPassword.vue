@@ -1,81 +1,82 @@
 <template>
-    <div class="container flex_between" style="padding: 70px 0;">
-        <div class="flex_between" style="gap: 48px; margin: 0 auto;">
+    <div class="forgot-page">
+        <div class="forgot-layout">
             <div class="left-section">
                 <div class="animation-area">
                     <div class="welcome-text">
-                        <p>找回您的账户密码</p>
-                        <p>安全验证，快速重置</p>
-                        <div style="font-size: 16px; color:rgba(142, 142, 146);margin-bottom: 25px;">安全、流畅、简单！</div>
+                        <h2>邀请朋友进行交易，您和您的朋友</h2>
+                        <h2>共享20%佣金</h2>
+                        <p>安全、流畅、简单</p>
                     </div>
                     <div class="animation-graphic">
-                        <img src="../../assets/svg/login_logo.svg" alt="">
+                        <img class="poster-image" src="../../assets/images/login-poster.png" alt="">
+                        <img class="aperture-image" src="../../assets/images/aperture.png" alt="">
                     </div>
                 </div>
             </div>
 
-            <div class="right-section">
-                <div class="login-form-container">
-                    <h1 style="text-align: start; font-size: 32px; font-weight: 700;">重置密码</h1>
-
-                    <!-- 统一重置表单 -->
-                    <div class="register-form">
-                        <div class="register-input-group">
-                            <label class="register-label">手机号/邮箱</label>
-                            <input type="text" v-model="resetForm.account" placeholder="请输入手机号或邮箱" class="form-input"
-                                :class="{ 'error': accountError }" />
-                            <div v-if="accountError" class="error-message">{{ accountError }}</div>
+            <div class="auth-panel">
+                <div class="right-section">
+                    <div class="login-form-container">
+                        <div class="panel-header">
+                            <h1 class="panel-title">重置密码</h1>
+                            <button class="switch-btn" @click="$router.push('/login')">返回登录</button>
                         </div>
 
-                        <div class="register-input-group">
-                            <label class="register-label">验证码</label>
-                            <div class="verification-wrapper">
-                                <input type="text" v-model="resetForm.verificationCode" placeholder="请输入验证码"
-                                    class="form-input" :class="{ 'error': verificationCodeError }" />
-                                <button class="verification-btn" @click="sendVerificationCode"
-                                    :disabled="countdown > 0">
-                                    {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
-                                </button>
+                        <div class="register-form">
+                            <div class="register-input-group">
+                                <input type="text" v-model="resetForm.account" placeholder="请输入手机号或邮箱" class="form-input"
+                                    :class="{ 'error': accountError }" />
+                                <div v-if="accountError" class="error-message">{{ accountError }}</div>
                             </div>
-                            <div v-if="verificationCodeError" class="error-message">{{ verificationCodeError }}</div>
-                        </div>
 
-                        <div class="register-input-group">
-                            <label class="register-label">新密码</label>
-                            <div class="register-password-wrapper">
-                                <input :type="showNewPassword ? 'text' : 'password'" v-model="resetForm.newPassword"
-                                    placeholder="请输入新密码" class="form-input" :class="{ 'error': newPasswordError }" />
-                                <button type="button" class="register-password-toggle"
-                                    @click="showNewPassword = !showNewPassword">
-                                    <img v-if="showNewPassword" src="../../assets/svg/eye_closed.svg" alt="">
-                                    <img v-else src="../../assets/svg/eye_open.svg" alt="">
-                                </button>
+                            <div class="register-input-group">
+                                <div class="verification-wrapper">
+                                    <input type="text" v-model="resetForm.verificationCode" placeholder="请输入验证码"
+                                        class="form-input" :class="{ 'error': verificationCodeError }" />
+                                    <button class="verification-btn" @click="sendVerificationCode"
+                                        :disabled="countdown > 0">
+                                        {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
+                                    </button>
+                                </div>
+                                <div v-if="verificationCodeError" class="error-message">{{ verificationCodeError }}</div>
                             </div>
-                            <div v-if="newPasswordError" class="error-message">{{ newPasswordError }}</div>
-                        </div>
 
-                        <div class="register-input-group">
-                            <label class="register-label">确认密码</label>
-                            <div class="register-password-wrapper">
-                                <input :type="showConfirmPassword ? 'text' : 'password'"
-                                    v-model="resetForm.confirmPassword" placeholder="请再次输入新密码" class="form-input"
-                                    :class="{ 'error': confirmPasswordError }" />
-                                <button type="button" class="register-password-toggle"
-                                    @click="showConfirmPassword = !showConfirmPassword">
-                                    <img v-if="showConfirmPassword" src="../../assets/svg/eye_closed.svg" alt="">
-                                    <img v-else src="../../assets/svg/eye_open.svg" alt="">
-                                </button>
+                            <div class="register-input-group">
+                                <div class="register-password-wrapper">
+                                    <input :type="showNewPassword ? 'text' : 'password'" v-model="resetForm.newPassword"
+                                        placeholder="请输入新密码" class="form-input" :class="{ 'error': newPasswordError }" />
+                                    <button type="button" class="register-password-toggle"
+                                        @click="showNewPassword = !showNewPassword">
+                                        <img v-if="showNewPassword" src="../../assets/svg/eye_closed.svg" alt="">
+                                        <img v-else src="../../assets/svg/eye_open.svg" alt="">
+                                    </button>
+                                </div>
+                                <div v-if="newPasswordError" class="error-message">{{ newPasswordError }}</div>
                             </div>
-                            <div v-if="confirmPasswordError" class="error-message">{{ confirmPasswordError }}</div>
-                        </div>
 
-                        <button class="register-submit-btn" @click="handleReset">
-                            重置密码
-                        </button>
+                            <div class="register-input-group">
+                                <div class="register-password-wrapper">
+                                    <input :type="showConfirmPassword ? 'text' : 'password'"
+                                        v-model="resetForm.confirmPassword" placeholder="请再次输入新密码" class="form-input"
+                                        :class="{ 'error': confirmPasswordError }" />
+                                    <button type="button" class="register-password-toggle"
+                                        @click="showConfirmPassword = !showConfirmPassword">
+                                        <img v-if="showConfirmPassword" src="../../assets/svg/eye_closed.svg" alt="">
+                                        <img v-else src="../../assets/svg/eye_open.svg" alt="">
+                                    </button>
+                                </div>
+                                <div v-if="confirmPasswordError" class="error-message">{{ confirmPasswordError }}</div>
+                            </div>
 
-                        <div class="login-redirect">
-                            <span class="login-text">想起密码了？</span>
-                            <a href="#" class="login-link" @click="$router.push('/login')">返回登录</a>
+                            <button class="register-submit-btn" @click="handleReset">
+                                重置密码
+                            </button>
+
+                            <div class="login-redirect">
+                                <span class="login-text">想起密码了？</span>
+                                <a href="#" class="login-link" @click.prevent="$router.push('/login')">返回登录</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -335,10 +336,10 @@ export default {
                     });
             } else {
                 let params = {};
-                params["account"] = this.formInline.account;
-                params["code"] = this.formInline.verificationCode;
+                params["account"] = this.resetForm.account;
+                params["code"] = this.resetForm.verificationCode;
                 params["mode"] = 0;
-                params["password"] = this.formInline.newPassword;
+                params["password"] = this.resetForm.newPassword;
                 this.$http
                     .post(this.host + "/reset/login/password", params)
                     .then(response => {
@@ -392,118 +393,150 @@ export default {
 </script>
 
 <style scoped>
-.login-container {
-    display: flex;
+.forgot-page {
     min-height: 100vh;
+    background: #000;
+    padding: 80px 32px 40px;
+    box-sizing: border-box;
+}
+
+.forgot-layout {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 72px;
 }
 
 .left-section {
-    border-radius: 20px;
-    background-image: url('../../assets/svg/bg_line.svg');
-    background-position: center bottom;
-    background-repeat: no-repeat;
-    background-size: 100%;
-    opacity: 1;
-    border: 1px solid #eaeaed;
+    flex: 1;
+    min-width: 0;
 }
 
 .animation-area {
-    width: 436px;
-    height: 548px;
-    padding: 32px;
-    padding-top: 58px;
+    max-width: 520px;
+    padding: 20px 10px 20px 0;
+}
+
+.welcome-text h2 {
     text-align: center;
-}
-
-.welcome-text h1 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-    background: linear-gradient(45deg, #fff, #f0f8ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.welcome-text p {
-    margin: 8px 0;
-    opacity: 0.9;
-    color: #000;
-    font-size: 24px;
+    margin: 0;
+    color: #fff;
+    font-size: 32px;
+    line-height: 1.16;
     font-weight: 700;
 }
 
-.right-section {
-    width: 450px;
-    background: white;
+.welcome-text p {
+    margin: 18px 0 0;
+    text-align: center;
+    font-size: 18px;
+    color: #8e8e92;
+}
+
+.animation-graphic {
     display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 42px;
+    position: relative;
+}
+
+.poster-image {
+    width: 250px;
+    position: relative;
+    z-index: 2;
+    animation: loginPosterFloat 3.6s ease-in-out infinite;
+}
+
+.aperture-image {
+    width: 220px;
+    margin-top: 12px;
+    transform-origin: center center;
+    animation: loginAperturePulse 3.6s ease-in-out infinite;
+}
+
+.auth-panel {
+    width: 100%;
+    max-width: 460px;
+    flex-shrink: 0;
+}
+
+.right-section {
+    width: 100%;
 }
 
 .login-form-container {
     width: 100%;
 }
 
-.register-tabs {
-    margin-top: 20px;
+.panel-header {
     display: flex;
-    margin-bottom: 30px;
-    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
 }
 
-.register-tab-btn {
-    flex: 1;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
+.panel-title {
+    margin: 0;
+    color: #fff;
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.switch-btn {
+    height: 38px;
+    padding: 0 18px;
+    border-radius: 999px;
+    border: 1px solid #2d2d2d;
+    background: #151515;
+    color: #fff;
     font-size: 14px;
-    font-weight: 500;
     cursor: pointer;
-    background-color: #f5f5f5;
-    color: #666;
-    transition: all 0.3s ease;
-}
-
-.register-tab-btn.active {
-    background-color: #D0f500;
-    color: #000;
 }
 
 .register-form {
-    margin-top: 20px;
+    margin-top: 0;
 }
 
 .register-input-group {
-    margin-bottom: 20px;
-}
-
-.register-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: #333;
+    margin-bottom: 18px;
 }
 
 .form-input {
     width: 100%;
-    padding: 12px 16px;
-    border: 1px solid #ddd;
-    border-radius: 99999px;
-    font-size: 14px;
-    transition: border-color 0.3s ease;
+    height: 54px;
+    padding: 0 18px;
+    border: 1px solid #1f1f1f;
+    border-radius: 12px;
+    font-size: 15px;
+    color: #fff;
+    background: #050505;
     box-sizing: border-box;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.form-input::placeholder {
+    color: #555;
 }
 
 .form-input:focus {
     outline: none;
-    border-color: #D0f500;
+    border-color: #2f2f2f;
+    background: #090909;
 }
 
 .form-input.error {
-    border-color: #ff4757;
+    border-color: #ff4d4f;
 }
 
 .verification-wrapper {
     display: flex;
     gap: 10px;
+    align-items: center;
 }
 
 .verification-wrapper .form-input {
@@ -511,23 +544,19 @@ export default {
 }
 
 .verification-btn {
-    padding: 12px 16px;
-    background-color: #f5f5f5;
-    border: none;
-    border-radius: 8px;
+    height: 54px;
+    padding: 0 16px;
+    border-radius: 12px;
+    border: 1px solid #242424;
+    background: #111;
+    color: #fff;
     font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
     white-space: nowrap;
-    transition: background-color 0.3s ease;
-}
-
-.verification-btn:hover {
-    background-color: #b8dd00;
+    cursor: pointer;
 }
 
 .verification-btn:disabled {
-    background-color: #ccc;
+    opacity: 0.5;
     cursor: not-allowed;
 }
 
@@ -537,93 +566,136 @@ export default {
 
 .register-password-toggle {
     position: absolute;
-    right: 12px;
+    right: 16px;
     top: 50%;
     transform: translateY(-50%);
     background: none;
     border: none;
     cursor: pointer;
-    padding: 4px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .register-password-toggle img {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
+    opacity: 0.7;
 }
 
 .error-message {
-    color: #ff4757;
+    color: #ff4d4f;
     font-size: 12px;
-    margin-top: 5px;
+    margin-top: 6px;
+    margin-left: 2px;
 }
 
 .register-submit-btn {
     width: 100%;
-    padding: 7px;
-    background-color: #000;
+    height: 54px;
+    margin-top: 28px;
     border: none;
-    border-radius: 99999px;
-    font-size: 14px;
+    border-radius: 12px;
+    background: #f2f2f2;
+    color: #111;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
-    color: #fff;
-    margin-top: 20px;
-    transition: background-color 0.3s ease;
+    transition: opacity 0.2s ease;
+}
+
+.register-submit-btn:hover {
+    opacity: 0.92;
 }
 
 .login-redirect {
+    margin-top: 18px;
     text-align: center;
-    margin-top: 20px;
 }
 
 .login-text {
-    color: #666;
+    color: #8e8e92;
     font-size: 14px;
+    margin-right: 6px;
 }
 
 .login-link {
-    color: #D0f500;
+    color: #d4ff00;
     text-decoration: none;
     font-weight: 500;
-    margin-left: 5px;
+    font-size: 14px;
 }
 
-.login-link:hover {
-    text-decoration: underline;
-}
-
-/* 动画效果 */
-@keyframes float {
-
-    0%,
-    100% {
-        transform: translateY(0px);
+@keyframes loginPosterFloat {
+    0% {
+        transform: translateY(0);
     }
 
     50% {
-        transform: translateY(-10px);
+        transform: translateY(-18px);
+    }
+
+    100% {
+        transform: translateY(0);
     }
 }
 
-@keyframes pulse {
+@keyframes loginAperturePulse {
+    0% {
+        transform: scaleX(0.92);
+        opacity: 0.72;
+    }
 
-    0%,
-    100% {
+    50% {
+        transform: scaleX(1.1);
         opacity: 1;
     }
 
-    50% {
-        opacity: 0.5;
+    100% {
+        transform: scaleX(0.92);
+        opacity: 0.72;
     }
 }
 
-@keyframes rotate {
-    from {
-        transform: translate(-50%, -50%) rotate(0deg);
+@media (max-width: 1100px) {
+    .forgot-layout {
+        gap: 36px;
+    }
+}
+
+@media (max-width: 900px) {
+    .forgot-page {
+        padding: 40px 20px;
     }
 
-    to {
-        transform: translate(-50%, -50%) rotate(360deg);
+    .forgot-layout {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .left-section {
+        display: none;
+    }
+
+    .auth-panel {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 520px) {
+    .panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .panel-title {
+        font-size: 30px;
+    }
+
+    .verification-wrapper {
+        flex-direction: column;
+        align-items: stretch;
     }
 }
 </style>
