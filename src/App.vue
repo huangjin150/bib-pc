@@ -164,8 +164,7 @@ textarea {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #f7f7f7;
-  border-radius: 25px;
+  background: #333;
 }
 
 

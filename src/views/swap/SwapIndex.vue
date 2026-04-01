@@ -2875,6 +2875,34 @@ $popper-background-color: #192330;
 //   margin-left: 20px;
 // }
 
+/* 滚动条样式优化 */
+::v-deep(.ivu-table-overflowX::-webkit-scrollbar),
+::v-deep(.ivu-table-overflowY::-webkit-scrollbar),
+::v-deep(.ivu-table-body::-webkit-scrollbar) {
+  width: 6px;
+  height: 6px;
+}
+
+::v-deep(.ivu-table-overflowX::-webkit-scrollbar-thumb),
+::v-deep(.ivu-table-overflowY::-webkit-scrollbar-thumb),
+::v-deep(.ivu-table-body::-webkit-scrollbar-thumb) {
+  background: #333;
+  border-radius: 4px;
+}
+
+::v-deep(.ivu-table-overflowX::-webkit-scrollbar-thumb:hover),
+::v-deep(.ivu-table-overflowY::-webkit-scrollbar-thumb:hover),
+::v-deep(.ivu-table-body::-webkit-scrollbar-thumb:hover) {
+  background: #555;
+}
+
+::v-deep(.ivu-table-overflowX::-webkit-scrollbar-track),
+::v-deep(.ivu-table-overflowY::-webkit-scrollbar-track),
+::v-deep(.ivu-table-body::-webkit-scrollbar-track) {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
 /* 强制黑色背景布局覆盖 */
 .dark-skin {
   background-color: #000 !important;
