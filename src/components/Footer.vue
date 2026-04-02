@@ -152,7 +152,7 @@
       <!-- 底部版权和语言选择 -->
       <!-- <div class="footer-bottom">
         <div class="footer-bottom-left">
-          <p class="copyright">© 2025 Abtcoin</p>
+          <p class="copyright">© 2025 Bibcoin</p>
           <p class="terms">隐私条款</p>
           <p class="terms">条款协议</p>
         </div>

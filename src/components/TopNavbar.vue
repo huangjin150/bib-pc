@@ -145,7 +145,7 @@ export default {
       navItems: [
         { name: '行情', path: '/market' },
         { name: '合约', path: '/swap' },
-        { name: '事件合约', path: '/eventContract' },
+        // { name: '事件合约', path: '/eventContract' },
         { name: '公告中心', path: '/announcement/0' },
         { name: '平台介绍', path: '/introduce' },
       ]

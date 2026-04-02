@@ -69,7 +69,7 @@ export default {
     },
     computed: {
         currentCategory() {
-            return this.sidebarItems.find(item => item.id === this.activeCategory) || { title: 'Abtcoin最新动态' };
+            return this.sidebarItems.find(item => item.id === this.activeCategory) || { title: 'Bibcoin最新动态' };
         }
     },
     created() {
@@ -88,7 +88,7 @@ export default {
     methods: {
         getCategoryTitle() {
             const category = this.sidebarItems.find(item => item.id == this.currentCategoryId);
-            return category ? category.title : 'Abtcoin最新动态';
+            return category ? category.title : 'Bibcoin最新动态';
         },
         goToCategory(id) {
             this.currentCategoryId = id;

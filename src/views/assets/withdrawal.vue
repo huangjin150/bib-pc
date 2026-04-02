@@ -165,7 +165,7 @@
                             <i class="arrow-right"></i>
                         </div>
                         <div class="question-item">
-                            <span>关于Abtcoin提币费用说明</span>
+                            <span>关于Bibcoin提币费用说明</span>
                             <i class="arrow-right"></i>
                         </div>
                         <div class="question-item">

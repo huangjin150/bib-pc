@@ -25,9 +25,9 @@ export default {
     items: {
       type: Array,
       default: () => ([
-        { title: '100% 储备金', desc: 'Abtcoin 坚持以默克尔树与 zk-SNARK 技术构建透明验证机制，利用零知识证明高效守护用户资产，让公众随时核查平台 100% 储备金并保护隐私，真正实现安全与信任的结合。', icon: require('@/assets/images/illustration-proof.png'), },
-        { title: 'Abtcoin SAFU', desc: 'Abtcoin SAFU 用户安全资产基金，为用户资产安全提供了第二重保障，最大限度保障用户资产安全。Abtcoin SAFU 基金以平台交易费收入为基础，由各种稳定币和其他数字资产组成，可在极端情况下无压力兑付用户资产。', icon: require('@/assets/images/illustration-safu.png'), },
-        { title: '多重安全保障', desc: '作为全球最安全的交易所之一，Abtcoin 提供十余种安全措施，覆盖登录、交易、提现等环节，全方位守护用户资产。通过采用中心化与去中心化结合的资金存储方案，在保障资产安全的同时，确保交易高效便捷。', icon: require('@/assets/images/illustration-safe.png'), }
+        { title: '100% 储备金', desc: 'Bibcoin 坚持以默克尔树与 zk-SNARK 技术构建透明验证机制，利用零知识证明高效守护用户资产，让公众随时核查平台 100% 储备金并保护隐私，真正实现安全与信任的结合。', icon: require('@/assets/images/illustration-proof.png'), },
+        { title: 'Bibcoin SAFU', desc: 'Bibcoin SAFU 用户安全资产基金，为用户资产安全提供了第二重保障，最大限度保障用户资产安全。Bibcoin SAFU 基金以平台交易费收入为基础，由各种稳定币和其他数字资产组成，可在极端情况下无压力兑付用户资产。', icon: require('@/assets/images/illustration-safu.png'), },
+        { title: '多重安全保障', desc: '作为全球最安全的交易所之一，Bibcoin 提供十余种安全措施，覆盖登录、交易、提现等环节，全方位守护用户资产。通过采用中心化与去中心化结合的资金存储方案，在保障资产安全的同时，确保交易高效便捷。', icon: require('@/assets/images/illustration-safe.png'), }
       ])
     }
   },

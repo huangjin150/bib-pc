@@ -44,19 +44,19 @@ export default {
                 {
                     id: 1,
                     title: '产品优势',
-                    description: 'Abtcoin使用尖端技术和多样化的产品来满足您的需求',
+                    description: 'Bibcoin使用尖端技术和多样化的产品来满足您的需求',
                     url: require('@/assets/svg/swiper_tip1.svg')
                 },
                 {
                     id: 2,
                     title: '合约',
-                    description: 'Abtcoin提供以 USDT 计价的线性永续合约',
+                    description: 'Bibcoin提供以 USDT 计价的线性永续合约',
                     url: require('@/assets/svg/swiper_tip2.svg')
                 },
                 {
                     id: 3,
                     title: '现货',
-                    description: 'Abtcoin提供多种订单类型的现货交易',
+                    description: 'Bibcoin提供多种订单类型的现货交易',
                     url: require('@/assets/svg/swiper_tip3.svg')
                 },
                 {
