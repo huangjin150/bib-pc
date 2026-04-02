@@ -89,7 +89,7 @@ export default {
 .ecosystem__title {
   font-size: 32px;
   font-weight: 800;
-  color: #000;
+  color: #fff;
 }
 
 .ecosystem__nav {
@@ -101,20 +101,20 @@ export default {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 1px solid #e5e7eb;
-  background: #fff;
+  border: 1px solid #333;
+  background: #1a1a1a;
   cursor: pointer;
   position: relative;
   transition: all .2s ease;
 }
 
 .eco-btn:hover {
-  background: #111827;
-  border-color: #111827;
+  background: #d4ff00;
+  border-color: #d4ff00;
 }
 
 .eco-btn.disabled {
-  opacity: 0.5;
+  opacity: 0.3;
   cursor: not-allowed;
 }
 
@@ -125,14 +125,14 @@ export default {
   top: 50%;
   width: 8px;
   height: 8px;
-  border-top: 2px solid #111827;
-  border-right: 2px solid #111827;
+  border-top: 2px solid #fff;
+  border-right: 2px solid #fff;
   transform: translate(-50%, -50%) rotate(45deg);
   transition: border-color .2s ease;
 }
 
 .eco-btn:hover::after {
-  border-color: #fff;
+  border-color: #000;
 }
 
 .eco-btn--prev::after {
@@ -147,32 +147,42 @@ export default {
 }
 
 .eco-card {
-  background: #fff;
+  background: #0c0c0c;
   border-radius: 16px;
-  border: 1px solid #eef2f7;
+  border: 1px solid #1a1a1a;
   padding: 24px;
   column-gap: 16px;
   min-height: 160px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    border-color: rgba(212, 255, 0, 0.2);
+    transform: translateY(-2px);
+  }
+}
+
+.eco-card__icon {
+  margin-bottom: 16px;
 }
 
 .eco-card__icon img {
   width: 48px;
-  width: 48px;
+  height: 48px;
   object-fit: contain;
 }
 
 .icon-placeholder {
-  width: 60px;
-  height: 60px;
+  width: 48px;
+  height: 48px;
   border-radius: 12px;
-  background: #f1f5f9;
-  border: 1px dashed #cbd5e1;
+  background: #1a1a1a;
+  border: 1px dashed #333;
 }
 
 .eco-card__title {
   font-size: 20px;
   font-weight: 700;
-  color: #0f172a;
+  color: #fff;
 }
 
 .eco-card__desc {

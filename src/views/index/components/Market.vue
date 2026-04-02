@@ -4,11 +4,19 @@
         <div class="market-panels" v-if="isMarketPage">
             <div class="panel-box full-width">
                 <div class="panel-header">
-                    <div class="panel-title" :class="{ active: activeTab === 'contract' }" @click="activeTab = 'contract'">热门合约榜</div>
-                    <div class="panel-title" :class="{ active: activeTab === 'gainers' }" @click="activeTab = 'gainers'">涨幅榜</div>
-                    <div class="panel-title" :class="{ active: activeTab === 'losers' }" @click="activeTab = 'losers'">跌幅榜</div>
-                    <div class="panel-title" :class="{ active: activeTab === 'volume' }" @click="activeTab = 'volume'">成交额</div>
+                    <div class="panel-title" v-for="(cat, index) in categories" :key="index"
+                        :class="{ active: activeTab === cat }" @click="activeTab = cat">{{ cat }}</div>
                 </div>
+
+                <div class="sort-options">
+                    <div class="sort-item" :class="{ active: activeSort === 'gainers' }"
+                        @click="activeSort = 'gainers'">涨幅榜</div>
+                    <div class="sort-item" :class="{ active: activeSort === 'losers' }" @click="activeSort = 'losers'">
+                        跌幅榜</div>
+                    <div class="sort-item" :class="{ active: activeSort === 'volume' }" @click="activeSort = 'volume'">
+                        成交额</div>
+                </div>
+
                 <div class="panel-content">
                     <Table style="border: none;" :columns="contractColumns" :data="tableData" class="dark-tables"
                         :disabled-hover="false" :loading="loading" :no-data-text="$t('common.nodata')">
@@ -17,30 +25,31 @@
             </div>
         </div>
 
-        <!-- 默认首页模式，展示双面板 -->
+        <!-- 默认首页模式，展示单面板 -->
         <div class="market-panels" v-else>
-            <div class="panel-box">
-                <div class="panel-header">
-                    <div class="panel-title active">热门合约榜</div>
+            <div class="panel-box full-width">
+                <div class="panel-header home-panel-header">
+                    <div class="header-left">
+                        <div class="panel-title" v-for="(cat, index) in categories" :key="index"
+                            :class="{ active: activeTab === cat }" @click="activeTab = cat">{{ cat }}</div>
+                    </div>
+                    <div class="header-right">
+                        <div class="sort-options home-sort">
+                            <div class="sort-item" :class="{ active: activeSort === 'gainers' }"
+                                @click="activeSort = 'gainers'">涨幅榜</div>
+                            <div class="sort-item" :class="{ active: activeSort === 'losers' }"
+                                @click="activeSort = 'losers'">跌幅榜</div>
+                            <div class="sort-item" :class="{ active: activeSort === 'volume' }"
+                                @click="activeSort = 'volume'">成交额</div>
+                        </div>
+                        <div class="more-link-top" @click="$router.push('/market')">
+                            查看更多 <span style="font-size: 16px; margin-left: 2px;">→</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="panel-content">
-                    <Table style="border: none;" :columns="contractColumns" :data="homeContractData" class="dark-tables"
-                        :disabled-hover="false" :loading="loading" :no-data-text="$t('common.nodata')">
-                    </Table>
-                </div>
-                <div class="more-link" @click="$router.push('/market')">
-                    更多 <span style="font-size: 18px; margin-left: 4px;">→</span>
-                </div>
-            </div>
 
-            <div class="panel-box">
-                <div class="panel-header">
-                    <div class="panel-title" :class="{ active: activeHomeTab === 'gainers' }" @click="activeHomeTab = 'gainers'">涨幅榜</div>
-                    <div class="panel-title" :class="{ active: activeHomeTab === 'losers' }" @click="activeHomeTab = 'losers'">跌幅榜</div>
-                    <div class="panel-title" :class="{ active: activeHomeTab === 'volume' }" @click="activeHomeTab = 'volume'">成交额</div>
-                </div>
                 <div class="panel-content">
-                    <Table style="border: none;" :columns="spotColumns" :data="homeSpotData" class="dark-tables"
+                    <Table style="border: none;" :columns="spotColumns" :data="tableData" class="dark-tables"
                         :disabled-hover="false" :loading="loading" :no-data-text="$t('common.nodata')">
                     </Table>
                 </div>
@@ -65,9 +74,11 @@ export default {
         let self = this;
         return {
             loading: false,
-            activeTab: 'contract',
+            activeTab: '',
+            activeSort: 'gainers', // 默认涨幅榜
             activeHomeTab: 'gainers',
             allData: [],
+            categories: [],
             coins: {
                 _map: []
             },
@@ -198,30 +209,23 @@ export default {
     computed: {
         tableData() {
             let data = [...this.allData];
-            if (this.activeTab === 'contract') {
-                return data.slice(0, 10);
-            } else if (this.activeTab === 'gainers') {
+
+            // 1. 先按分类过滤
+            if (this.activeTab && this.categories.includes(this.activeTab)) {
+                data = data.filter(item => item.category === this.activeTab);
+            }
+
+            // 2. 再根据当前分类进行排序
+            if (this.activeSort === 'gainers') {
                 data.sort((a, b) => parseFloat(b.rose) - parseFloat(a.rose));
-            } else if (this.activeTab === 'losers') {
+            } else if (this.activeSort === 'losers') {
                 data.sort((a, b) => parseFloat(a.rose) - parseFloat(b.rose));
-            } else if (this.activeTab === 'volume') {
+            } else if (this.activeSort === 'volume') {
                 data.sort((a, b) => parseFloat(b.volume) - parseFloat(a.volume));
             }
-            return data.slice(0, 10);
-        },
-        homeContractData() {
-            return this.allData.slice(0, 6);
-        },
-        homeSpotData() {
-            let data = [...this.allData];
-            if (this.activeHomeTab === 'gainers') {
-                data.sort((a, b) => parseFloat(b.rose) - parseFloat(a.rose));
-            } else if (this.activeHomeTab === 'losers') {
-                data.sort((a, b) => parseFloat(a.rose) - parseFloat(b.rose));
-            } else if (this.activeHomeTab === 'volume') {
-                data.sort((a, b) => parseFloat(b.volume) - parseFloat(a.volume));
-            }
-            return data.slice(0, 6);
+
+            // 行情页展示更多数据，首页截取前8条
+            return this.isMarketPage ? data : data.slice(0, 8);
         }
     },
     methods: {
@@ -233,6 +237,7 @@ export default {
             this.$http.post(this.swapHost + this.api.market.thumbTrend, {}).then(response => {
                 var resp = response.body;
                 let processedData = [];
+                let categorySet = new Set();
                 for (var i = 0; i < resp.length; i++) {
                     var coin = resp[i];
                     coin.price = resp[i].close;
@@ -242,9 +247,19 @@ export default {
                     coin.href = (coin.coin + "_" + coin.base).toLowerCase();
                     this.coins._map[coin.symbol] = coin;
                     processedData.push(coin);
+
+                    if (coin.category) {
+                        categorySet.add(coin.category);
+                    }
                 }
 
                 this.allData = processedData;
+
+                // 获取前三个类别
+                this.categories = Array.from(categorySet).slice(0, 3);
+                if (this.categories.length > 0) {
+                    this.activeTab = this.categories[0];
+                }
 
                 this.startWebsock();
                 this.loading = false;
@@ -347,6 +362,11 @@ export default {
     cursor: pointer;
     font-weight: 600;
     position: relative;
+    transition: color 0.3s ease;
+
+    &:hover {
+        color: #fff;
+    }
 
     &.active {
         color: #fff;
@@ -355,11 +375,83 @@ export default {
             content: '';
             position: absolute;
             bottom: -1px;
-            left: 0;
-            width: 100%;
-            height: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 3px;
+            border-radius: 3px;
             background-color: #d4ff00;
         }
+    }
+}
+
+.sort-options {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+
+    .sort-item {
+        font-size: 13px;
+        color: #8e949e;
+        cursor: pointer;
+        padding: 6px 16px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.03);
+        transition: all 0.3s ease;
+
+        &:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        &.active {
+            color: #d4ff00;
+            background: rgba(212, 255, 0, 0.1);
+            font-weight: 600;
+        }
+    }
+}
+
+.home-panel-header {
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-right: 100px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #1a1a1a;
+    display: flex;
+    width: 100%;
+
+    .header-left {
+        display: flex;
+        gap: 40px;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        padding-bottom: 16px;
+    }
+
+    .home-sort {
+        margin-bottom: 0;
+        gap: 12px;
+    }
+}
+
+.more-link-top {
+    color: #8e949e;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding-left: 12px;
+    border-left: 1px solid #333;
+    transition: color 0.3s ease;
+
+    &:hover {
+        color: #d4ff00;
     }
 }
 

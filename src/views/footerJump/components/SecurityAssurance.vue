@@ -45,7 +45,7 @@ export default {
 
   .security-assurance-title {
     font-size: 32px;
-    color: #262933;
+    color: #fff;
     font-weight: 700;
   }
 }
@@ -78,35 +78,36 @@ export default {
 .sa-title {
   font-size: 28px;
   font-weight: 700;
-  color: #0f172a;
+  color: #fff;
   margin: 0 0 12px;
 }
 
 .sa-desc {
   font-size: 14px;
   line-height: 1.8;
-  color: #6b7280;
+  color: #8e949e;
   margin: 0 0 20px;
   max-width: 600px;
 }
 
 .sa-btn {
   padding: 10px 16px;
-  background: #2563eb;
+  background: #1a1a1a;
   color: #fff;
-  border: none;
+  border: 1px solid #333;
   border-radius: 9999px;
   font-size: 13px;
   line-height: 1;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  transition: all .2s ease;
 }
 
 .sa-btn:hover {
   transform: translateY(-1px);
-  background: #1d4ed8;
-  box-shadow: 0 6px 18px rgba(29, 78, 216, 0.28);
+  background: #d4ff00;
+  color: #000;
+  border-color: #d4ff00;
+  box-shadow: 0 4px 12px rgba(212, 255, 0, 0.2);
 }
 
 .sa-illustration {
@@ -124,9 +125,9 @@ export default {
 .sa-placeholder {
   width: 320px;
   height: 220px;
-  border: 1px dashed #cbd5e1;
+  border: 1px dashed #333;
   border-radius: 12px;
-  background: #f8fafc;
+  background: #1a1a1a;
 }
 
 @media (max-width: 992px) {

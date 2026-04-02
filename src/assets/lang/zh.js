@@ -17,7 +17,7 @@
         please: "请先",
         pleaseselect: "请选择",
         searchplaceholder: "输入币种名称搜索",
-        searchplaceholderswap: "输入合约名称搜索",
+        searchplaceholderswap: "输入名称搜索",
         loading: "加载中...",
         close: "关闭",
         ok: "确定"

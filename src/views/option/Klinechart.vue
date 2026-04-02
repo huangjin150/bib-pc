@@ -271,7 +271,7 @@ export default {
                     },
                     tickText: {
                         show: true,
-                        color: '#000',
+                        color: '#fff',
                         family: 'Helvetica Neue',
                         weight: 'normal',
                         size: 12,
@@ -301,7 +301,7 @@ export default {
                     },
                     tickText: {
                         show: true,
-                        color: '#000',
+                        color: '#fff',
                         family: 'Helvetica Neue',
                         weight: 'normal',
                         size: 12,

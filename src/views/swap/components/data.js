@@ -58,6 +58,8 @@ export default function getData(self) {
 		symbolFee: 0.001,
 		dataIndex: [],
 		searchKey: "",
+		categories: [],
+		activeCategory: "",
 		coinInfo: {
 
 		},
@@ -164,7 +166,7 @@ export default function getData(self) {
 									marginBottom: "6px",
 									lineHeight: "1.2"
 								}
-							}, params.row.coin + "/USDT " + self.$t("swap.swapindex")),
+							}, params.row.name),
 							h("div", {
 								style: {
 									color: "#61688A",

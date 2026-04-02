@@ -75,7 +75,7 @@ export default {
 .media__title {
   font-size: 32px;
   font-weight: 800;
-  color: #000;
+  color: #fff;
 }
 
 .media__nav {
@@ -88,16 +88,16 @@ export default {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 1px solid #e5e7eb;
-  background: #fff;
+  border: 1px solid #333;
+  background: #1a1a1a;
   cursor: pointer;
   position: relative;
   transition: all .2s ease;
 }
 
 .media-btn:hover {
-  background: #111827;
-  border-color: #111827;
+  background: #d4ff00;
+  border-color: #d4ff00;
 }
 
 .media-btn.disabled {
@@ -112,14 +112,14 @@ export default {
   top: 50%;
   width: 8px;
   height: 8px;
-  border-top: 2px solid #111827;
-  border-right: 2px solid #111827;
+  border-top: 2px solid #fff;
+  border-right: 2px solid #fff;
   transform: translate(-50%, -50%) rotate(45deg);
   transition: border-color .2s ease;
 }
 
 .media-btn:hover::after {
-  border-color: #fff;
+  border-color: #000;
 }
 
 .media-btn.media-btn--prev::after {
@@ -127,9 +127,9 @@ export default {
 }
 
 .media__card {
-  background: #f8f9fb;
+  background: #0c0c0c;
   height: 258px;
-  border: 1px solid #edeff2;
+  border: 1px solid #1a1a1a;
   border-radius: 12px;
   padding: 32px 24px;
   text-align: center;
@@ -140,7 +140,7 @@ export default {
 }
 
 .media__quote {
-  color: #262933;
+  color: #fff;
   font-size: 16px;
   line-height: 1.5;
   max-width: 812px;
@@ -162,7 +162,7 @@ export default {
 
 .brand-text {
   font-weight: 700;
-  color: #0f172a;
+  color: #fff;
 }
 
 .media__source {
@@ -182,12 +182,12 @@ export default {
   width: 6px;
   height: 6px;
   border-radius: 9999px;
-  background: #d1d5db;
+  background: #333;
   transition: all .2s ease;
 }
 
 .media__dots .dot.active {
-  background: #111827;
+  background: #d4ff00;
   transform: scale(1.2);
 }
 

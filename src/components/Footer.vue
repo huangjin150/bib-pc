@@ -6,7 +6,7 @@
         <!-- 左侧：Logo和社交媒体 -->
         <div class="footer-left">
           <div class="footer-logo">
-            <img width="100%" src="../assets/images/logo1.png" alt="Bibcoin" class="logo-img" />
+            <img width="100%" src="../assets/images/logo-338.png" alt="Bibcoin" class="logo-img" />
           </div>
           <p class="footer-description">解锁通往加密货币宇宙的大门
           </p>

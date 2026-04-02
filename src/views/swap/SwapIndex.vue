@@ -8,11 +8,10 @@
             <img style="width: 24px; height: 24px;" :src="currentCoin.logo" alt="">
           </div>
           <div>
-            <div class="coin">{{ currentCoin.symbol }}</div>
+            <div class="coin">{{ currentCoin.name }}</div>
             <div style="font-size: 12px; color: #8e8e92;">{{ $t("swap.swapindex") }}</div>
           </div>
         </div>
-        <!-- 悬浮框内容 -->
         <div v-if="showPopup" class="popup">
           <div class="">
             <div class="coin-menu">
@@ -20,11 +19,14 @@
                 <Input search :placeholder="$t('common.searchplaceholderswap')" @on-change="seachInputChange"
                   v-model="searchKey" />
               </div>
-              <div class="sc_filter" style="display: none;">
-                <span @click="changeBaseCion('usdt')" :class="{ active: basecion === 'usdt' }">USDT</span>
+              <div class="popup-categories">
+                <span v-for="(cat, index) in categories" :key="index" @click="changeCategory(cat)"
+                  :class="['category-item', { active: activeCategory === cat }]">
+                  {{ cat }}
+                </span>
               </div>
-              <Table height="463" @on-current-change="gohref" highlight-row id="USDT" v-show="basecion === 'usdt'"
-                :columns="coins.columns" :data="dataIndex"></Table>
+              <Table height="463" @on-current-change="gohref" highlight-row id="USDT" :columns="coins.columns"
+                :data="filteredDataIndex"></Table>
             </div>
           </div>
         </div>
@@ -282,7 +284,7 @@
             </div>
             <div class="assets-list">
               <div class="asset-item"><span class="label">可用保证金</span><span class="value">{{ freeMargin() | fixed4
-              }}</span></div>
+                  }}</span></div>
               <div class="asset-item"><span class="label">持仓保证金</span><span class="value">{{ bonds() | fixed4 }}</span>
               </div>
               <div class="asset-item"><span class="label">未实现盈亏</span><span class="value">{{ unrealizedProfitAndLoss() |
@@ -576,6 +578,14 @@ export default {
 
   },
   computed: {
+    filteredDataIndex() {
+      if (!this.dataIndex) return [];
+      let data = this.dataIndex;
+      if (this.activeCategory) {
+        data = data.filter(item => item.category === this.activeCategory);
+      }
+      return data;
+    },
     rechargeUSDTUrl: function () {
       return "/uc/recharge?name=" + this.currentCoin.base;
       // return "#/finance/recharge?name=" + this.currentCoin.base;
@@ -929,6 +939,9 @@ export default {
     tipFormat(val) {
       return val + "%";
     },
+    changeCategory(cat) {
+      this.activeCategory = cat;
+    },
     changeBaseCion(str) {
       this.basecion = str;
       this.dataIndex = this.coins.USDT;
@@ -1028,6 +1041,7 @@ export default {
           this.coins[coin.base + "2"] = [];
           this.coins._map = [];
         }
+        let categorySet = new Set();
         for (var i = 0; i < resp.length; i++) {
           var coin = resp[i];
           coin.price = resp[i].close = resp[i].close.toFixed(
@@ -1051,7 +1065,16 @@ export default {
             this.currentCoin = coin;
             this.form.entrustPrice = coin.price;
           }
+          if (coin.category) {
+            categorySet.add(coin.category);
+          }
         }
+
+        this.categories = Array.from(categorySet).slice(0, 3);
+        if (this.categories.length > 0) {
+          this.activeCategory = this.categories[0];
+        }
+
         require(["../../assets/js/swap.js"], function (e) {
           e.clickScTab();
         });
@@ -2071,7 +2094,7 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @import url(../../assets/css/swap.css);
 $night-bg: #0b1520;
 $night-headerbg: #27313e;
@@ -2079,6 +2102,44 @@ $night-contentbg: #192330;
 $night-color: #fff;
 $popper-background-color: #192330;
 
+
+.popup-categories {
+  display: flex;
+  padding: 0 10px 10px;
+  gap: 16px;
+  border-bottom: 1px solid #1a1a1a;
+  margin-bottom: 8px;
+
+  .category-item {
+    font-size: 14px;
+    color: #8e949e;
+    cursor: pointer;
+    position: relative;
+    padding-bottom: 8px;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: #fff;
+    }
+
+    &.active {
+      color: #fff;
+      font-weight: 600;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        height: 2px;
+        background-color: #d4ff00;
+        border-radius: 2px;
+      }
+    }
+  }
+}
 
 * {
   white-space: nowrap;

@@ -26,14 +26,17 @@
                 <div class="banner_left_content" style="margin-left: 50px;">
                     <div
                         style="font-size: 52px;  color: #fff; margin-bottom: 30px; line-height: 1.4; letter-spacing: 1px; max-width: 540px;">
-                        积分不限量，奖励兑不停，Apple 全家桶等你拿！
+                        限时活动
+                    </div>
+                    <div
+                        style="font-size: 40px;  color: #fff; margin-bottom: 30px; line-height: 1.4; letter-spacing: 1px; max-width: 540px;">
+                        注册立得100USDT手续费减免券
                     </div>
 
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 30px;">
                         <span
                             style="color: #fff; font-size: 16px; font-weight: 600; display: flex; align-items: center;">
-                            <span style="margin-right: 8px; font-size: 20px;">🎁</span>新用户专享 <span
-                                style="color: #d4ff00; margin: 0 4px;">$500</span> 奖励
+                            <span style="margin-right: 8px; font-size: 20px;">🎁</span>新用户专享
                         </span>
                     </div>
 
