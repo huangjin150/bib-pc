@@ -23,7 +23,7 @@
               <img :src="coin.logo" class="icon-img" alt="coin logo" />
             </div>
             <div class="coin-info">
-              <div class="coin-symbol">{{ coin.symbol }}</div>
+              <div class="coin-symbol">{{ coin.name }}</div>
             </div>
           </div>
 

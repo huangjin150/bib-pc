@@ -100,7 +100,7 @@ export default {
                             }),
                             h("span", {
                                 style: { fontSize: "14px", fontWeight: 600, color: "#fff" }
-                            }, params.row.coin + params.row.base)
+                            }, params.row.name)
                         ]);
                     }
                 },
@@ -178,7 +178,7 @@ export default {
                             }),
                             h("span", {
                                 style: { fontSize: "14px", fontWeight: 600, color: "#fff" }
-                            }, params.row.coin + params.row.base)
+                            }, params.row.name)
                         ]);
                     }
                 },

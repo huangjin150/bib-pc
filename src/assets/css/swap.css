@@ -43,6 +43,23 @@
     cursor: pointer;
 }
 
+.ivu-table-body table {
+    width: 360px !important;
+    box-sizing: border-box;
+}
+
+.ivu-table-tbody {
+    width: 320px;
+}
+
+.ivu-table-row {
+    width: 330px;
+}
+
+.coin-menu-symbol {
+    box-sizing: border-box;
+}
+
 .sc_filter {
     /* padding: 0 7%; */
     white-space: nowrap;
@@ -937,14 +954,27 @@ tr.ivu-table-row-highlight.ivu-table-row-hover td {
     font-size: 8px;
 }
 
+.ivu-table-overflowY {
+    overflow-x: hidden;
+}
+
+.ivu-table-row {}
+
 .ivu-table th.swap-coin-menu-symbol {
     text-align: left !important;
     padding-left: 20px;
+    box-sizing: border-box;
 }
 
 .ivu-table th.swap-coin-menu-lastprice {
     text-align: right !important;
     padding-right: 10px;
+}
+
+
+.ivu-table td.swap-coin-menu-lastprice {
+    text-align: right !important;
+    padding-right: 20px;
 }
 
 .swap .swap-account {
