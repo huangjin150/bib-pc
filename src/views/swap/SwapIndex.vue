@@ -12,7 +12,7 @@
             <div style="font-size: 12px; color: #8e8e92;">{{ $t("swap.swapindex") }}</div>
           </div>
         </div>
-        <div class="popup">
+        <div v-if="showPopup" class="popup">
           <div class="">
             <div class="coin-menu">
               <div style="padding: 8px 10px;height:48px;">
