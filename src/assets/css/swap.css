@@ -44,17 +44,12 @@
 }
 
 .ivu-table-body table {
-    width: 360px !important;
     box-sizing: border-box;
 }
 
-.ivu-table-tbody {
-    width: 320px;
-}
+.ivu-table-tbody {}
 
-.ivu-table-row {
-    width: 330px;
-}
+.ivu-table-row {}
 
 .coin-menu-symbol {
     box-sizing: border-box;

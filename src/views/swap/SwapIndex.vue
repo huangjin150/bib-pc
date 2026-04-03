@@ -284,7 +284,7 @@
             </div>
             <div class="assets-list">
               <div class="asset-item"><span class="label">可用保证金</span><span class="value">{{ freeMargin() | fixed4
-                  }}</span></div>
+              }}</span></div>
               <div class="asset-item"><span class="label">持仓保证金</span><span class="value">{{ bonds() | fixed4 }}</span>
               </div>
               <div class="asset-item"><span class="label">未实现盈亏</span><span class="value">{{ unrealizedProfitAndLoss() |
