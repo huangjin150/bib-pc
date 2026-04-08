@@ -15,7 +15,7 @@
                         <button v-if="!isLogin" @click="loginClick" class="hero-btn primary">
                             立即开启交易
                         </button>
-                        <button class="hero-btn secondary">
+                        <button @click="rechangeClick" class="hero-btn secondary">
                             探索生态
                         </button>
                     </div>
@@ -221,7 +221,7 @@ export default {
             ecosystemItems: [
                 {
                     title: 'Bibcoin 交易平台',
-                    desc: '全球 TOP3 加密货币交易所，拥有超过 3,400 种加密货币。24 小时现货交易量排名全球第二，支持 BTC、ETH、DOGE 等热门资产，提供现货交易、合约交易、杠杆交易以及理财等全方位产品与服务。',
+                    desc: '全球领先的综合交易平台，一站式连通三大核心市场。不仅支持 3,400+ 种虚拟币现货与合约交易，更零门槛提供全球顶级美股及大宗商品（黄金、原油等）的极速交易服务，全方位满足您的投资需求。',
                     icon: require('../../assets/svg/introduction_svg1.svg')
                 },
                 {
@@ -235,8 +235,8 @@ export default {
                     icon: require('../../assets/svg/introduction_svg3.svg')
                 },
                 {
-                    title: 'Bibcoin Fun',
-                    desc: 'Bibcoin 生态首个专为 Meme 代币设计的发射平台，聚焦“零代码发币+全场景交易”，旨在为 Web3 创作者和投资者打造一条从代币发行到流通的完整生态路径。',
+                    title: 'Bibcoin 全域资产池',
+                    desc: '打破传统金融与加密资产的隔阂。在全域资产池中，您可以将虚拟货币、美股持仓或大宗商品合约作为统一保证金，实现资金的高效周转与跨市场对冲。',
                     icon: require('../../assets/svg/introduction_svg4.svg')
                 },
                 {
@@ -245,8 +245,8 @@ export default {
                     icon: require('../../assets/svg/introduction_svg5.svg')
                 },
                 {
-                    title: 'Bibcoin Travel',
-                    desc: 'Bibcoin 旗下全新一站式出行预订平台，覆盖 190+ 国家、100 万+ 酒店及 150 家航空公司，支持多种加密支付，Bibcoin 用户专享 5% 折扣，让出行更轻松、更便捷。',
+                    title: 'Bibcoin Wealth',
+                    desc: '专业的全品类财富管理中心。提供从虚拟币余币宝、链上赚币，到挂钩美股和大宗商品表现的结构性理财产品，助您在不同市场周期中稳健增值。',
                     icon: require('../../assets/svg/introduction_svg6.svg')
                 },
                 {
@@ -271,7 +271,7 @@ export default {
                 },
                 {
                     title: 'Bibcoin Learn & Research',
-                    desc: 'Bibcoin Learn 精心打造区块链知识教育平台，Bibcoin Research 深度解析行业趋势，呈现前沿洞察与深刻见解。',
+                    desc: '全方位的投资教育与投研智库。从加密市场前沿洞察，到美股财报深度解析与大宗商品周期分析，为您提供最专业的交易参考。',
                     icon: require('../../assets/svg/introduction_svg11.svg')
                 },
                 {
@@ -281,12 +281,12 @@ export default {
                 },
                 {
                     title: 'Bibcoin Post',
-                    desc: '加密用户专属社交平台，聚焦热点资讯、洞悉行业脉搏、链接全球加密用户，发现加密价值。',
+                    desc: '全领域投资者专属社交平台，聚焦加密、美股与大宗商品的热点资讯，洞悉行业脉搏、链接全球顶尖交易者。',
                     icon: require('../../assets/svg/introduction_svg13.svg')
                 },
                 {
                     title: 'Bibcoin Live',
-                    desc: 'Bibcoin 官方直播平台，汇聚全球行业前沿分析师，为加密用户提供专业的市场趋势分析、交易策略和投资机会解读等内容。',
+                    desc: '官方专业直播平台，汇聚全球行业前沿分析师，为您提供覆盖加密资产、美股走势与大宗商品宏观周期的全天候行情解读。',
                     icon: require('../../assets/svg/introduction_svg14.svg')
                 },
                 {
@@ -357,6 +357,10 @@ export default {
         },
         loginClick() {
             this.$router.push({ path: '/login' })
+        },
+        rechangeClick() {
+            this.$router.push({ path: '/swap' })
+
         }
     }
 }
