@@ -13,7 +13,8 @@
     <div class="eco-grid">
       <div class="eco-card" v-for="(item, idx) in visibleItems" :key="idx">
         <div class="eco-card__icon">
-          <img v-if="item.icon" :src="item.icon" alt="" />
+          <div class="card__icon" v-if="item.icon"
+            :style="{ '-webkit-mask-image': 'url(' + item.icon + ')', 'mask-image': 'url(' + item.icon + ')' }"></div>
           <div v-else class="icon-placeholder"></div>
         </div>
         <div class="eco-card__body">
@@ -152,9 +153,9 @@ export default {
   border: 1px solid #1a1a1a;
   padding: 24px;
   column-gap: 16px;
-  min-height: 160px;
+  height: 270px;
   transition: all 0.3s ease;
-  
+
   &:hover {
     border-color: rgba(212, 255, 0, 0.2);
     transform: translateY(-2px);
@@ -169,6 +170,19 @@ export default {
   width: 48px;
   height: 48px;
   object-fit: contain;
+}
+
+.card__icon {
+  width: 48px;
+  height: 48px;
+  /* 在这里修改你想要的颜色，比如 #d4ff00 */
+  background-color: #d4ff00;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: left center;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: left center;
 }
 
 .icon-placeholder {

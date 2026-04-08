@@ -194,13 +194,37 @@ export default {
                 {
                     title: '24H 涨跌幅',
                     key: "rose",
-                    align: 'right',
                     render: (h, params) => {
                         const isUp = parseFloat(params.row.rose) >= 0;
                         return h("span", {
                             class: { green: isUp, red: !isUp },
                             style: { fontWeight: 600, fontSize: "14px" }
                         }, params.row.rose);
+                    }
+                },
+                {
+                    title: '操作',
+                    key: "action",
+                    align: 'right',
+                    render: function (h, params) {
+                        return h("div", {
+                            style: {
+                                backgroundColor: '#2a2a2a',
+                                color: "#ccc",
+                                padding: "6px 20px",
+                                width: '100px',
+                                borderRadius: '6px',
+                                textAlign: 'center',
+                                cursor: "pointer",
+                                fontSize: "14px",
+                                display: 'inline-block'
+                            },
+                            on: {
+                                click: function () {
+                                    self.$router.push({ name: 'SwapPair', params: { pair: params.row.href } });
+                                }
+                            }
+                        }, "交易");
                     }
                 }
             ]

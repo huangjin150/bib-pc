@@ -87,8 +87,8 @@
                     <div class="step-item">
                         <div class="step-number" style="color: #fff;">2</div>
                         <div class="step-details">
-                            <h3 class="step-title" style="color: #fff;">快捷买币</h3>
-                            <p class="step-description" style="color: #aaa;">简单几步购买加密货币</p>
+                            <h3 class="step-title" style="color: #fff;">快捷入金</h3>
+                            <p class="step-description" style="color: #aaa;">简单几步购买全球热门资产</p>
                             <button class="step-button" style="background-color: #333; color: #fff; border-color: #555;"
                                 @click="onGuideClick('/buy')">即刻买币 →</button>
                         </div>
@@ -97,7 +97,7 @@
                         <div class="step-number" style="color: #fff;">3</div>
                         <div class="step-details">
                             <h3 class="step-title" style="color: #fff;">开始交易</h3>
-                            <p class="step-description" style="color: #aaa;">买卖数字货币、轻松跟单，探索更多玩法</p>
+                            <p class="step-description" style="color: #aaa;">交易美股、大宗商品和虚拟币、轻松跟单，探索更多玩法</p>
                             <button class="step-button" style="background-color: #333; color: #fff; border-color: #555;"
                                 @click="onGuideClick('/swap')">即刻交易 →</button>
                         </div>
@@ -146,7 +146,7 @@
                 </div>
                 <div>
                     <div class="transaction_box_text1" style="color: #fff;">3,400+</div>
-                    <div class="transaction_box_text2">币种</div>
+                    <div class="transaction_box_text2">交易标的</div>
                 </div>
                 <div>
                     <div class="transaction_box_text1" style="color: #fff;">11.29%</div>
@@ -235,28 +235,28 @@ export default {
             activeFaqIndex: '',
             faqList: [
                 {
-                    q: '什么是加密货币交易所？',
-                    a: '加密货币交易所是为用户提供加密货币买卖和交易的平台，支持包括 BTC、ETH、GT  等超过 3,400 种。Bibcoin 是全球领先的加密货币交易所，致力于为用户提供现货、合约、理财等多元化服务及全方位的数字资产交易体验。'
+                    q: '什么是全球综合资产交易平台？',
+                    a: '全球综合资产交易平台是为用户提供多品类金融资产买卖和交易的平台，支持包括虚拟币（BTC、ETH 等超过 3,400 种）、全球顶级美股以及大宗商品（黄金、原油等）。Bibcoin 是全球领先的综合交易平台，致力于为用户提供一站式、全方位的数字资产与传统金融交易体验。'
                 },
                 {
                     q: 'Bibcoin 提供哪些产品？',
-                    a: '作为全球领先的加密货币交易平台，Bibcoin 提供丰富的产品和服务，包括现货交易、合约交易、Launchpool、余币宝、链上赚币、机器人以及跟单等，满足不同用户的投资需求。请注意，Bibcoin 可能会限制或禁止来自受限制地区的所有或部分服务。请阅读用户协议了解更多信息。'
+                    a: '作为全球领先的综合交易平台，Bibcoin 提供丰富的产品和服务，包括虚拟币现货与合约交易、美股交易、大宗商品交易，以及 Launchpool、余币宝、链上赚币等理财产品，满足不同用户的多元化投资需求。请注意，Bibcoin 可能会限制或禁止来自受限制地区的所有或部分服务。'
                 },
                 {
-                    q: '如何在 Bibcoin 购买比特币和其他加密货币？',
-                    a: '在 Bibcoin 购买加密货币仅需注册账户，完成身份验证，充值法币或数字货币，前往交易页面选择所需资产并下单即可。平台支持多种支付方式。关于详细的购买流程，请参阅用户指南'
+                    q: '如何在 Bibcoin 购买虚拟币、美股和大宗商品？',
+                    a: '在 Bibcoin 购买各类资产仅需注册账户，完成身份验证，充值法币或数字货币，前往交易页面选择所需资产（虚拟币、美股或大宗商品）并下单即可。平台支持多种支付方式，一个账户即可连通三大投资市场。'
                 },
                 {
-                    q: '如何追踪加密货币价格？',
-                    a: '您可以通过 Bibcoin官网 或 APP 实时查看市场行情，亦可设置价格提醒、自选币种列表，也可以通过 Bibcoin 提供行情工具的和数据面板，随时掌握价格动态。'
+                    q: '如何追踪各类资产的市场价格？',
+                    a: '您可以通过 Bibcoin 官网或 APP 实时查看虚拟币、美股和大宗商品的市场行情，亦可设置价格提醒、自选资产列表，随时掌握全球核心资产的价格动态。'
                 },
                 {
-                    q: '如何在 Bibcoin 进行加密货币交易？',
-                    a: '用户登录 Bibcoin 后，可前往交易和合约页面，挑选想要交易的币种进行买入或卖出。同时，也可使用跟单功能，跟随高阶用户策略自动交易。'
+                    q: '如何在 Bibcoin 进行交易？',
+                    a: '用户登录 Bibcoin 后，可前往交易和合约页面，在“虚拟币”、“美股”、“大宗商品”分类中挑选想要交易的标的进行买入或卖出。同时，也可使用跟单功能，跟随高阶用户策略自动交易。'
                 },
                 {
-                    q: '为什么选择 Bibcoin 作为您的加密货币交易平台？',
-                    a: 'Bibcoin 成立于 2013 年，是全球最早的加密货币交易所之一。平台储备金规模超过 100 亿美元，支持 3,400 多种加密资产交易。注册用户可享受新人福利，是全球超过 4300万 用户的首选平台。'
+                    q: '为什么选择 Bibcoin 作为您的综合交易平台？',
+                    a: 'Bibcoin 成立于 2013 年，是全球领先的交易平台之一。平台储备金规模超过 100 亿美元，打破传统金融与加密世界的壁垒，支持虚拟币、美股、大宗商品三大核心模块。注册用户可享受新人福利，是全球超过 4300万 用户的首选平台。'
                 }
             ]
         }
@@ -1313,4 +1313,10 @@ export default {
 
 
 .panel-box {}
+
+.banner_left_content {
+    display: flex;
+    flex-direction: column;
+
+}
 </style>

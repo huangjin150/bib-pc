@@ -1,1 +1,8 @@
-<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" class="slide-icon"><path d="M23.9998 6.55566L41.9995 15.2784H6L23.9998 6.55566Z" stroke="currentColor" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9.91211 16.291V39.5441M38.3987 16.291V39.5441" stroke="currentColor" stroke-width="2.7"></path><path d="M6 39.873H41.9995" stroke="currentColor" stroke-width="2.7" stroke-linecap="round"></path><rect x="18.4004" y="27.8018" width="7.91959" height="7.91959" rx="1.88552" transform="rotate(-45 18.4004 27.8018)" stroke="currentColor" stroke-width="2.7" stroke-linecap="round"></rect></svg>
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" class="slide-icon">
+	<path d="M23.9998 6.55566L41.9995 15.2784H6L23.9998 6.55566Z" stroke="currentColor" stroke-width="2.7"
+		stroke-linecap="round" stroke-linejoin="round"></path>
+	<path d="M9.91211 16.291V39.5441M38.3987 16.291V39.5441" stroke="currentColor" stroke-width="2.7"></path>
+	<path d="M6 39.873H41.9995" stroke="currentColor" stroke-width="2.7" stroke-linecap="round"></path>
+	<rect x="18.4004" y="27.8018" width="7.91959" height="7.91959" rx="1.88552" transform="rotate(-45 18.4004 27.8018)"
+		stroke="currentColor" stroke-width="2.7" stroke-linecap="round"></rect>
+</svg>

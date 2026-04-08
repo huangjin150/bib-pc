@@ -6,8 +6,10 @@
             <div class="hero-content container">
                 <div class="hero-center">
                     <div class="brand-badge">Bibcoin Crypto Exchange</div>
-                    <h1 class="hero-title">重新定义数字资产交易体验</h1>
-                    <p class="hero-desc">安全、快捷、轻松交易超过 3,400 种加密货币。<br>为全球 4300 万用户提供安全可靠的数字资产服务。</p>
+                    <h1 class="hero-title">重新定义全球资产交易体验</h1>
+                    <p class="hero-desc">安全、快捷、轻松交易 <strong>美股</strong>、<strong>大宗商品</strong> 与
+                        <strong>虚拟币</strong>。<br>为全球 4300 万用户提供一站式、全方位的数字资产与传统金融服务。
+                    </p>
 
                     <div class="hero-actions">
                         <button v-if="!isLogin" @click="loginClick" class="hero-btn primary">
@@ -76,22 +78,29 @@
             <div class="container">
                 <div class="feature-row">
                     <div class="feature-text">
-                        <div class="feature-tag">01 / 全球首家</div>
-                        <h2 class="feature-title">100% 储备金证明</h2>
-                        <p class="feature-desc">首家承诺 100% 储备金，超行业基准
-                            20%+。储备金总量位列全球顶尖，我们在区块链上公开透明地展示资产状况，保障您的每一分资产安全，让您交易无忧。</p>
+                        <div class="feature-tag">01 / 全品类覆盖</div>
+                        <h2 class="feature-title">美股 · 大宗商品 · 虚拟币</h2>
+                        <p class="feature-desc">打破传统金融与加密世界的壁垒。在同一个平台，您不仅可以交易数千种热门虚拟资产，还能零门槛投资全球顶级美股科技公司，以及黄金、原油等核心大宗商品。
+                        </p>
                         <ul class="feature-list">
-                            <li><span class="dot"></span> 定期发布储备金审计报告</li>
-                            <li><span class="dot"></span> 默克尔树 (Merkle Tree) 验证支持</li>
-                            <li><span class="dot"></span> 资金透明，绝不挪用用户资产</li>
+                            <li><span class="dot"></span> <span
+                                    style="color: #fff; font-weight: bold; margin-right: 8px;">虚拟币:</span> 3400+
+                                主流与新兴数字资产</li>
+                            <li><span class="dot"></span> <span
+                                    style="color: #fff; font-weight: bold; margin-right: 8px;">美股:</span> 顶级科技股与优质企业股票
+                            </li>
+                            <li><span class="dot"></span> <span
+                                    style="color: #fff; font-weight: bold; margin-right: 8px;">大宗商品:</span>
+                                黄金、白银、原油等全球硬核资产</li>
                         </ul>
                     </div>
                     <div class="feature-image">
                         <div class="image-box">
-                            <img src="../../assets/images/banner-proof-dark.webp" alt="Proof of Reserve">
+                            <!-- 如果有综合类图片可以替换，这里暂时保留原来的并加一点装饰框 -->
+                            <img src="../../assets/images/banner-proof-dark.webp" alt="Multi Assets">
                             <div class="floating-badge">
                                 <span class="badge-dot"></span>
-                                安全保障
+                                一站式交易
                             </div>
                         </div>
                     </div>
@@ -101,9 +110,10 @@
                     <div class="feature-text">
                         <div class="feature-tag">02 / 极致体验</div>
                         <h2 class="feature-title">全网最快发掘潜力项目</h2>
-                        <p class="feature-desc">新币、热币极速上线，覆盖广泛的主流与新兴币种。提供行业领先的现货交易量及流动性，确保您在任何市场波动下都能获得极佳的成交价格。</p>
+                        <p class="feature-desc">新币、热股、热门商品极速上线，覆盖广泛的主流与新兴投资标的。提供行业领先的交易深度及流动性，确保您在任何市场波动下都能获得极佳的成交价格。
+                        </p>
                         <ul class="feature-list">
-                            <li><span class="dot"></span> 支持 3,400+ 优质数字资产</li>
+                            <li><span class="dot"></span> 一个账户，连通三大投资市场</li>
                             <li><span class="dot"></span> 微秒级撮合引擎，拒绝卡顿</li>
                             <li><span class="dot"></span> 深度流动性，大额交易滑点极低</li>
                         </ul>
@@ -242,47 +252,47 @@ export default {
                 {
                     title: 'Bibcoin Pay',
                     desc: '从收单、下发到法币出入金，一站式加密支付服务，快速、安全，驱动数字支付融入更多场景。',
-                    icon: require('../../assets/svg/introduction_svg6.svg')
+                    icon: require('../../assets/svg/introduction_svg7.svg')
                 },
                 {
                     title: 'Bibcoin Labs',
                     desc: '用专业点燃创意，为初创项目提供孵化支持与运营资源，陪伴每一个创新想法从起步走向成功。',
-                    icon: require('../../assets/svg/introduction_svg6.svg')
+                    icon: require('../../assets/svg/introduction_svg8.svg')
                 },
                 {
                     title: 'Bibcoin Life',
                     desc: '数字货币消费与娱乐的一站式平台，集成 Bibcoin Gift Card、Bibcoin Pay 支付、C2C 转账等核心功能。',
-                    icon: require('../../assets/svg/introduction_svg6.svg')
+                    icon: require('../../assets/svg/introduction_svg9.svg')
                 },
                 {
                     title: 'Bibcoin Ventures',
                     desc: '聚焦区块链与金融科技基础设施投资的加密风投基金，赋能未来，推动数字经济的创新与变革。',
-                    icon: require('../../assets/svg/introduction_svg6.svg')
+                    icon: require('../../assets/svg/introduction_svg10.svg')
                 },
                 {
                     title: 'Bibcoin Learn & Research',
                     desc: 'Bibcoin Learn 精心打造区块链知识教育平台，Bibcoin Research 深度解析行业趋势，呈现前沿洞察与深刻见解。',
-                    icon: require('../../assets/svg/introduction_svg6.svg')
+                    icon: require('../../assets/svg/introduction_svg11.svg')
                 },
                 {
                     title: 'Bibcoin Web3',
                     desc: 'Bibcoin Web3 是 Bibcoin 生态的全新链上入口，集钱包、跨链、交易、空投、赚币与 DApp 于一体，构建开放互联的 Web3 全域生态。',
-                    icon: require('../../assets/svg/introduction_svg6.svg')
+                    icon: require('../../assets/svg/introduction_svg12.svg')
                 },
                 {
                     title: 'Bibcoin Post',
                     desc: '加密用户专属社交平台，聚焦热点资讯、洞悉行业脉搏、链接全球加密用户，发现加密价值。',
-                    icon: require('../../assets/svg/introduction_svg6.svg')
+                    icon: require('../../assets/svg/introduction_svg13.svg')
                 },
                 {
                     title: 'Bibcoin Live',
                     desc: 'Bibcoin 官方直播平台，汇聚全球行业前沿分析师，为加密用户提供专业的市场趋势分析、交易策略和投资机会解读等内容。',
-                    icon: require('../../assets/svg/introduction_svg6.svg')
+                    icon: require('../../assets/svg/introduction_svg14.svg')
                 },
                 {
                     title: 'Bibcoin Charity',
                     desc: '全球性非盈利慈善基金组织，致力于将区块链技术与传统公益相结合，打造透明、高效、可持续的慈善生态。',
-                    icon: require('../../assets/svg/introduction_svg6.svg')
+                    icon: require('../../assets/svg/introduction_svg15.svg')
                 },
 
             ],
@@ -346,7 +356,7 @@ export default {
             });
         },
         loginClick() {
-            this.$router.push({ path: '/login', query: { tab: 'register' } })
+            this.$router.push({ path: '/login' })
         }
     }
 }
