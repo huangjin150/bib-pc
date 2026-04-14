@@ -66,7 +66,7 @@
                   </div>
 
                   <div class="menu-item" @click="openPreferences">
-                    <div class="menu-icon"><img src="../assets/svg/invitation.svg" alt=""></div>
+                    <div class="menu-icon"><img src="../assets/svg/setting.svg" alt=""></div>
                     <span>偏好设置</span>
                   </div>
                 </div>
@@ -113,7 +113,8 @@
         </button> -->
 
         <!-- 偏好设置弹窗 -->
-        <Modal v-model="showPreferencesModal" title="偏好设置" :footer-hide="true" width="400" class-name="vertical-center-modal preference-modal">
+        <Modal v-model="showPreferencesModal" title="偏好设置" :footer-hide="true" width="400"
+          class-name="vertical-center-modal preference-modal">
           <div class="pref-content">
             <div class="pref-form-group">
               <label class="pref-label">涨跌颜色显示</label>
@@ -683,21 +684,25 @@ export default {
     overflow: hidden;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   }
+
   ::v-deep .ivu-modal-header {
     background-color: #ffffff;
     border-bottom: 1px solid #f3f4f6;
     padding: 16px 24px;
   }
+
   ::v-deep .ivu-modal-header-inner {
     color: #111827;
     font-size: 16px;
     font-weight: 600;
     letter-spacing: 0.5px;
   }
+
   ::v-deep .ivu-modal-close .ivu-icon-ios-close {
     color: #9ca3af;
     transition: color 0.2s;
   }
+
   ::v-deep .ivu-modal-close .ivu-icon-ios-close:hover {
     color: #4b5563;
   }
