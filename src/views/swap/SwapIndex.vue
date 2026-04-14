@@ -33,7 +33,7 @@
       </div>
       <div class="item" style="width: 100px;">
         <div class="num" style="font-size: 14px; font-weight: 700;"
-          :class="{ buy: currentCoin.change > 0, sell: currentCoin.change < 0 }">{{
+          :style="{ color: currentCoin.change > 0 ? upColor : (currentCoin.change < 0 ? downColor : '') }">{{
             currentCoin.close }}</div>
         <div class="price-cny">≈ ${{ currentCoin.close }}</div>
       </div>
@@ -43,9 +43,10 @@
       </div>
       <div class="item">
         <span class="text">{{ $t('service.Change') }}</span>
-        <span class="num" :class="{ buy: currentCoin.change > 0, sell: currentCoin.change < 0 }">{{
-          currentCoin.rose
-        }}</span>
+        <span class="num"
+          :style="{ color: currentCoin.change > 0 ? upColor : (currentCoin.change < 0 ? downColor : '') }">{{
+            currentCoin.rose
+          }}</span>
       </div>
       <div class="item">
         <span class="text">{{ $t('service.high') }}</span>
@@ -97,9 +98,10 @@
                     <span class="ceneter" :class="{ active: selectedPlate == 'all' }"><span @click="changePlate('all')"
                         class="handler handler-all"></span></span>
                     <span class="ceneter" :class="{ active: selectedPlate == 'buy' }"> <span @click="changePlate('buy')"
-                        class="handler handler-green"></span></span>
+                        class="handler" :class="isUpColorGreen ? 'handler-green' : 'handler-red'"></span></span>
                     <span class="ceneter" :class="{ active: selectedPlate == 'sell' }"> <span
-                        @click="changePlate('sell')" class="handler handler-red"></span></span>
+                        @click="changePlate('sell')" class="handler"
+                        :class="isUpColorGreen ? 'handler-red' : 'handler-green'"></span></span>
                   </div>
                   <div class="New_flex">
                     <!-- 盘口：卖 -->
@@ -111,15 +113,22 @@
                     </div>
                     <div class="plate-nowprice">
                       <div style="display: flex; align-items: center; justify-content: center;">
-                        <div class="price" :class="{ buy: currentCoin.change > 0, sell: currentCoin.change < 0 }">{{
-                          currentCoin.price |
-                          toFixed(baseCoinScale) }}</div>
-                        <span v-if="currentCoin.change > 0" class="buy"><img
-                            style="width: 20px;height: 20px; color: red;" src="../../assets/svg/up_arrow.svg"
-                            alt=""></span>
-                        <span v-else-if="currentCoin.change < 0" class="sell"><img
-                            style="width: 20px;height: 20px; color: red;" src="../../assets/svg/down_arrow.svg"
-                            alt=""></span>
+                        <div class="price"
+                          :style="{ color: currentCoin.change > 0 ? upColor : (currentCoin.change < 0 ? downColor : '') }">
+                          {{
+                            currentCoin.price |
+                            toFixed(baseCoinScale) }}</div>
+                        <span v-if="currentCoin.change > 0" :style="{ color: upColor }">
+                          <img v-if="isUpColorGreen" style="width: 20px;height: 20px;"
+                            src="../../assets/svg/arrow_up.svg" alt="">
+                          <img v-else style="width: 20px;height: 20px;" src="../../assets/svg/arrow_up_red.svg" alt="">
+                        </span>
+                        <span v-else-if="currentCoin.change < 0" :style="{ color: downColor }">
+                          <img v-if="isUpColorGreen" style="width: 20px;height: 20px;"
+                            src="../../assets/svg/arrow_down.svg" alt="">
+                          <img v-else style="width: 20px;height: 20px;" src="../../assets/svg/arrow_down_green.svg"
+                            alt="">
+                        </span>
                       </div>
                       <div>
                         <span class="price-cny"> {{ currentCoin.usdRate * CNYRate | toFixed(2) }} CNY</span>
@@ -217,11 +226,11 @@
           </div>
 
           <div class="open-amount-row">
-            <div class="open-amount-item buy">
+            <div class="open-amount-item" :style="{ color: upColor }">
               <span class="label">{{ $t('swap.canup') }}</span>
               <span class="value">{{ Number(avaOpenBuy()).toFixed(4) }} {{ currentCoin.coin }}</span>
             </div>
-            <div class="open-amount-item sell">
+            <div class="open-amount-item" :style="{ color: downColor }">
               <span class="label">{{ $t('swap.candown') }}</span>
               <span class="value">{{ Number(avaOpenSell()).toFixed(4) }} {{ currentCoin.coin }}</span>
             </div>
@@ -270,8 +279,10 @@
               <button v-else-if="contractWalletInfo && contractWalletInfo.usdtBalance === 0" class="submit-btn green-bg"
                 @click="$router.push('/assets/transfer')">充值</button>
               <div v-else style="display: flex; gap: 10px; width: 100%;">
-                <button class="submit-btn green-bg" style="flex: 1; padding: 6px 0;" @click="onOpen(0)">买入开多</button>
-                <button class="submit-btn red-bg" style="flex: 1; padding: 6px 0;" @click="onOpen(1)">卖出开空</button>
+                <button class="submit-btn" :style="{ backgroundColor: upColor, color: '#000' }"
+                  style="flex: 1; padding: 6px 0;" @click="onOpen(0)">买入开多</button>
+                <button class="submit-btn" :style="{ backgroundColor: downColor, color: '#000' }"
+                  style="flex: 1; padding: 6px 0;" @click="onOpen(1)">卖出开空</button>
               </div>
             </div>
           </div>
@@ -284,7 +295,7 @@
             </div>
             <div class="assets-list">
               <div class="asset-item"><span class="label">可用保证金</span><span class="value">{{ freeMargin() | fixed4
-              }}</span></div>
+                  }}</span></div>
               <div class="asset-item"><span class="label">持仓保证金</span><span class="value">{{ bonds() | fixed4 }}</span>
               </div>
               <div class="asset-item"><span class="label">未实现盈亏</span><span class="value">{{ unrealizedProfitAndLoss() |
@@ -384,11 +395,11 @@
           <div class="after" style="color:#cccccc;white-space: normal" v-if="profitLossForm.direction == 0">当价格达到
             <span style="color:#000">{{ profitLossForm.targetProfit }}</span>时，
             将会触发市价止盈委托平仓当前仓位，预计盈亏为
-            <span style="color:#3b8442" v-if="profitLossForm.targetProfit > profitLossForm.openPrice">
+            <span :style="{ color: upColor }" v-if="profitLossForm.targetProfit > profitLossForm.openPrice">
               {{ profitLossForm.targetProfit ? (((profitLossForm.targetProfit - profitLossForm.openPrice) *
                 profitLossForm.volume).toFixed(4)) : "--" }}
             </span>
-            <span style="color:#ed4014" v-else>
+            <span :style="{ color: downColor }" v-else>
               {{ profitLossForm.targetProfit ? (((profitLossForm.targetProfit - profitLossForm.openPrice) *
                 profitLossForm.volume).toFixed(4)) : "--" }}
             </span>
@@ -396,11 +407,11 @@
           <div class="after" style="color:#cccccc;white-space: normal" v-else>当价格达到
             <span style="color:#000">{{ profitLossForm.targetProfit }}</span>时，
             将会触发市价止盈委托平仓当前仓位，预计盈亏为
-            <span style="color:#3b8442" v-if="profitLossForm.targetProfit < profitLossForm.openPrice">
+            <span :style="{ color: upColor }" v-if="profitLossForm.targetProfit < profitLossForm.openPrice">
               {{ profitLossForm.targetProfit ? (((profitLossForm.openPrice - profitLossForm.targetProfit) *
                 profitLossForm.volume).toFixed(4)) : "--" }}
             </span>
-            <span style="color:#ed4014" v-else>
+            <span :style="{ color: downColor }" v-else>
               {{ profitLossForm.targetProfit ? (((profitLossForm.openPrice - profitLossForm.targetProfit) *
                 profitLossForm.volume).toFixed(4)) : "--" }}
             </span>
@@ -413,11 +424,11 @@
           <div class="after" style="color:#cccccc;white-space: normal" v-if="profitLossForm.direction == 0">当价格达到
             <span style="color:#000">{{ profitLossForm.targetLoss }}</span>时，
             将会触发市价止损委托平仓当前仓位，预计盈亏为
-            <span style="color:#3b8442" v-if="profitLossForm.targetLoss > profitLossForm.openPrice">
+            <span :style="{ color: upColor }" v-if="profitLossForm.targetLoss > profitLossForm.openPrice">
               {{ profitLossForm.targetLoss ? (((profitLossForm.targetLoss - profitLossForm.openPrice) *
                 profitLossForm.volume).toFixed(4)) : "--" }}
             </span>
-            <span style="color:#ed4014" v-else>
+            <span :style="{ color: downColor }" v-else>
               {{ profitLossForm.targetLoss ? (((profitLossForm.targetLoss - profitLossForm.openPrice) *
                 profitLossForm.volume).toFixed(4)) : "--" }}
             </span>
@@ -425,11 +436,11 @@
           <div class="after" style="color:#cccccc" v-else>当价格达到
             <span style="color:#ffffff">{{ profitLossForm.targetLoss }}</span>时，
             将会触发市价止损委托平仓当前仓位，预计盈亏为
-            <span style="color:#3b8442" v-if="profitLossForm.targetLoss < profitLossForm.openPrice">
+            <span :style="{ color: upColor }" v-if="profitLossForm.targetLoss < profitLossForm.openPrice">
               {{ profitLossForm.targetLoss ? (((profitLossForm.openPrice - profitLossForm.targetLoss) *
                 profitLossForm.volume).toFixed(4)) : "--" }}
             </span>
-            <span style="color:#ed4014" v-else>
+            <span :style="{ color: downColor }" v-else>
               {{ profitLossForm.targetLoss ? (((profitLossForm.openPrice - profitLossForm.targetLoss) *
                 profitLossForm.volume).toFixed(4)) : "--" }}
             </span>
@@ -458,8 +469,8 @@
                 <div class="position-type">永续</div>
                 <div class="position-leverage" v-if="backhandData.patterns == 0">全仓</div>
                 <div class="position-leverage" v-else>逐仓</div>
-                <div class="position-buy" v-if="backhandData.direction == 0">买入到卖出</div>
-                <div class="position-sell" v-else>卖出到买入</div>
+                <div class="position-buy" :style="{ color: upColor }" v-if="backhandData.direction == 0">买入到卖出</div>
+                <div class="position-sell" :style="{ color: downColor }" v-else>卖出到买入</div>
               </div>
             </div>
             <div class="">
@@ -474,8 +485,9 @@
           <div class="position-box">
             <div class="position-header">
               <div class="position-left">
-                <div class="position-buy" v-if="backhandData.direction == 0">买</div>
-                <div class="position-sell" v-else>卖</div>
+                <div class="position-buy" :style="{ backgroundColor: upColor }" v-if="backhandData.direction == 0">买
+                </div>
+                <div class="position-sell" :style="{ backgroundColor: downColor }" v-else>卖</div>
                 <div class="position-pair">{{ backhandData.symbol }}</div>
                 <div class="position-type">永续</div>
                 <div class="position-leverage" v-if="backhandData.patterns == 0">全仓
@@ -518,8 +530,9 @@
           <div class="position-box">
             <div class="position-header">
               <div class="position-left">
-                <div class="position-buy" v-if="backhandData.direction == 1">买</div>
-                <div class="position-sell" v-else>卖</div>
+                <div class="position-buy" :style="{ backgroundColor: upColor }" v-if="backhandData.direction == 1">买
+                </div>
+                <div class="position-sell" :style="{ backgroundColor: downColor }" v-else>卖</div>
                 <div class="position-pair">{{ backhandData.symbol }}</div>
                 <div class="position-type">永续</div>
                 <div class="position-leverage" v-if="backhandData.patterns == 0">全仓
@@ -578,6 +591,15 @@ export default {
 
   },
   computed: {
+    isUpColorGreen() {
+      return (localStorage.getItem('upColor') || 'green') === 'green';
+    },
+    upColor() {
+      return this.isUpColorGreen ? '#ABE127' : '#ff5a7a';
+    },
+    downColor() {
+      return this.isUpColorGreen ? '#ff5a7a' : '#ABE127';
+    },
     filteredDataIndex() {
       if (!this.dataIndex) return [];
       let data = this.dataIndex;
@@ -2430,19 +2452,22 @@ $popper-background-color: #192330;
       padding: 10px;
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 12px;
+      /* 缩小间距 */
 
       >span {
         font-size: 12px;
-        padding: 4px 10px;
+        padding: 4px 8px;
+        /* 减小内边距 */
         cursor: pointer;
         color: #8e8e92;
+        white-space: nowrap;
+        /* 确保不换行 */
 
         &.active {
           font-weight: 700;
           color: #000;
           background-color: #2bc287;
-          padding: 4px 10px;
           border-radius: 12px;
           box-sizing: border-box;
         }
@@ -2657,6 +2682,12 @@ $popper-background-color: #192330;
 
 .order {
   width: 100%;
+}
+
+.table {
+  overflow-x: auto;
+  width: 100%;
+
 }
 
 .New_flex {
@@ -2929,7 +2960,9 @@ $popper-background-color: #192330;
 
 }
 
-::v-deep(.ivu-table-row) {}
+::v-deep(.ivu-table-row) {
+  padding-bottom: 10px;
+}
 
 // ::v-deep(.ivu-input-default) {
 //   width: 80%;
@@ -3945,5 +3978,9 @@ $popper-background-color: #192330;
   background-color: #d4ff00 !important;
   border: none;
   color: #000 !important;
+}
+
+::v-deep(.order-box .ivu-table-body) {
+  height: 240px !important;
 }
 </style>

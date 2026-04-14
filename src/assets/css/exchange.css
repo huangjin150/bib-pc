@@ -132,12 +132,12 @@ span.price {
 }
 
 .buy {
-    color: #00b275 !important;
+    color: #ABE127 !important;
 
 }
 
 .sell {
-    color: #f15057 !important;
+    color: #ff5a7a !important;
 }
 
 .kline {
@@ -342,11 +342,11 @@ p.math_price {
 }
 
 .trade_bd Button.bg-red {
-    background-color: #f15057;
+    background-color: #ff5a7a;
 }
 
 .trade_bd Button.bg-green {
-    background-color: #00b275;
+    background-color: #ABE127;
 }
 
 .trade_bd Button.bg-gray {
@@ -754,20 +754,20 @@ iframe {
 
 .exchange .silder-buy .ivu-slider-bar {
     height: 6px;
-    background: #00b275;
+    background: #ABE127;
 }
 
 .exchange .silder-buy .ivu-slider-button {
-    border-color: #00b275;
+    border-color: #ABE127;
 }
 
 .exchange .silder-sell .ivu-slider-bar {
     height: 6px;
-    background: #f15057;
+    background: #ff5a7a;
 }
 
 .exchange .silder-sell .ivu-slider-button {
-    border-color: #f15057;
+    border-color: #ff5a7a;
 }
 
 .exchange .ivu-slider-stop {

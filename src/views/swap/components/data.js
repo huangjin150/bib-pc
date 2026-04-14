@@ -1,5 +1,9 @@
 
 export default function getData(self) {
+	const isGreenUp = (localStorage.getItem('upColor') || 'green') === 'green';
+	const upColor = isGreenUp ? '#ABE127' : '#ff5a7a';
+	const downColor = isGreenUp ? '#ff5a7a' : '#ABE127';
+
 	return {
 		currentConnectionId: null,
 		// buyLeverage: "10",
@@ -51,7 +55,7 @@ export default function getData(self) {
 		selectedPlate: "all", //当前显示的买卖盘
 		CNYRate: null,
 		datafeed: null,
-		defaultPath: "btc_usdt",
+		defaultPath: "xau_usdt",
 		basecion: "usdt",
 		coinScale: 6,
 		baseCoinScale: 6,
@@ -285,14 +289,14 @@ export default function getData(self) {
 				render: (h, params) => {
 					let str = "";
 					let price = "";
-					const className = params.row.direction.toLowerCase();
+					const color = params.row.direction === "BUY" ? upColor : downColor;
 					params.row.price == 0 && (str = h("span", {}, "--"));
 					params.row.price != 0 &&
 						(price = params.row.price.toFixed(self.accuracys(self.currentCoin.symbol))) &&
 						(str = h(
 							"span", {
-							attrs: {
-								class: className
+							style: {
+								color: color
 							}
 						},
 							price
@@ -349,7 +353,7 @@ export default function getData(self) {
 				render: (h, params) => {
 					let width = "0",
 						backgroundColor =
-							params.row.direction === "BUY" ? "#00b275" : "#f15057",
+							params.row.direction === "BUY" ? upColor : downColor,
 						totle =
 							params.row.direction === "BUY" ?
 								self.plate.bidTotle :
@@ -378,18 +382,18 @@ export default function getData(self) {
 		currentPosition: {//当前持仓
 			columns: [{
 				title: self.$t("swap.pos_leverage"),
-				width: 120,
+				width: 140,
 				key: "leverage",
 				render: (h, params) => {
 					if (params.row.direction == 0) {
 						return h("span", {
 							style: {
 								color: '#FFF',
-								backgroundColor: "#42b983",
+								backgroundColor: upColor,
 								padding: "3px 5px",
 								borderRadius: "3px",
 								display: "inline-block",
-								width: "100px"
+								width: "140px"
 							}
 						}, params.row.symbol + self.$t("swap.pos_long") + " " + params.row
 							.leverage + "X");
@@ -397,11 +401,11 @@ export default function getData(self) {
 						return h("span", {
 							style: {
 								color: '#FFF',
-								backgroundColor: "#FF0000",
+								backgroundColor: downColor,
 								padding: "3px 5px",
 								borderRadius: "3px",
 								display: "inline-block",
-								width: "100px"
+								width: "140px"
 							}
 						}, params.row.symbol + self.$t("swap.pos_short") + " " + params.row
 							.leverage + "X");
@@ -498,13 +502,13 @@ export default function getData(self) {
 					if (shouyi > 0) {
 						return h("span", {
 							style: {
-								color: '#42b983'
+								color: upColor
 							}
 						}, "+" + shouyi.toFixed(4) + " USDT");
 					}
 					return h("span", {
 						style: {
-							color: '#FF0000',
+							color: downColor,
 							width: '100px',
 						}
 					}, shouyi.toFixed(4) + " USDT");
@@ -526,7 +530,7 @@ export default function getData(self) {
 					if (value > 0) {
 						return h("span", {
 							style: {
-								color: '#42b983',
+								color: upColor,
 								width: '100px',
 							}
 						}, value.toFixed(2) + " %");
@@ -534,7 +538,7 @@ export default function getData(self) {
 					return h("span", {
 						style: {
 							width: '100px',
-							color: '#FF0000'
+							color: downColor
 						}
 					}, value.toFixed(2) + " %");
 				}
@@ -711,6 +715,7 @@ export default function getData(self) {
 						// 限价委托（带输入框）
 						h("div", {
 							style: {
+								margin: "5px 0 0 0 ",
 								display: "flex",
 								alignItems: "center"
 
@@ -743,12 +748,15 @@ export default function getData(self) {
 								},
 								style: {
 									width: "70px",
+									height: "22px",
 									margin: ' 0  3px  0  2px',
 									padding: "3px",
 									border: "1px solid #eee",
 									outline: "#d0f500 ",
 									backgroundColor: "#fff ",
+									fontSize: "14px",
 									color: "#000",
+									borderRadius: "3px"
 								},
 								domProps: {
 									value: params.row.limitPrice
@@ -767,11 +775,15 @@ export default function getData(self) {
 								},
 								style: {
 									width: "70px",
+									height: "22px",
 									padding: "3px",
+									fontSize: "14px",
 									border: "1px solid #eee",
 									outline: "#d0f500 ",
 									backgroundColor: "#fff ",
 									color: "#000",
+									borderRadius: "3px"
+
 								},
 								domProps: {
 									value: params.row.limitAmount
@@ -822,13 +834,13 @@ export default function getData(self) {
 						if (params.row.direction == "0") {
 							return h("span", {
 								style: {
-									color: "#42b983"
+									color: upColor
 								}
 							}, self.$t("swap.openup"));
 						} else {
 							return h("span", {
 								style: {
-									color: "#FF0000"
+									color: downColor
 								}
 							}, self.$t("swap.opendown"));
 						}
@@ -836,13 +848,13 @@ export default function getData(self) {
 						if (params.row.direction == "0") {
 							return h("span", {
 								style: {
-									color: "#42b983"
+									color: downColor
 								}
 							}, self.$t("swap.closedown"));
 						} else {
 							return h("span", {
 								style: {
-									color: "#FF0000"
+									color: upColor
 								}
 							}, self.$t("swap.closeup"));
 						}
@@ -983,13 +995,13 @@ export default function getData(self) {
 						if (params.row.direction == "0") {
 							return h("span", {
 								style: {
-									color: "#42b983"
+									color: upColor
 								}
 							}, self.$t("swap.openup"));
 						} else {
 							return h("span", {
 								style: {
-									color: "#FF0000"
+									color: downColor
 								}
 							}, self.$t("swap.opendown"));
 						}
@@ -997,13 +1009,13 @@ export default function getData(self) {
 						if (params.row.direction == "0") {
 							return h("span", {
 								style: {
-									color: "#FF0000"
+									color: downColor
 								}
 							}, self.$t("swap.closedown"));
 						} else {
 							return h("span", {
 								style: {
-									color: "#42b983"
+									color: upColor
 								}
 							}, self.$t("swap.closeup"));
 						}
@@ -1108,13 +1120,13 @@ export default function getData(self) {
 					if (params.row.direction == "0") {
 						return h("span", {
 							style: {
-								color: "#42b983"
+								color: upColor
 							}
 						}, "做多" + message);
 					} else {
 						return h("span", {
 							style: {
-								color: "#FF0000"
+								color: downColor
 							}
 						}, "做空" + message);
 					}
@@ -1155,20 +1167,20 @@ export default function getData(self) {
 					if (params.row.status == 0) {
 						return h("span", {
 							style: {
-								color: "#42b983"
+								color: upColor
 							}
 						}, '--');
 					}
 					else if (params.row.profitAndLoss > 0) {
 						return h("span", {
 							style: {
-								color: "#42b983"
+								color: upColor
 							}
 						}, params.row.profitAndLoss + " USDT");
 					} else {
 						return h("span", {
 							style: {
-								color: "#FF0000"
+								color: downColor
 							}
 						}, params.row.profitAndLoss + " USDT");
 					}

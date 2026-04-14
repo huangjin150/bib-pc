@@ -19,7 +19,7 @@
         <div v-if="!registrationStatus" class="right-section">
           <div class="login-form-container">
             <div class="panel-header">
-              <h1 class="panel-title">欢迎来到 Bibcoin</h1>
+              <h1 class="panel-title">欢迎来到 BIBCEX</h1>
               <button class="switch-btn" @click="registrationJump">立即注册</button>
             </div>
             <div class="form-content">

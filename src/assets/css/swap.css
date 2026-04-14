@@ -352,11 +352,11 @@ p.math_price {
 }
 
 .trade_bd Button.bg-red {
-    background-color: #f15057;
+    background-color: #ff5a7a;
 }
 
 .trade_bd Button.bg-green {
-    background-color: #00b275;
+    background-color: #ABE127;
 }
 
 .trade_bd Button.bg-gray {
@@ -763,7 +763,7 @@ tr.ivu-table-row-highlight.ivu-table-row-hover td {
 
 .swap .silder-buy .ivu-slider-bar {
     height: 6px;
-    background: #00b275;
+    background: #ABE127;
 }
 
 .swap .market-price input {
@@ -1096,7 +1096,7 @@ tr.ivu-table-row-highlight.ivu-table-row-hover td {
 }
 
 .swap .open-close .operate .open-up {
-    background: #2bc287 !important;
+    background: #ABE127 !important;
     height: 40px;
     border: none;
     color: #fff;
@@ -1111,7 +1111,7 @@ tr.ivu-table-row-highlight.ivu-table-row-hover td {
 }
 
 .swap .open-close .operate .open-down {
-    background: #f74b60 !important;
+    background: #ff5a7a !important;
     height: 40px;
     border: none;
     color: #fff;
@@ -1123,11 +1123,11 @@ tr.ivu-table-row-highlight.ivu-table-row-hover td {
 }
 
 .swap .green {
-    color: #d0f500 !important;
+    color: #ABE127 !important;
 }
 
 .swap .red {
-    color: #f43f5e !important;
+    color: #ff5a7a !important;
 }
 
 .swap .open-close .open .open-tips {

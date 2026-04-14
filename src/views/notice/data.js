@@ -1,8 +1,8 @@
 export const marketItems = [{
 	type: 'trading_pairs',
 	id: "0",
-	title: 'Bibcoin最新动态',
-	description: '及时掌握Bibcoin的最新资讯。',
+	title: 'BIBCEX最新动态',
+	description: '及时掌握BIBCEX的最新资讯。',
 	img: require('@/assets/images/notice_new.png')
 },
 {
@@ -37,7 +37,7 @@ export const marketItems = [{
 	type: 'maintenance',
 	id: "5",
 	title: '投票公告',
-	description: '查看Bibcoin新闻中心发布的Bibcoin投票的最新资讯。',
+	description: '查看BIBCEX新闻中心发布的BIBCEX投票的最新资讯。',
 	img: require('@/assets/images/vote.png')
 },
 
@@ -45,7 +45,7 @@ export const marketItems = [{
 	type: 'airdrop',
 	id: "6",
 	title: '其他',
-	description: '查看Bibcoin其他资讯。',
+	description: '查看BIBCEX其他资讯。',
 	img: require('@/assets/images/other.png')
 }
 ]

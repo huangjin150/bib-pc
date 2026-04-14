@@ -5,7 +5,7 @@
             <div class="hero-bg-lines"></div>
             <div class="hero-content container">
                 <div class="hero-center">
-                    <div class="brand-badge">Bibcoin Crypto Exchange</div>
+                    <div class="brand-badge">BIBCEX Crypto Exchange</div>
                     <h1 class="hero-title">重新定义全球资产交易体验</h1>
                     <p class="hero-desc">安全、快捷、轻松交易 <strong>美股</strong>、<strong>大宗商品</strong> 与
                         <strong>虚拟币</strong>。<br>为全球 4300 万用户提供一站式、全方位的数字资产与传统金融服务。
@@ -150,7 +150,7 @@
             <div class="container">
                 <div class="section-header center">
                     <h2 class="section-title">来自全球媒体的认可</h2>
-                    <p class="section-subtitle">行业顶尖媒体如何评价 Bibcoin</p>
+                    <p class="section-subtitle">行业顶尖媒体如何评价 BIBCEX</p>
                 </div>
                 <MediaTestimonials :items="mediaReviews" />
             </div>
@@ -220,77 +220,77 @@ export default {
             ],
             ecosystemItems: [
                 {
-                    title: 'Bibcoin 交易平台',
+                    title: 'BIBCEX 交易平台',
                     desc: '全球领先的综合交易平台，一站式连通三大核心市场。不仅支持 3,400+ 种虚拟币现货与合约交易，更零门槛提供全球顶级美股及大宗商品（黄金、原油等）的极速交易服务，全方位满足您的投资需求。',
                     icon: require('../../assets/svg/introduction_svg1.svg')
                 },
                 {
-                    title: 'Bibcoin Layer',
+                    title: 'BIBCEX Layer',
                     desc: '基于 OP Stack 构建的高性能二层网络，完全兼容以太坊 EVM，可实现每秒 5,700 笔以上交易，区块生成时间仅 1 秒，交易费用远低于多数现有二层网络，为 Web3 应用提供更快、更安全、更经济的基础设施。',
                     icon: require('../../assets/svg/introduction_svg2.svg')
                 },
                 {
-                    title: 'Bibcoin Perp DEX',
-                    desc: 'Bibcoin 自主研发的去中心化永续合约交易所，基于高性能二层网络 Bibcoin Layer，内置高性能撮合引擎，支持高并发处理与低延迟交易，打造接近专业 CEX 的使用体验。',
+                    title: 'BIBCEX Perp DEX',
+                    desc: 'BIBCEX 自主研发的去中心化永续合约交易所，基于高性能二层网络 BIBCEX Layer，内置高性能撮合引擎，支持高并发处理与低延迟交易，打造接近专业 CEX 的使用体验。',
                     icon: require('../../assets/svg/introduction_svg3.svg')
                 },
                 {
-                    title: 'Bibcoin 全域资产池',
+                    title: 'BIBCEX 全域资产池',
                     desc: '打破传统金融与加密资产的隔阂。在全域资产池中，您可以将虚拟货币、美股持仓或大宗商品合约作为统一保证金，实现资金的高效周转与跨市场对冲。',
                     icon: require('../../assets/svg/introduction_svg4.svg')
                 },
                 {
-                    title: 'Bibcoin Alpha',
+                    title: 'BIBCEX Alpha',
                     desc: '专注于早期优质链上项目的交易平台，融合 CEX 的便捷体验与 DEX 的链上自由。用户可直接使用交易所的 USDT 无缝购买链上热门代币，轻松探索 Web3 潜力项目。',
                     icon: require('../../assets/svg/introduction_svg5.svg')
                 },
                 {
-                    title: 'Bibcoin Wealth',
+                    title: 'BIBCEX Wealth',
                     desc: '专业的全品类财富管理中心。提供从虚拟币余币宝、链上赚币，到挂钩美股和大宗商品表现的结构性理财产品，助您在不同市场周期中稳健增值。',
                     icon: require('../../assets/svg/introduction_svg6.svg')
                 },
                 {
-                    title: 'Bibcoin Pay',
+                    title: 'BIBCEX Pay',
                     desc: '从收单、下发到法币出入金，一站式加密支付服务，快速、安全，驱动数字支付融入更多场景。',
                     icon: require('../../assets/svg/introduction_svg7.svg')
                 },
                 {
-                    title: 'Bibcoin Labs',
+                    title: 'BIBCEX Labs',
                     desc: '用专业点燃创意，为初创项目提供孵化支持与运营资源，陪伴每一个创新想法从起步走向成功。',
                     icon: require('../../assets/svg/introduction_svg8.svg')
                 },
                 {
-                    title: 'Bibcoin Life',
-                    desc: '数字货币消费与娱乐的一站式平台，集成 Bibcoin Gift Card、Bibcoin Pay 支付、C2C 转账等核心功能。',
+                    title: 'BIBCEX Life',
+                    desc: '数字货币消费与娱乐的一站式平台，集成 BIBCEX Gift Card、BIBCEX Pay 支付、C2C 转账等核心功能。',
                     icon: require('../../assets/svg/introduction_svg9.svg')
                 },
                 {
-                    title: 'Bibcoin Ventures',
+                    title: 'BIBCEX Ventures',
                     desc: '聚焦区块链与金融科技基础设施投资的加密风投基金，赋能未来，推动数字经济的创新与变革。',
                     icon: require('../../assets/svg/introduction_svg10.svg')
                 },
                 {
-                    title: 'Bibcoin Learn & Research',
+                    title: 'BIBCEX Learn & Research',
                     desc: '全方位的投资教育与投研智库。从加密市场前沿洞察，到美股财报深度解析与大宗商品周期分析，为您提供最专业的交易参考。',
                     icon: require('../../assets/svg/introduction_svg11.svg')
                 },
                 {
-                    title: 'Bibcoin Web3',
-                    desc: 'Bibcoin Web3 是 Bibcoin 生态的全新链上入口，集钱包、跨链、交易、空投、赚币与 DApp 于一体，构建开放互联的 Web3 全域生态。',
+                    title: 'BIBCEX Web3',
+                    desc: 'BIBCEX Web3 是 BIBCEX 生态的全新链上入口，集钱包、跨链、交易、空投、赚币与 DApp 于一体，构建开放互联的 Web3 全域生态。',
                     icon: require('../../assets/svg/introduction_svg12.svg')
                 },
                 {
-                    title: 'Bibcoin Post',
+                    title: 'BIBCEX Post',
                     desc: '全领域投资者专属社交平台，聚焦加密、美股与大宗商品的热点资讯，洞悉行业脉搏、链接全球顶尖交易者。',
                     icon: require('../../assets/svg/introduction_svg13.svg')
                 },
                 {
-                    title: 'Bibcoin Live',
+                    title: 'BIBCEX Live',
                     desc: '官方专业直播平台，汇聚全球行业前沿分析师，为您提供覆盖加密资产、美股走势与大宗商品宏观周期的全天候行情解读。',
                     icon: require('../../assets/svg/introduction_svg14.svg')
                 },
                 {
-                    title: 'Bibcoin Charity',
+                    title: 'BIBCEX Charity',
                     desc: '全球性非盈利慈善基金组织，致力于将区块链技术与传统公益相结合，打造透明、高效、可持续的慈善生态。',
                     icon: require('../../assets/svg/introduction_svg15.svg')
                 },
@@ -298,49 +298,49 @@ export default {
             ],
             mediaReviews: [
                 {
-                    quote: 'Bibcoin 是 Winkrypto 值得信赖的合作伙伴。我们见证了 Bibcoin 团队不断的努力和奉献。合约产品是众多 CEX 和 DEX 平台核心竞争力的关键特征之一。 Bibcoin 通过提供稳定的交互用户体验，是市场波动时的完美主机。Bibcoin 上架的许多主流加密资产都具有高流动性，并提供有竞争力的价格。',
+                    quote: 'BIBCEX 是 Winkrypto 值得信赖的合作伙伴。我们见证了 BIBCEX 团队不断的努力和奉献。合约产品是众多 CEX 和 DEX 平台核心竞争力的关键特征之一。 BIBCEX 通过提供稳定的交互用户体验，是市场波动时的完美主机。BIBCEX 上架的许多主流加密资产都具有高流动性，并提供有竞争力的价格。',
                     img_icon: require('@/assets/images/aboutUs_icon.png'),
                     source: 'Media',
                     logo: null
                 },
                 {
-                    quote: '全球数字金融联合主席 Lawrence Wintermeyer 评论说：“全球加密和数字资产领域继续快速成熟我们看到数字金融得到更广泛的采用。我们很高兴 Bibcoin 加入 GDF 赞助人委员会，作为该领域的领先创新者，我们期待与他们合作，参与和促进 GDF 在社区中的知识共享计划。”',
+                    quote: '全球数字金融联合主席 Lawrence Wintermeyer 评论说：“全球加密和数字资产领域继续快速成熟我们看到数字金融得到更广泛的采用。我们很高兴 BIBCEX 加入 GDF 赞助人委员会，作为该领域的领先创新者，我们期待与他们合作，参与和促进 GDF 在社区中的知识共享计划。”',
                     img_icon: require('@/assets/images/aboutUsIcon2.png'),
                     source: 'Media',
                     logo: null
                 },
                 {
-                    quote: 'Bibcoin 将无数的加密货币和市场汇集在一个地方。几乎有太多的加密货币可供选择，甚至有更多的市场可供选择。当您打开“市场”选项卡时，左侧会打开一个加密货币列表，您可以搜索您的首选货币。',
+                    quote: 'BIBCEX 将无数的加密货币和市场汇集在一个地方。几乎有太多的加密货币可供选择，甚至有更多的市场可供选择。当您打开“市场”选项卡时，左侧会打开一个加密货币列表，您可以搜索您的首选货币。',
                     img_icon: require('@/assets/images/aboutUsIcon3.png'),
                     source: 'Media',
                     logo: null
                 },
                 {
-                    quote: '我们一直在 Bibcoin 上进行愉快的交易，并高度重视我们的业务关系并期待继续下去。',
+                    quote: '我们一直在 BIBCEX 上进行愉快的交易，并高度重视我们的业务关系并期待继续下去。',
                     img_icon: require('@/assets/images/aboutUsIcon4.png'),
                     source: 'Media',
                     logo: null
                 },
                 {
-                    quote: 'Tower Research Capital 很高兴成为 Bibcoin 的一部分，并为交易所的交易币组合提供流动性',
+                    quote: 'Tower Research Capital 很高兴成为 BIBCEX 的一部分，并为交易所的交易币组合提供流动性',
                     img_icon: require('@/assets/images/aboutUsIcon5.png'),
                     source: 'Media',
                     logo: null
                 },
                 {
-                    quote: 'Banxa 的整个团队很自豪能与 Bibcoin 合作，以推进我们将数字资产推向世界的共同使命。',
+                    quote: 'Banxa 的整个团队很自豪能与 BIBCEX 合作，以推进我们将数字资产推向世界的共同使命。',
                     img_icon: require('@/assets/images/aboutUsIcon6.png'),
                     source: 'Media',
                     logo: null
                 },
                 {
-                    quote: '我们是 Bibcoin 的忠实拥护者，见证了它在过去几年中不断攀升的排名，并达到了超过 100 亿美元的日交易量（有时）。作为一个交易平台，设计师们做了了不起的工作，引入了友好的质押服务、期货交易、保证金交易、期权交易、以友好的利率借贷，以及一个包容性的“启动”计划，以支持新兴数字资产的兴起。',
+                    quote: '我们是 BIBCEX 的忠实拥护者，见证了它在过去几年中不断攀升的排名，并达到了超过 100 亿美元的日交易量（有时）。作为一个交易平台，设计师们做了了不起的工作，引入了友好的质押服务、期货交易、保证金交易、期权交易、以友好的利率借贷，以及一个包容性的“启动”计划，以支持新兴数字资产的兴起。',
                     img_icon: require('@/assets/images/aboutUsIcon7.png'),
                     source: 'Media',
                     logo: null
                 },
                 {
-                    quote: '据 CoinMarketCap.com 称，Bibcoin 让用户可以访问超过 1500 种不同的代币，这对于寻找不太常见的山寨币的高级加密交易者来说是更好的选择。',
+                    quote: '据 CoinMarketCap.com 称，BIBCEX 让用户可以访问超过 1500 种不同的代币，这对于寻找不太常见的山寨币的高级加密交易者来说是更好的选择。',
                     img_icon: require('@/assets/images/aboutUsIcon8.png'),
                     source: 'Media',
                     logo: null

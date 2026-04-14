@@ -396,6 +396,12 @@ export default {
             locale: 'zh-HK',
         });
         this.chart.setBarSpace(6)
+
+        const upColorPref = localStorage.getItem('upColor') || 'green';
+        const isGreenUp = upColorPref === 'green';
+        const klineUpColor = isGreenUp ? '#ABE127' : '#ff5a7a';
+        const klineDownColor = isGreenUp ? '#ff5a7a' : '#ABE127';
+
         const option = {
             crosshair: {
                 show: true,
@@ -422,14 +428,14 @@ export default {
             candle: {
                 bar: {
                     compareRule: 'current_open',
-                    upColor: '#f43f5e',
-                    downColor: '#abe127',
+                    upColor: klineUpColor,
+                    downColor: klineDownColor,
                     noChangeColor: '#888888',
-                    upBorderColor: '#f43f5e',
-                    downBorderColor: '#abe127',
+                    upBorderColor: klineUpColor,
+                    downBorderColor: klineDownColor,
                     noChangeBorderColor: '#888888',
-                    upWickColor: '#f43f5e',
-                    downWickColor: '#abe127',
+                    upWickColor: klineUpColor,
+                    downWickColor: klineDownColor,
                     noChangeWickColor: '#888888'
                 },
                 tooltip: {
@@ -468,8 +474,8 @@ export default {
                     last: {
                         show: true,
                         compareRule: 'current_open',
-                        upColor: '#f43f5e',
-                        downColor: '#abe127',
+                        upColor: klineUpColor,
+                        downColor: klineDownColor,
                         noChangeColor: '#888888',
                         line: {
                             show: true,
@@ -524,8 +530,8 @@ export default {
                 ohlc: {
                     // 'current_open' | 'previous_close'
                     compareRule: 'current_open',
-                    upColor: '#f43f5e',
-                    downColor: '#abe127',
+                    upColor: klineUpColor,
+                    downColor: klineDownColor,
                     noChangeColor: '#888888'
                 },
                 bars: [{
@@ -535,8 +541,8 @@ export default {
                     borderStyle: 'solid',
                     borderSize: 1,
                     borderDashedValue: [2, 2],
-                    upColor: '#f43f5e',
-                    downColor: '#abe127',
+                    upColor: klineUpColor,
+                    downColor: klineDownColor,
                     noChangeColor: '#888888'
                 }],
                 tooltip: {

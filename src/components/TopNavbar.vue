@@ -64,6 +64,11 @@
                     <div class="menu-icon"><img src="../assets/svg/invitation.svg" alt=""></div>
                     <span>邀请好友</span>
                   </div>
+
+                  <div class="menu-item" @click="openPreferences">
+                    <div class="menu-icon"><img src="../assets/svg/invitation.svg" alt=""></div>
+                    <span>偏好设置</span>
+                  </div>
                 </div>
 
                 <div class="logout-section">
@@ -107,6 +112,33 @@
           <LanguangeIcon style="width: 20px; height: 20px;" :size="14" className="global-btn1" />
         </button> -->
 
+        <!-- 偏好设置弹窗 -->
+        <Modal v-model="showPreferencesModal" title="偏好设置" :footer-hide="true" width="400" class-name="vertical-center-modal preference-modal">
+          <div class="pref-content">
+            <div class="pref-form-group">
+              <label class="pref-label">涨跌颜色显示</label>
+              <div class="pref-select-wrapper">
+                <div class="pref-radio-option" :class="{ active: upColor === 'green' }" @click="setUpColor('green')">
+                  <div class="radio-circle">
+                    <div class="radio-inner" v-if="upColor === 'green'"></div>
+                  </div>
+                  <span class="radio-text">绿涨红跌 (Green Up / Red Down)</span>
+                </div>
+                <div class="pref-radio-option" :class="{ active: upColor === 'red' }" @click="setUpColor('red')">
+                  <div class="radio-circle">
+                    <div class="radio-inner" v-if="upColor === 'red'"></div>
+                  </div>
+                  <span class="radio-text">红涨绿跌 (Red Up / Green Down)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pref-footer">
+              <button class="pref-save-btn" @click="showPreferencesModal = false">确定</button>
+            </div>
+          </div>
+        </Modal>
+
         <!-- 主题切换 -->
         <!-- <button class="theme-btn" @click="toggleTheme">
           <BrightColorIcon style="width: 20px; height: 20px;" :size="14" className="theme-btn1" />
@@ -141,7 +173,9 @@ export default {
       showLangMenu: false,
       showUserMenu: false,
       showdownload: false,
+      showPreferencesModal: false,
       currentLang: 'zh',
+      upColor: localStorage.getItem('upColor') || 'green', // 'green' or 'red'
       navItems: [
         { name: '行情', path: '/market' },
         { name: '合约', path: '/swap' },
@@ -195,6 +229,17 @@ export default {
       localStorage.removeItem('TOKEN')
       this.showUserMenu = false
       this.$router.push('/login')
+    },
+    openPreferences() {
+      this.showUserMenu = false;
+      this.showPreferencesModal = true;
+    },
+    setUpColor(color) {
+      this.upColor = color;
+      localStorage.setItem('upColor', color);
+      // Optional: trigger an event or Vuex mutation if other components need to react instantly without reload
+      // We will reload the page for simplicity to apply changes everywhere easily
+      window.location.reload();
     }
   },
   mounted() {
@@ -627,6 +672,137 @@ export default {
   top: 50px;
   right: -20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
 
+.preference-modal {
+  ::v-deep .ivu-modal-content {
+    background-color: #ffffff;
+    color: #333333;
+    border-radius: 16px;
+    border: none;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  }
+  ::v-deep .ivu-modal-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #f3f4f6;
+    padding: 16px 24px;
+  }
+  ::v-deep .ivu-modal-header-inner {
+    color: #111827;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  ::v-deep .ivu-modal-close .ivu-icon-ios-close {
+    color: #9ca3af;
+    transition: color 0.2s;
+  }
+  ::v-deep .ivu-modal-close .ivu-icon-ios-close:hover {
+    color: #4b5563;
+  }
+}
+
+.pref-content {
+  padding: 12px 16px;
+}
+
+.pref-form-group {
+  margin-bottom: 24px;
+}
+
+.pref-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+.pref-select-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pref-radio-option {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #f9fafb;
+    border-color: #d1d5db;
+  }
+
+  &.active {
+    background-color: rgba(171, 225, 39, 0.1);
+    border-color: #ABE127;
+  }
+}
+
+.radio-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #d1d5db;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.pref-radio-option.active .radio-circle {
+  border-color: #ABE127;
+}
+
+.radio-inner {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ABE127;
+}
+
+.radio-text {
+  font-size: 15px;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+.pref-radio-option.active .radio-text {
+  color: #111827;
+}
+
+.pref-footer {
+  margin-top: 12px;
+  padding-top: 16px;
+  text-align: right;
+}
+
+.pref-save-btn {
+  background-color: #ABE127;
+  color: #000;
+  border: none;
+  padding: 10px 32px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: #bdf23a;
+    box-shadow: 0 4px 12px rgba(171, 225, 39, 0.3);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
 }
 </style>

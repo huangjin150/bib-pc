@@ -18,7 +18,7 @@
                                         <div class="stat-label">总佣金</div>
                                         <div class="stat-value">
                                             <span class="amount">{{ truncateToTwoDecimal(totalCommissionRebate)
-                                                }}</span>
+                                            }}</span>
                                             <span class="currency">USDT</span>
                                         </div>
                                     </div>
@@ -89,7 +89,7 @@
                                                 <span style="width: 20%;" class="info-label">推荐链接</span>
                                                 <div style="width: 70%;" class="flex_alicenter">
                                                     <span style="max-width: 340px;" class="link-text">{{ linkUrl
-                                                        }}</span>
+                                                    }}</span>
                                                     <button class="copy-btn" @click="copyLink">
                                                         <img src="../../assets/images/copy.svg" alt="">
                                                     </button>
@@ -161,7 +161,7 @@ export default {
     data() {
         return {
             inviteCode: '',
-            baseUrl: 'https://www.Bibcoin.pro/register?inviteCode=',
+            baseUrl: 'https://www.BIBCEX.pro/register?inviteCode=',
             promotionCode: '',
             linkUrl: '',
             memberData: {},

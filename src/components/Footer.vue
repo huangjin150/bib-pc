@@ -6,7 +6,7 @@
         <!-- 左侧：Logo和社交媒体 -->
         <div class="footer-left">
           <div class="footer-logo">
-            <img width="100%" src="../assets/images/logo-338.png" alt="Bibcoin" class="logo-img" />
+            <img width="100%" src="../assets/images/logo-338.png" alt="BIBCEX" class="logo-img" />
           </div>
           <p class="footer-description">解锁通往加密货币宇宙的大门
           </p>
@@ -62,7 +62,7 @@
           <div class="nav-column">
             <h4 class="nav-title">关于我们</h4>
             <ul class="nav-list">
-              <li><a href="/introduce" class="nav-link">关于Bibcoin</a></li>
+              <li><a href="/introduce" class="nav-link">关于BIBCEX</a></li>
               <li><a href="/announcementList/4" class="nav-link">交易对上新</a></li>
               <li><a href="/announcement/0" class="nav-link">平台公告</a></li>
               <li class="nav-link">
@@ -152,7 +152,7 @@
       <!-- 底部版权和语言选择 -->
       <!-- <div class="footer-bottom">
         <div class="footer-bottom-left">
-          <p class="copyright">© 2025 Bibcoin</p>
+          <p class="copyright">© 2025 BIBCEX</p>
           <p class="terms">隐私条款</p>
           <p class="terms">条款协议</p>
         </div>

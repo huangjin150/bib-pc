@@ -118,9 +118,21 @@ export default {
                     key: "rose",
                     render: (h, params) => {
                         const isUp = parseFloat(params.row.rose) >= 0;
+                        const upColor = localStorage.getItem('upColor') || 'green';
+                        
+                        let color;
+                        if (upColor === 'green') {
+                            color = isUp ? '#ABE127' : '#ff5a7a';
+                        } else {
+                            color = isUp ? '#ff5a7a' : '#ABE127';
+                        }
+
                         return h("span", {
-                            class: { green: isUp, red: !isUp },
-                            style: { fontWeight: 600, fontSize: "14px" }
+                            style: {
+                                fontWeight: 600,
+                                fontSize: "14px",
+                                color: color
+                            }
                         }, params.row.rose);
                     }
                 },
@@ -196,9 +208,21 @@ export default {
                     key: "rose",
                     render: (h, params) => {
                         const isUp = parseFloat(params.row.rose) >= 0;
+                        const upColor = localStorage.getItem('upColor') || 'green';
+                        
+                        let color;
+                        if (upColor === 'green') {
+                            color = isUp ? '#ABE127' : '#ff5a7a';
+                        } else {
+                            color = isUp ? '#ff5a7a' : '#ABE127';
+                        }
+
                         return h("span", {
-                            class: { green: isUp, red: !isUp },
-                            style: { fontWeight: 600, fontSize: "14px" }
+                            style: { 
+                                fontWeight: 600, 
+                                fontSize: "14px",
+                                color: color
+                            }
                         }, params.row.rose);
                     }
                 },
