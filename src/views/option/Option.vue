@@ -1879,7 +1879,9 @@ export default {
   margin-right: 10px;
 }
 
-.option .trade_panel .panel.panel_buy {}
+.option .trade_panel .panel.panel_buy {
+  background-color: #000;
+}
 
 .option .trade_panel .panel.panel_sell {
   padding-right: 15px;
