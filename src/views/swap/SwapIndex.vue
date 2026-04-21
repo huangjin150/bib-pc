@@ -262,7 +262,7 @@
                 <input type="text" placeholder="开仓数量" v-model="form.volume" @focus="onOpenAmountFocus"
                   @keyup="handleOpenVolumeInput" />
                 <div class="suffix">
-                  <span>BTC</span>
+                  <span>{{ currentCoin.coin }}</span>
                 </div>
               </div>
             </div>
@@ -295,7 +295,7 @@
             </div>
             <div class="assets-list">
               <div class="asset-item"><span class="label">可用保证金</span><span class="value">{{ freeMargin() | fixed4
-                  }}</span></div>
+              }}</span></div>
               <div class="asset-item"><span class="label">持仓保证金</span><span class="value">{{ bonds() | fixed4 }}</span>
               </div>
               <div class="asset-item"><span class="label">未实现盈亏</span><span class="value">{{ unrealizedProfitAndLoss() |
@@ -1191,18 +1191,6 @@ export default {
 
     handleOpenVolumeInput() {
       this.form.volume = this.form.volume.replace(/[^\d^\.]+/g, '');
-      const currentVolume = Number(this.form.volume);
-      const maxVolume = this.avaOpenBuy();
-      if (!Number.isFinite(currentVolume) || currentVolume <= 0 || !Number.isFinite(maxVolume) || maxVolume <= 0) {
-        this.value1 = 0;
-        this.sliderOpenPercent = 0;
-        this.styleAdd();
-        return;
-      }
-      const percent = Math.min(100, Math.max(0, currentVolume / maxVolume * 100));
-      this.value1 = Number(percent.toFixed(4));
-      this.sliderOpenPercent = this.value1;
-      this.styleAdd();
     },
 
     initKlineResizeObserver() {
