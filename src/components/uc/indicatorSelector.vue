@@ -130,7 +130,8 @@ export default {
     max-height: 600px;
     display: flex;
     flex-direction: column;
-    background-color: #fff;
+    background-color: #000;
+    border: 1px solid #292929;
 
 }
 
@@ -139,7 +140,7 @@ export default {
     justify-content: space-between;
     align-items: center;
     padding: 16px 20px;
-    border-bottom: 1px solid #eaeaed;
+    border-bottom: 1px solid #292929;
     border-radius: 8px 8px 0 0;
 }
 

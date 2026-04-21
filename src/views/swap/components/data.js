@@ -554,7 +554,8 @@ export default function getData(self) {
 						h('Tooltip', {
 							props: {
 								content: `维持保证金=持仓名义价值*0.3%`,
-								placement: 'top'
+								placement: 'top',
+								color: '#fff'
 							}
 						}, [
 							h('img', {
