@@ -376,6 +376,16 @@ export default {
           }
         },
         {
+          title: '手续费',
+          key: "rewardAmount",
+          minWidth: 65,
+          render: (h, params) => {
+            let txt = params.row.fee;
+
+            return h("span", {}, txt);
+          }
+        },
+        {
           title: self.$t("option.col_rewardAmount"),
           key: "rewardAmount",
           minWidth: 65,
@@ -1319,6 +1329,16 @@ export default {
   background-color: transparent !important;
   border-bottom: 1px solid #1a1a1a !important;
   color: #fff !important;
+}
+
+::v-deep(.ivu-table th) {
+  border-bottom: 1px solid #1a1a1a !important;
+
+}
+
+::v-deep(.ivu-table td) {
+  border-bottom: 1px solid #1a1a1a !important;
+
 }
 
 .dark-skin .ivu-table th {
