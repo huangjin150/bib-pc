@@ -1307,6 +1307,11 @@ export default {
   border-bottom: 1px solid #1a1a1a !important;
 }
 
+::v-deep(.ivu-table td) {
+  color: #fff !important;
+  background-color: #000;
+}
+
 .dark-skin .ivu-table,
 .dark-skin .ivu-table-wrapper,
 .dark-skin .ivu-table td,
@@ -1363,6 +1368,14 @@ export default {
 .dark-skin .ivu-page-item {
   background-color: #1a1a1a !important;
   border-color: #333 !important;
+}
+
+::v-deep(.ivu-page-item) {
+  background-color: #1a1a1a !important;
+}
+
+::v-deep(.ivu-page-disabled) {
+  background-color: #1a1a1a !important;
 }
 
 .dark-skin .ivu-page-item a {

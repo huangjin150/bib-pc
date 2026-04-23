@@ -64,6 +64,9 @@
                 <div class="balance-info">
                     <span class="balance-text">余额：<span class="balance-amount">{{ num }}</span>USDT</span>
                 </div>
+                <div class="fee-info">
+                    <span class="fee-text">手续费：<span class="fee-amount">{{ transferFee }}</span> USDT</span>
+                </div>
             </div>
 
             <div class="submit-section">
@@ -105,12 +108,13 @@ export default {
                 { symbol: 'USDT', icon: '/images/usdt-icon.png' },
             ],
             amountError: false,
-            amountErrorMessage: ''
+            amountErrorMessage: '',
+            transferFee: ''
         }
     },
     computed: {
         canTransfer() {
-            return this.recipientId && this.transferAmount && parseFloat(this.transferAmount) > 0 && parseFloat(this.transferAmount) <= this.balance
+            return this.recipientId && this.transferAmount && parseFloat(this.transferAmount) > 0 && (parseFloat(this.transferAmount) + 0.1) <= this.balance
         }
     },
     methods: {
@@ -149,9 +153,9 @@ export default {
             }
 
             const currentBalance = this.assetsWallet.balance || 0;
-            if (amount > currentBalance) {
+            if (amount + 0.1 > currentBalance) {
                 this.amountError = true;
-                this.amountErrorMessage = '转账数量不能超过可用余额';
+                this.amountErrorMessage = '转账数量加上手续费不能超过可用余额';
                 return false;
             }
 
@@ -159,7 +163,10 @@ export default {
         },
 
         setMaxAmount() {
-            this.transferAmount = this.assetsWallet.balance ? this.MathFloor(this.assetsWallet.balance) : 0
+            let maxAmount = (this.assetsWallet.balance || 0) - 0.1;
+            if (maxAmount < 0) maxAmount = 0;
+            this.transferAmount = this.MathFloor(maxAmount);
+            this.validateAmount();
         },
 
         confirmTransfer() {
@@ -210,6 +217,7 @@ export default {
                     var resp = response.body;
                     if (resp.data && resp.data.length > 0) {
                         this.assetsWallet = resp.data[0]
+                        this.transferFee = resp.data[0].memo
                         this.num = this.assetsWallet.balance
                         this.balance = this.num
                     }
@@ -418,6 +426,21 @@ export default {
                     color: #666666;
 
                     .balance-amount {
+                        color: #1a1a1a;
+                        font-weight: 500;
+                    }
+                }
+            }
+
+            .fee-info {
+                text-align: end;
+                margin-top: 4px;
+
+                .fee-text {
+                    font-size: 14px;
+                    color: #666666;
+
+                    .fee-amount {
                         color: #1a1a1a;
                         font-weight: 500;
                     }
