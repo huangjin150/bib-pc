@@ -66,6 +66,11 @@ const routes = [
     component: () => import('@/views/account/invite.vue')
   },
   {
+    path: '/transferUser',
+    name: 'transferUserView',
+    component: () => import('@/views/assets/transferUser.vue')
+  },
+  {
     path: '/assets',
     component: () => import('@/views/assets/PropertyLayout.vue'),
     redirect: '/assets/overview',
@@ -149,6 +154,11 @@ const routes = [
   {
     path: "/eventContract",
     component: (resolve) => require(["@/views/option/Option_event.vue"], resolve),
+    name: "SwapPair",
+  },
+  {
+    path: "/sports",
+    component: (resolve) => require(["@/views/sports/index.vue"], resolve),
     name: "SwapPair",
   },
   {

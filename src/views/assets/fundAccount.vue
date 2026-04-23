@@ -18,6 +18,9 @@
                 <button class="action-btn secondary" @click="navigateTo('/assets/transfer')">
                     划转
                 </button>
+                <button class="action-btn secondary" @click="navigateTo('/transferUser')">
+                    转账
+                </button>
             </div>
         </div>
 

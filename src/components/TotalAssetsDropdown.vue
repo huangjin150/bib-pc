@@ -39,6 +39,12 @@
                         </div>
                         <span>划转</span>
                     </div>
+                    <div class="action-btn" @click="navigateTo('/transferUser')">
+                        <div class="action-icon">
+                            <img style="width: 24px; height: 24px;" src="../assets/svg/transfer_fff.svg" alt="">
+                        </div>
+                        <span>转账</span>
+                    </div>
                 </div>
 
                 <div class="my-assets-section">
