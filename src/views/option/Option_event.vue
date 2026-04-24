@@ -195,7 +195,7 @@ export default {
       skin: "night", //皮肤样式day&night
       coinList: [],
       streamList: [],
-      currentCoinSymbol: "BTC/USDT",
+      currentCoinSymbol: "XAU/USDT",
       isCollecting: false,
       rewardAmount: 0, // 示例奖励金额
       currentBalance: 0,
@@ -245,7 +245,7 @@ export default {
         number: 0,
       },
       currentCoinList: {
-        symbol: 'BTC/USDT'
+        symbol: 'XAU/USDT'
       },
       myOpeningOption: {
         betAmount: 0
@@ -454,7 +454,7 @@ export default {
       //模拟数据选择当前币种
       cities: [{
         id: 1,
-        label: 'BTCUSDT',
+        label: 'XAUUSDT',
         value: '80000'
       }],
       //已过期奖池假数据
