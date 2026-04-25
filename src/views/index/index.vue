@@ -1319,4 +1319,15 @@ export default {
     flex-direction: column;
 
 }
+
+::v-deep(.ivu-spin-fix) {
+    // background-color: #8e949e;
+    // border: none !important; 
+    border: 1px solid rgb(26, 26, 26) !important;
+    background-color: transparent !important;
+}
+
+::v-deep(.ivu-table td) {
+    background-color: transparent !important;
+}
 </style>
