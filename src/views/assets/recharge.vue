@@ -228,10 +228,24 @@ export default {
                 this.netwokers.forEach(item => {
                     if (item.id == this.selectedNetwork.id) {
                         this.depositAddress = item
-                        this.rechargeAddress = '0x' + this.depositAddress.rechargeAddress
+                        this.getRechargeAddress()
                     }
                 });
             }
+        },
+        async getRechargeAddress() {
+            await this.$http
+                .post(this.host + "/asset/wallet/reset-address", {
+                    unit: 'USDT'
+                })
+                .then(response => {
+                    var resp = response.body;
+                    if (resp.code == 0) {
+                        this.rechargeAddress = '0x' + resp.data.address;
+                    } else {
+                        this.$Message.error(resp.message);
+                    }
+                });
         },
         async newwokerlistGet() {
             await this.$http
