@@ -4,7 +4,7 @@
       style="display:none;background-image: linear-gradient( 135deg, #FD6585 10%, #0D25B9 100%);text-align: center;height:30px;line-height:30px;letter-spacing: 1px;color:#FFF;">
     </div>
     <div class="ctc_container">
-      <h1>{{ $t('option.desc') }}</h1>
+      <h1>XAU(黄金)</h1>
       <div class="main">
         <div class="ctc-container">
           <div class="trade_wrap">
@@ -1965,11 +1965,11 @@ export default {
   height: 100%;
 
   >h1 {
-    margin-top: -150px;
-    font-size: 32px;
+    margin-top: -50px;
+    font-size: 24px;
     line-height: 1;
-    padding: 50px 0 20px 0;
-    letter-spacing: 3px;
+    padding: 20px 0 0 10px;
+    letter-spacing: 2px;
   }
 }
 
