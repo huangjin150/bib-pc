@@ -267,7 +267,7 @@ export default {
         {
           title: "币种",
           key: "optionNo",
-          minWidth: 120,
+          minWidth: 40,
           render: (h, params) => {
             return h("span", {}, params.row.symbol);
           }
@@ -275,7 +275,7 @@ export default {
         {
           title: '时间',
           key: "Time",
-          minWidth: 65,
+          minWidth: 40,
           render: (h, params) => {
             return h("span", {}, params.row.guessCycle + '分钟');
 
@@ -284,7 +284,7 @@ export default {
         {
           title: "下单金额",
           key: "amount",
-          minWidth: 65,
+          minWidth: 40,
           render: (h, params) => {
             return h("span", {}, params.row.amount);
           }
@@ -292,7 +292,7 @@ export default {
         {
           title: self.$t("option.col_direction"),
           key: "direction",
-          minWidth: 65,
+          minWidth: 40,
           render: (h, params) => {
             let txt = params.row.direction == 1 ? '涨' : '跌';
             const txtColor = params.row.direction == 1 ? "#2bc287" : "#FF0000";
@@ -308,7 +308,7 @@ export default {
         {
           title: self.$t("option.col_result"),
           key: "result",
-          minWidth: 65,
+          minWidth: 40,
           render: (h, params) => {
             let txt = self.$t("option.wait");
             let txtColor = "#fff";
@@ -342,7 +342,7 @@ export default {
             }
             return h("div", {
               style: {
-                color: txtColor,
+                color: "#fff",
                 backgroundColor: bgColor,
                 padding: '2px 8px',
                 borderRadius: '2px',
@@ -368,7 +368,7 @@ export default {
         {
           title: '支付率',
           key: "rewardAmount",
-          minWidth: 65,
+          minWidth: 40,
           render: (h, params) => {
             let txt = ((params.row.rate - 1) * 100).toFixed(2) + '%';
 
@@ -378,7 +378,7 @@ export default {
         {
           title: '手续费',
           key: "rewardAmount",
-          minWidth: 65,
+          minWidth: 40,
           render: (h, params) => {
             let txt = params.row.fee;
 
@@ -388,7 +388,7 @@ export default {
         {
           title: self.$t("option.col_rewardAmount"),
           key: "rewardAmount",
-          minWidth: 65,
+          minWidth: 40,
           render: (h, params) => {
             let txt = params.row.profit;
             if (params.row.result == 0) {

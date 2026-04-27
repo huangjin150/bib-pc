@@ -1038,6 +1038,7 @@
                 transMessage35: "事件合约开仓",
                 transMessage36: "事件合约盈利",
                 transMessage37: "持仓费",
+                transMessage38: "预测手续费",
                 chargetime: '交易时间',
                 type: '类型',
                 fee: '手续费',

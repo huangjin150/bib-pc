@@ -209,6 +209,10 @@ export default {
         {
           value: 37,
           label: this.$t("uc.finance.record.transMessage37")
+        },
+        {
+          value: 38,
+          label: this.$t("uc.finance.record.transMessage38")
         }
       ],
       coinList: [],
@@ -417,6 +421,8 @@ export default {
             str = that.$t("uc.finance.record.transMessage36");
           } else if (type == 37) {
             str = that.$t("uc.finance.record.transMessage37");
+          } else if (type == 38) {
+            str = that.$t("uc.finance.record.transMessage38");
           } else {
             str = that.$t("uc.finance.record.other");
           }
