@@ -112,17 +112,26 @@ function isMobile() {
 }
 
 function replaceSubdomain(host, mobilePrefix = 'm') {
+  // 如果已经是 m. 开头，直接返回
   if (/^(m)\./.test(host)) {
     return host;
   }
-  const match = host.match(/^www\.(.+)$/);
-  if (match) {
+
+  // 如果是 www. 开头，替换 www 为 m
+  const matchWww = host.match(/^www\.(.+)$/);
+  if (matchWww) {
     if (isMobile()) {
-      return mobilePrefix + '.' + match[1];
+      return mobilePrefix + '.' + matchWww[1];
     } else {
-      return 'www.' + match[1];
+      return host;
     }
   }
+
+  // 如果没有 www，直接在前面加上 m.
+  if (isMobile()) {
+    return mobilePrefix + '.' + host;
+  }
+
   return host;
 }
 function getCodeFromHash() {
