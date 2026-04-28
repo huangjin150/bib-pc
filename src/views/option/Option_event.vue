@@ -295,7 +295,7 @@ export default {
           minWidth: 40,
           render: (h, params) => {
             let txt = params.row.direction == 1 ? '涨' : '跌';
-            const txtColor = params.row.direction == 1 ? "#2bc287" : "#FF0000";
+            const txtColor = params.row.direction == 1 ? self.upColor : self.downColor;
             return h("div", {
               style: {
                 color: txtColor
@@ -319,10 +319,10 @@ export default {
               txtColor = '#000'
             } else if (params.row.result == 1) {
               txt = self.$t("option.win")
-              bgColor = "#2bc287" // 绿色
+              bgColor = self.upColor // 跟随上涨颜色
             } else if (params.row.result == 2) {
               txt = self.$t("option.lose")
-              bgColor = "#f74b60" // 红色
+              bgColor = self.downColor // 跟随下跌颜色
             } else if (params.row.result == 3) {
               txt = self.$t("option.prediction")
               bgColor = "#f0a70a" // 橙色
@@ -337,6 +337,8 @@ export default {
                 txt = params.row.displayTime;
                 if (txt === "结算中") {
                   isSettling = true;
+                } else {
+                  bgColor = "#f0a70a"; // 倒计时黄色/橙色背景
                 }
               }
             }
@@ -529,6 +531,12 @@ export default {
     window.removeEventListener('blur', this.onWindowBlur);
   },
   computed: {
+    upColor() {
+      return localStorage.getItem('upColor') || '#ABE127';
+    },
+    downColor() {
+      return localStorage.getItem('downColor') || '#ff5a7a';
+    },
     lang() {
       return this.$store.state.lang;
     },
