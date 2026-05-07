@@ -705,9 +705,12 @@ export default {
     handleShowPopup() {
       this.showPopup = true;
       this.$nextTick(() => {
-        const highlighted = document.querySelector('.ivu-table-row-highlight');
-        if (highlighted && highlighted.scrollIntoView) {
-          highlighted.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        const popup = document.querySelector('.popup');
+        if (!popup) return;
+        const highlighted = popup.querySelector('.ivu-table-row-highlight');
+        const scrollContainer = popup.querySelector('.ivu-table-body');
+        if (highlighted && scrollContainer) {
+          scrollContainer.scrollTop = highlighted.offsetTop - (scrollContainer.clientHeight / 2) + (highlighted.clientHeight / 2);
         }
       });
     },
