@@ -42,82 +42,43 @@
                             </div>
                         </div>
                         <div class="odds-list">
-                            <div class="odds-header" v-if="event.id === 3">
-                                <span>胜负线</span>
-                                <span>让分</span>
-                                <span>总分</span>
-                            </div>
                             <div v-for="(team, idx) in event.teams" :key="'odd-' + team.id" class="odd-btn-row">
-                                <button class="odd-btn" :class="team.color" @click.stop="openTrade(event, team)">
+                                <button class="odd-btn" :class="team.color" @click.stop="openTrade(event, team, null)">
                                     <span class="team-short">{{ team.shortName || team.name.substring(0,
-                                        7).toUpperCase()
-                                    }}</span>
+                                        7).toUpperCase() }}</span>
                                     <span class="team-price">{{ team.price }}</span>
                                 </button>
-                                <div v-if="event.id === 3 || event.id === 4" class="extra-odds">
-                                    <button class="extra-btn disabled">--</button>
-                                    <button class="extra-btn extra-val"><span class="val-label">{{ idx === 0 ? 'O 21.5'
-                                        : 'U 21.5' }}</span> <span class="val-price">{{ idx === 0 ? '0¢' : '99¢'
-                                            }}</span></button>
-                                </div>
                             </div>
                         </div>
                     </div>
 
                     <el-collapse-transition>
                         <div class="expanded-section" v-show="event.expanded" @click.stop>
-                            <div class="expanded-tabs">
-                                <div class="tabs-left">
-                                    <span class="tab active">Order Book</span>
-                                    <span class="tab">Graph</span>
-                                </div>
-                                <div class="tabs-right">
-                                    <span class="rebate"><i class="el-icon-money"></i> 挂单返佣</span>
-                                    <i class="el-icon-refresh refresh-icon"></i>
-                                </div>
-                            </div>
-                            <div class="order-book" v-if="event.orderBook">
-                                <div class="ob-header">
-                                    <span class="trade-title">TRADE {{ event.teams[1].shortName ||
-                                        event.teams[1].name.substring(0, 3).toUpperCase() }} <i
-                                            class="el-icon-sort"></i></span>
-                                    <span class="col-price">价格</span>
-                                    <span class="col-shares">份额</span>
-                                    <span class="col-total">总计</span>
-                                </div>
-                                <div class="ob-asks">
-                                    <div v-for="(ask, idx) in event.orderBook.asks" :key="'ask' + idx"
-                                        class="ob-row ask-row">
-                                        <div class="bg-bar"
-                                            :style="{ width: (ask.shares / event.orderBook.maxShare * 100) + '%' }">
+                            <div class="markets-container" v-if="event.markets && event.markets.length > 0">
+                                <div v-for="market in event.markets" :key="'market-' + market.id"
+                                    class="expanded-market-section">
+                                    <div class="market-header">
+                                        <div class="market-title-wrap">
+                                            <span class="market-blue-bar"></span>
+                                            <span class="market-title-text">{{ market.marketTitle }}</span>
                                         </div>
-                                        <span class="col-label"><span class="badge red-badge"
-                                                v-if="idx === event.orderBook.asks.length - 1">卖单</span></span>
-                                        <span class="col-price text-red">{{ ask.price }}</span>
-                                        <span class="col-shares">{{ ask.shares.toFixed(2) }}</span>
-                                        <span class="col-total">{{ ask.total }}</span>
+                                        <div class="market-stats">
+                                            <div class="stat-item">总下注: ${{ market.totalBetAmount || 0 }}</div>
+                                            <div class="stat-item">参与人数: {{ market.totalUserCount || 0 }}</div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="ob-middle">
-                                    <span>最新价: {{ event.orderBook.lastPrice }}</span>
-                                    <span>点差: {{ event.orderBook.spread }}</span>
-                                </div>
-                                <div class="ob-bids">
-                                    <div v-for="(bid, idx) in event.orderBook.bids" :key="'bid' + idx"
-                                        class="ob-row bid-row">
-                                        <div class="bg-bar"
-                                            :style="{ width: (bid.shares / event.orderBook.maxShare * 100) + '%' }">
+                                    <div class="market-options-grid">
+                                        <div v-for="(option, idx) in market.options" :key="'opt-' + option.id"
+                                            class="option-row-btn" @click.stop="openTrade(event, option, market)">
+                                            <span class="opt-name">{{ option.optionName }}</span>
+                                            <span class="opt-price">{{ Number(option.currentPrice).toFixed(4) }}
+                                                $</span>
                                         </div>
-                                        <span class="col-label"><span class="badge green-badge"
-                                                v-if="idx === 0">买单</span></span>
-                                        <span class="col-price text-green">{{ bid.price }}</span>
-                                        <span class="col-shares">{{ bid.shares.toFixed(2) }}</span>
-                                        <span class="col-total">{{ bid.total }}</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="no-data" v-else>
-                                暂无订单簿数据
+                                加载中...
                             </div>
                         </div>
                     </el-collapse-transition>
@@ -154,8 +115,17 @@
                 </div>
 
                 <div class="tp-teams-toggle">
-                    <button v-for="team in selectedEvent.teams" :key="'tp-' + team.id" class="tp-team-btn"
-                        :class="{ active: selectedTeam.id === team.id, [team.color]: selectedTeam.id === team.id }"
+                    <button v-if="selectedTeam && selectedTeam.marketData"
+                        v-for="option in selectedTeam.marketData.options" :key="'tp-' + option.id" class="tp-team-btn"
+                        :class="{ active: selectedTeam.id === option.id, [selectedTeam.color]: selectedTeam.id === option.id }"
+                        @click="openTrade(selectedEvent, option, selectedTeam.marketData)">
+                        {{ option.optionName.substring(0, 3).toUpperCase() }} ${{ Number(option.currentPrice).toFixed(4)
+                        }}
+                    </button>
+                    <!-- Fallback for events without marketData loaded yet -->
+                    <button v-if="!selectedTeam || !selectedTeam.marketData" v-for="team in selectedEvent.teams"
+                        :key="'tp-fallback-' + team.id" class="tp-team-btn"
+                        :class="{ active: selectedTeam && selectedTeam.id === team.id, [team.color]: selectedTeam && selectedTeam.id === team.id }"
                         @click="selectedTeam = team">
                         {{ team.shortName || team.name.substring(0, 3).toUpperCase() }} {{ team.price }}
                     </button>
@@ -169,6 +139,7 @@
                         <button class="plus-btn">+</button>
                     </div>
                 </div>
+
 
                 <div class="tp-input-group">
                     <label>份额</label>
@@ -184,7 +155,7 @@
                     <button @click="tradeShares = tradeShares + 100">+100</button>
                 </div>
 
-                <div class="tp-matching-info" v-if="selectedTeam.price === '63¢'">
+                <div class="tp-matching-info" v-if="selectedTeam.price === '$0.63'">
                     <i class="el-icon-info"></i> 61.85 正在撮合
                 </div>
 
@@ -196,8 +167,8 @@
                 <div class="tp-summary">
                     <div class="summary-row">
                         <span>总计</span>
-                        <span class="value total-val">${{ (tradeShares * parseFloat(selectedTeam.price) /
-                            100).toFixed(2) }}</span>
+                        <span class="value total-val">${{ (tradeShares * parseFloat(selectedTeam.price.replace('$',
+                            ''))).toFixed(2) }}</span>
                     </div>
                     <div class="summary-row win-row">
                         <span>赢取 <i class="el-icon-info"></i></span>
@@ -205,7 +176,9 @@
                     </div>
                 </div>
 
-                <button class="tp-submit-btn" :class="selectedTeam.color">交易</button>
+                <button class="tp-submit-btn" :class="selectedTeam.color" @click="submitBet" :disabled="isSubmitting">
+                    {{ isSubmitting ? '交易中...' : '交易' }}
+                </button>
 
                 <div class="tp-terms">
                     交易即表示你同意 <a>使用条款</a>.
@@ -227,91 +200,88 @@ export default {
             expireEnabled: false,
             selectedEvent: null,
             selectedTeam: null,
-            categories: [
-                {
-                    name: "CRINT",
-                    events: [
-                        {
-                            id: 1,
-                            time: "下午 3:00",
-                            volume: "$5.00K",
-                            title: "T20 Challenge Trophy, Women",
-                            views: 12,
-                            expanded: true,
-                            teams: [
-                                { id: "t1", name: "Rwanda", shortName: "RWA", score: "0-0", price: "40¢", color: "light-blue", icon: "🇷🇼" },
-                                { id: "t2", name: "USA", shortName: "USA", score: "0-0", price: "63¢", color: "dark-red", icon: "🇺🇸" }
-                            ],
-                            orderBook: {
-                                maxShare: 600,
-                                asks: [
-                                    { price: "70¢", shares: 59.00, total: "$441.98" },
-                                    { price: "67¢", shares: 530.01, total: "$400.68" },
-                                    { price: "66¢", shares: 10.00, total: "$45.57" },
-                                    { price: "63¢", shares: 61.85, total: "$38.97" }
-                                ],
-                                bids: [
-                                    { price: "60¢", shares: 188.11, total: "$112.87" },
-                                    { price: "55¢", shares: 500.00, total: "$387.87" },
-                                    { price: "50¢", shares: 10.00, total: "$392.87" },
-                                    { price: "45¢", shares: 10.00, total: "$397.37" }
-                                ],
-                                lastPrice: "60¢",
-                                spread: "3¢"
-                            }
-                        },
-                        {
-                            id: 2,
-                            time: "下午 3:30",
-                            volume: "$0.00",
-                            title: "",
-                            views: 12,
-                            expanded: false,
-                            teams: [
-                                { id: "t3", name: "Himalayan Xi", shortName: "HIM", score: "0-0", price: "99¢", color: "blue", icon: "🏔️" },
-                                { id: "t4", name: "Kokrajhar", shortName: "KOK", score: "0-0", price: "99¢", color: "blue", icon: "🌲" }
-                            ],
-                            orderBook: null
-                        }
-                    ]
-                },
-                {
-                    name: "ATP",
-                    events: [
-                        {
-                            id: 3,
-                            isLive: true,
-                            set: "S2",
-                            volume: "$37.38K",
-                            title: "",
-                            views: 9,
-                            expanded: false,
-                            teams: [
-                                { id: "t5", name: "Dali Blanch", shortName: "BLAN", score: "7⁷ 1", price: "97.7¢", color: "blue", icon: "🇺🇸" },
-                                { id: "t6", name: "Denis Yevseyev", shortName: "YEVSEYE", score: "6² 0", price: "3.0¢", color: "blue", icon: "🇰🇿" }
-                            ],
-                            orderBook: null
-                        },
-                        {
-                            id: 4,
-                            isLive: true,
-                            set: "S2",
-                            volume: "$34.11K",
-                            title: "",
-                            views: 9,
-                            expanded: false,
-                            teams: [
-                                { id: "t7", name: "August Holmgren", shortName: "HOLMGRE", score: "", price: "90¢", color: "blue", icon: "🇩🇰" },
-                                { id: "t8", name: "Yunchaokete Bu", shortName: "BU", score: "", price: "11¢", color: "blue", icon: "🇨🇳" }
-                            ],
-                            orderBook: null
-                        }
-                    ]
-                }
-            ]
+            categories: [],
+            isSubmitting: false
         }
     },
     methods: {
+        getLeagues() {
+            this.$http.get(this.swapHost + "/quiz/leagues").then(response => {
+                let resp = response.body;
+                if (resp && resp.code == 0 && resp.data) {
+                    const leagues = resp.data.map(item => ({
+                        id: item.id,
+                        name: item.leagueName,
+                        leagueCode: item.leagueCode,
+                        country: item.country,
+                        sportType: item.sportType,
+                        matchCount: item.matchCount,
+                        events: []
+                    }));
+
+                    this.categories = leagues;
+                    this.getMatches();
+                }
+            });
+        },
+        getMatches() {
+            // 遍历所有联赛，分别通过 ?leagueId=xxx 请求比赛数据
+            this.categories.forEach(league => {
+                this.$http.get(this.swapHost + `/quiz/matches?leagueId=${league.id}`).then(response => {
+                    let resp = response.body;
+                    if (resp && resp.code == 0 && resp.data) {
+                        resp.data.forEach(match => {
+                            // 拆分队名
+                            let teamNames = match.matchName.split(' 对阵 ');
+                            if (teamNames.length !== 2) teamNames = match.matchName.split(' vs ');
+                            if (teamNames.length !== 2) teamNames = [match.matchName, 'Unknown'];
+
+                            const team1 = match.homeTeam || teamNames[0];
+                            const team2 = match.awayTeam || teamNames[1];
+
+                            const event = {
+                                id: match.id,
+                                time: new Date(match.startTime).toLocaleString(),
+                                volume: match.marketCount + " 市场",
+                                title: match.matchName,
+                                views: match.marketCount, // 用 marketCount 暂代浏览量/市场数
+                                expanded: false,
+                                isLive: match.matchStatus === 1,
+                                teams: [
+                                    {
+                                        id: "t1_" + match.id,
+                                        name: team1,
+                                        shortName: team1.substring(0, 3).toUpperCase(),
+                                        score: match.homeScore || "0-0",
+                                        price: "",
+                                        color: "light-blue",
+                                        icon: match.homeLogo || "🏳️"
+                                    },
+                                    {
+                                        id: "t2_" + match.id,
+                                        name: team2,
+                                        shortName: team2.substring(0, 3).toUpperCase(),
+                                        score: match.awayScore || "0-0",
+                                        price: "",
+                                        color: "dark-red",
+                                        icon: match.awayLogo || "🏳️"
+                                    }
+                                ],
+                                orderBook: null
+                            };
+                            league.events.push(event);
+                        });
+
+                        // 首次加载到有数据的比赛时，更新右侧交易面板的默认选中
+                        if (!this.selectedEvent && league.events.length > 0) {
+                            this.selectedEvent = league.events[0];
+                            this.selectedTeam = league.events[0].teams[1];
+                            this.getMatchDetails(league.events[0].id);
+                        }
+                    }
+                });
+            });
+        },
         handleCardClick(event) {
             this.selectEvent(event);
             this.toggleExpand(event);
@@ -320,10 +290,87 @@ export default {
             if (this.selectedEvent && this.selectedEvent.id === event.id) return;
             this.selectedEvent = event;
             this.selectedTeam = event.teams[0];
+
+            // 请求比赛详情获取 markets
+            this.getMatchDetails(event.id);
         },
-        openTrade(event, team) {
+        getMatchDetails(matchId) {
+            this.$http.get(this.swapHost + `/quiz/matches/${matchId}`).then(response => {
+                let resp = response.body;
+                if (resp && resp.code == 0 && resp.data) {
+                    const matchData = resp.data;
+                    // Find the event in categories and update it
+                    for (let league of this.categories) {
+                        const event = league.events.find(e => e.id === matchId);
+                        if (event && matchData.markets && matchData.markets.length > 0) {
+                            // 将接口返回的所有 markets 存入 event
+                            event.markets = matchData.markets;
+
+                            // 更新 event 里面的 teams 数据为第一个 options 的数据（仅更新价格和附加数据，保留队名和图标）
+                            const mainMarket = matchData.markets[0];
+                            if (mainMarket.options && mainMarket.options.length >= 2) {
+                                event.teams[0].price = "$" + Number(mainMarket.options[0].currentPrice).toFixed(4);
+                                event.teams[0].optionData = mainMarket.options[0];
+                                event.teams[0].marketData = mainMarket;
+
+                                event.teams[1].price = "$" + Number(mainMarket.options[1].currentPrice).toFixed(4);
+                                event.teams[1].optionData = mainMarket.options[1];
+                                event.teams[1].marketData = mainMarket;
+                            }
+
+                            // 更新当前选中状态
+                            if (this.selectedEvent && this.selectedEvent.id === matchId) {
+                                // 默认选中第一个 market 的第一个 option
+                                const mainMarket = matchData.markets[0];
+                                if (mainMarket.options && mainMarket.options.length > 0) {
+                                    this.openTrade(event, mainMarket.options[0], mainMarket);
+                                }
+                            }
+
+                            // 强制 Vue 响应式更新
+                            this.$forceUpdate();
+                            break;
+                        }
+                    }
+                }
+            });
+        },
+        openTrade(event, optionOrTeam, market) {
             this.selectedEvent = event;
-            this.selectedTeam = team;
+            let color = "blue";
+            let icon = "🎯";
+
+            // 如果从快捷按钮点过来，且包含 optionData 和 marketData，按市场逻辑处理
+            if (!market && optionOrTeam.marketData && optionOrTeam.optionData) {
+                market = optionOrTeam.marketData;
+                color = optionOrTeam.color || "blue";
+                icon = optionOrTeam.icon || "🎯";
+                optionOrTeam = optionOrTeam.optionData;
+            }
+
+            if (market) {
+                // 尝试从 teams 中匹配颜色和图标
+                const matchingTeam = event.teams.find(t => t.optionData && t.optionData.id === optionOrTeam.id);
+                if (matchingTeam) {
+                    color = matchingTeam.color || color;
+                    icon = matchingTeam.icon || icon;
+                }
+
+                // from markets list
+                this.selectedTeam = {
+                    id: optionOrTeam.id,
+                    name: optionOrTeam.optionName,
+                    shortName: optionOrTeam.optionName.substring(0, 3).toUpperCase(),
+                    price: "$" + Number(optionOrTeam.currentPrice).toFixed(4),
+                    color: color,
+                    icon: icon,
+                    optionData: optionOrTeam,
+                    marketData: market
+                };
+            } else {
+                // from teams list
+                this.selectedTeam = optionOrTeam;
+            }
         },
         toggleExpand(targetEvent) {
             const isExpanding = !targetEvent.expanded;
@@ -337,12 +384,43 @@ export default {
             if (isExpanding) {
                 targetEvent.expanded = true;
             }
+        },
+        submitBet() {
+            if (!this.selectedTeam || !this.selectedTeam.marketData || !this.selectedTeam.optionData) {
+                this.$message.warning('请选择有效的下注选项（比赛数据可能仍在加载中）');
+                return;
+            }
+            if (!this.tradeShares || this.tradeShares <= 0) {
+                this.$message.warning('请输入有效的下注份额');
+                return;
+            }
+
+            this.isSubmitting = true;
+            const payload = {
+                marketId: this.selectedTeam.marketData.id,
+                optionId: this.selectedTeam.optionData.id,
+                betAmount: this.tradeShares,
+                deviceId: 'pc'
+            };
+
+            this.$http.post(this.swapHost + '/quiz/bet', payload).then(response => {
+                this.isSubmitting = false;
+                let resp = response.body;
+                if (resp && resp.code == 0) {
+                    this.$message.success('交易成功');
+                    // 可以在这里刷新用户余额或更新比赛数据
+                    this.getMatchDetails(this.selectedEvent.id);
+                } else {
+                    this.$message.error((resp && resp.msg) ? resp.msg : '交易失败');
+                }
+            }).catch(err => {
+                this.isSubmitting = false;
+                this.$message.error('网络请求失败，请稍后重试');
+            });
         }
     },
     mounted() {
-        // default selection
-        this.selectedEvent = this.categories[0].events[0];
-        this.selectedTeam = this.categories[0].events[0].teams[1];
+        this.getLeagues();
     }
 }
 </script>
@@ -532,6 +610,7 @@ export default {
                 justify-content: space-between;
                 align-items: center;
                 width: 120px;
+                height: 36px;
                 font-size: 14px;
 
                 &.light-blue {
@@ -557,12 +636,14 @@ export default {
 
                 .extra-btn {
                     width: 80px;
+                    height: 36px;
                     border: 1px solid #eaeaea;
                     background: #fafafa;
                     border-radius: 8px;
                     padding: 8px;
                     display: flex;
                     justify-content: space-between;
+                    align-items: center;
                     font-size: 13px;
                     color: #333;
 
@@ -584,140 +665,89 @@ export default {
         border-top: 1px solid #eaeaea;
         padding-top: 15px;
 
-        .expanded-tabs {
+        .markets-container {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            font-size: 13px;
-            font-weight: bold;
+            flex-direction: column;
+            gap: 16px;
 
-            .tabs-left {
-                display: flex;
-                gap: 15px;
+            .expanded-market-section {
+                background: #fff;
+                border-radius: 12px;
+                padding: 16px;
+                border: 1px solid #f0f0f0;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 
-                .tab {
-                    cursor: pointer;
-                    color: #888;
-                    padding-bottom: 4px;
+                .market-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border-bottom: 1px solid #f0f0f0;
+                    padding-bottom: 12px;
+                    margin-bottom: 12px;
 
-                    &.active {
-                        color: #333;
-                        border-bottom: 2px solid #333;
+                    .market-title-wrap {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+
+                        .market-blue-bar {
+                            width: 3px;
+                            height: 16px;
+                            background-color: #2f62fd;
+                            border-radius: 2px;
+                        }
+
+                        .market-title-text {
+                            font-size: 15px;
+                            font-weight: bold;
+                            color: #333;
+                        }
                     }
-                }
-            }
 
-            .tabs-right {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                color: #d46b08;
-
-                .refresh-icon {
-                    color: #888;
-                    cursor: pointer;
-                }
-            }
-        }
-
-        .order-book {
-            font-size: 13px;
-            color: #333;
-
-            .ob-header {
-                display: flex;
-                color: #888;
-                padding: 8px 10px;
-                border-bottom: 1px solid #eee;
-                font-size: 11px;
-                text-transform: uppercase;
-
-                .trade-title {
-                    flex: 2;
-                    color: #888;
-                }
-
-                .col-price,
-                .col-shares,
-                .col-total {
-                    flex: 1;
-                    text-align: right;
-                }
-            }
-
-            .ob-row {
-                display: flex;
-                padding: 4px 10px;
-                position: relative;
-                align-items: center;
-
-                .bg-bar {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    bottom: 0;
-                    opacity: 0.1;
-                    z-index: 0;
-                }
-
-                &.ask-row .bg-bar {
-                    background-color: #ff4d4f;
-                }
-
-                &.bid-row .bg-bar {
-                    background-color: #52c41a;
-                }
-
-                .text-red {
-                    color: #ff4d4f;
-                    font-weight: bold;
-                }
-
-                .text-green {
-                    color: #52c41a;
-                    font-weight: bold;
-                }
-
-                span {
-                    z-index: 1;
-                }
-
-                .col-label {
-                    flex: 2;
-
-                    .badge {
-                        font-size: 10px;
-                        padding: 2px 6px;
-                        border-radius: 4px;
-                        color: #fff;
-
-                        &.red-badge {
-                            background-color: #ff4d4f;
-                        }
-
-                        &.green-badge {
-                            background-color: #52c41a;
-                        }
+                    .market-stats {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: flex-end;
+                        font-size: 12px;
+                        color: #888;
+                        gap: 4px;
                     }
                 }
 
-                .col-price,
-                .col-shares,
-                .col-total {
-                    flex: 1;
-                    text-align: right;
-                }
-            }
+                .market-options-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                    gap: 10px;
 
-            .ob-middle {
-                display: flex;
-                justify-content: space-between;
-                padding: 8px 10px;
-                color: #888;
-                font-size: 12px;
-                border-top: 1px solid #eee;
-                border-bottom: 1px solid #eee;
+                    .option-row-btn {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 12px 16px;
+                        background-color: #f8f9fa;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        border: 1px solid transparent;
+
+                        &:hover {
+                            background-color: #f0f2f5;
+                            border-color: #2f62fd;
+                        }
+
+                        .opt-name {
+                            font-size: 14px;
+                            color: #333;
+                            font-weight: 500;
+                        }
+
+                        .opt-price {
+                            font-size: 14px;
+                            font-weight: bold;
+                            color: #2f62fd;
+                        }
+                    }
+                }
             }
         }
 

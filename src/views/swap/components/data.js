@@ -55,7 +55,7 @@ export default function getData(self) {
 		selectedPlate: "all", //当前显示的买卖盘
 		CNYRate: null,
 		datafeed: null,
-		defaultPath: "xau_usdt",
+		defaultPath: localStorage.getItem("swap_selected_symbol") || "xau_usdt",
 		basecion: "usdt",
 		coinScale: 6,
 		baseCoinScale: 6,

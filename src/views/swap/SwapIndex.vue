@@ -936,6 +936,9 @@ export default {
       if (params == undefined) {
         this.$router.push("/swap/" + this.defaultPath);
         params = this.defaultPath;
+      } else {
+        localStorage.setItem("swap_selected_symbol", params);
+        this.defaultPath = params;
       }
       const basecion = params.split("_")[1];
       if (basecion) {
@@ -1129,6 +1132,11 @@ export default {
             this.contractCoinInfo = resp;
             if (this.contractCoinInfo.leverageType == 1) {
               this.leverageList = this.contractCoinInfo.leverage.split(",");
+              this.leverage = this.leverageList[0];
+              this.leverageModalValue = Number(this.leverage);
+            } else {
+              this.leverage = "1";
+              this.leverageModalValue = 1;
             }
             if (this.isLogin) {
               this.getMemberContractWallet(); // 获取用户合约资产信息
@@ -1151,7 +1159,11 @@ export default {
               return;
             }
             this.marginMode = this.contractWalletInfo.coinPattern + ""//仓位类型：逐仓/全仓
-            this.leverage = this.contractWalletInfo.leverage
+            // 注释掉从钱包信息中覆盖杠杆的逻辑，保留 getSymbolInfo 中设置的默认第一个杠杆
+            if (this.contractWalletInfo.leverage) {
+              // 只有当明确有有效杠杆且不希望重置时才覆盖，但根据需求，切换时默认第一个
+              // this.leverage = this.contractWalletInfo.leverage
+            }
             this.getCurrentEntrustOrders();
             this.getHistoryEntrustOrders();
             this.getCurrentOrder();
@@ -3868,21 +3880,26 @@ $popper-background-color: #192330;
   display: flex;
   align-items: center;
   background-color: #2a2a2a;
-  border-radius: 24px;
-  padding: 4px;
+  border-radius: 12px;
+  padding: 8px;
   margin-bottom: 30px;
 }
 
 .quick-items {
   display: flex;
   flex: 1;
-  overflow-x: auto;
-  gap: 4px;
-  scrollbar-width: none;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.quick-items::-webkit-scrollbar {
-  display: none;
+.quick-item {
+  padding: 6px 12px;
+  border-radius: 16px;
+  cursor: pointer;
+  color: #888;
+  font-size: 14px;
+  transition: all 0.3s;
+  text-align: center;
 }
 
 .quick-item {
