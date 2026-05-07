@@ -2,7 +2,7 @@
   <div class="swap dark-skin" :class="skin">
     <!-- <section v-loading="loading"></section> -->
     <div class="symbol">
-      <div class="item" @mouseenter="showPopup = true" @mouseleave="showPopup = false">
+      <div class="item" @mouseenter="handleShowPopup" @mouseleave="showPopup = false">
         <div class="coin-box">
           <div>
             <img style="width: 24px; height: 24px;" :src="currentCoin.logo" alt="">
@@ -295,7 +295,7 @@
             </div>
             <div class="assets-list">
               <div class="asset-item"><span class="label">可用保证金</span><span class="value">{{ freeMargin() | fixed4
-              }}</span></div>
+                  }}</span></div>
               <div class="asset-item"><span class="label">持仓保证金</span><span class="value">{{ bonds() | fixed4 }}</span>
               </div>
               <div class="asset-item"><span class="label">未实现盈亏</span><span class="value">{{ unrealizedProfitAndLoss() |
@@ -606,7 +606,12 @@ export default {
       if (this.activeCategory) {
         data = data.filter(item => item.category === this.activeCategory);
       }
-      return data;
+      return data.map(item => {
+        return {
+          ...item,
+          _highlight: this.currentCoin && item.symbol === this.currentCoin.symbol
+        }
+      });
     },
     rechargeUSDTUrl: function () {
       return "/uc/recharge?name=" + this.currentCoin.base;
@@ -697,6 +702,15 @@ export default {
     window.removeEventListener('blur', this.onWindowBlur);
   },
   methods: {
+    handleShowPopup() {
+      this.showPopup = true;
+      this.$nextTick(() => {
+        const highlighted = document.querySelector('.ivu-table-row-highlight');
+        if (highlighted && highlighted.scrollIntoView) {
+          highlighted.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }
+      });
+    },
     onWindowFocus() {
       this.$refs.kline.fetchData();
       this.startWebsock();
@@ -1096,7 +1110,9 @@ export default {
         }
 
         this.categories = Array.from(categorySet).slice(0, 3);
-        if (this.categories.length > 0) {
+        if (this.currentCoin && this.currentCoin.category && this.categories.includes(this.currentCoin.category)) {
+          this.activeCategory = this.currentCoin.category;
+        } else if (this.categories.length > 0) {
           this.activeCategory = this.categories[0];
         }
 
@@ -1465,7 +1481,6 @@ export default {
           function (msg) {
             if (connectionId !== that.currentConnectionId) return;
             var resp = JSON.parse(msg.body);
-            console.log('resp', resp)
             if (resp.direction == "SELL") {
               var asks = resp.items;
               that.plate.askRows = [];

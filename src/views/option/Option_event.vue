@@ -717,7 +717,6 @@ export default {
       params.pageSize = 10;
       this.$http.post(this.swapHost + "/event-contract/record", params).then(response => {
         var resp = response.body;
-        console.log('resp', resp)
         this.historyList = resp.records;
         // 计算服务器时间偏移量
         if (this.historyList && this.historyList.length > 0 && this.historyList[0].serviceTime) {
