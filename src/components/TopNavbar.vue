@@ -181,9 +181,9 @@ export default {
       navItems: [
         { name: '行情', path: '/market' },
         { name: '合约', path: '/swap' },
-        { name: '预测市场', path: '/eventContract' },
+        // { name: '预测市场', path: '/eventContract' },
         // { name: '预测合约', path: '/prediction' },
-        { name: '体育', path: '/sports' },
+        // { name: '体育', path: '/sports' },
         { name: '公告中心', path: '/announcement/0' },
         { name: '平台介绍', path: '/introduce' },
       ]
