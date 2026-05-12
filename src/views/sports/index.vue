@@ -102,7 +102,7 @@
                                                                 :disabled="!event.teams[0].optionData.bettable"
                                                                 @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
                                                                 <span class="header-odd-label">{{ event.teams[0].name
-                                                                }}</span>
+                                                                    }}</span>
                                                                 <span class="header-odd-value">{{
                                                                     formatOddsLabel(event.teams[0].optionData) }}</span>
                                                             </button>
@@ -113,7 +113,7 @@
                                                                 :disabled="!event.teams[1].optionData.bettable"
                                                                 @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
                                                                 <span class="header-odd-label">{{ event.teams[1].name
-                                                                }}</span>
+                                                                    }}</span>
                                                                 <span class="header-odd-value">{{
                                                                     formatOddsLabel(event.teams[1].optionData) }}</span>
                                                             </button>
@@ -137,7 +137,7 @@
                                 :class="{ active: activeOrderTab === tab.key }" @click="activeOrderTab = tab.key">
                                 {{ tab.label }}
                                 <span class="tab-count" v-if="tab.key === 'active'">{{ getOrderTabCount(tab.key)
-                                }}</span>
+                                    }}</span>
                             </button>
                         </div>
                     </div>
@@ -149,7 +149,7 @@
                             <tr>
                                 <th>赛事</th>
                                 <th>选项</th>
-                                <th>时间</th>
+                                <th>下单时间</th>
                                 <th>下注金额</th>
                                 <th>赔率</th>
                                 <th>预计可得</th>
@@ -260,7 +260,7 @@
                                 <div class="odds-info-row">
                                     <span class="info-label">当前赔率</span>
                                     <span class="info-value odds-value">{{ formatOddsLabel(selectedTeam.optionData)
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </div>
 
@@ -2188,5 +2188,10 @@ export default {
 
 .profit-value {
     color: #16a34a;
+}
+
+.empty-orders-state {
+    text-align: center;
+    padding-top: 100px;
 }
 </style>
