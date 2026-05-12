@@ -102,7 +102,7 @@
                                                                 :disabled="!event.teams[0].optionData.bettable"
                                                                 @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
                                                                 <span class="header-odd-label">{{ event.teams[0].name
-                                                                }}</span>
+                                                                    }}</span>
                                                                 <span class="header-odd-value">{{
                                                                     formatOddsLabel(event.teams[0].optionData) }}</span>
                                                             </button>
@@ -113,7 +113,7 @@
                                                                 :disabled="!event.teams[1].optionData.bettable"
                                                                 @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
                                                                 <span class="header-odd-label">{{ event.teams[1].name
-                                                                }}</span>
+                                                                    }}</span>
                                                                 <span class="header-odd-value">{{
                                                                     formatOddsLabel(event.teams[1].optionData) }}</span>
                                                             </button>
@@ -138,7 +138,7 @@
                                 :class="{ active: activeOrderTab === tab.key }" @click="activeOrderTab = tab.key">
                                 {{ tab.label }}
                                 <span class="tab-count" v-if="tab.key === 'active'">{{ getOrderTabCount(tab.key)
-                                }}</span>
+                                    }}</span>
                             </button>
                         </div>
                     </div>
@@ -202,8 +202,8 @@
                                             {{ selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 ?
                                                 selectedEvent.statusText : '可下注' }}
                                         </span>
-                                        <span class="deadline-text">截止 {{ selectedEvent.time ?
-                                            selectedEvent.time.substring(5, 16).replace('T', ' ') : '--' }}</span>
+                                        <span class="deadline-text">截止 {{ selectedEvent.closeTime ?
+                                            selectedEvent.closeTime.substring(0, 16).replace('T', ' ') : '--' }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -238,7 +238,8 @@
                                 </div>
                             </div>
 
-                            <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4" class="tp-quick-amounts">
+                            <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4"
+                                class="tp-quick-amounts">
                                 <button v-for="amount in quickAmounts" :key="amount" @click="setTradeAmount(amount)">
                                     {{ amount }}
                                 </button>
@@ -248,11 +249,12 @@
                                 <div class="odds-info-row">
                                     <span class="info-label">当前赔率</span>
                                     <span class="info-value odds-value">{{ formatOddsLabel(selectedTeam.optionData)
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </div>
 
-                            <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4" class="odds-info-card">
+                            <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4"
+                                class="odds-info-card">
                                 <div class="odds-info-row">
                                     <span class="info-label">预计可得</span>
                                     <span class="info-value return-value">{{ formatAmount(betPreview.expectReturnAmount
@@ -260,7 +262,8 @@
                                 </div>
                             </div>
 
-                            <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4" class="odds-info-card">
+                            <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4"
+                                class="odds-info-card">
                                 <div class="odds-info-row">
                                     <span class="info-label">预计盈利</span>
                                     <span v-if="formatAmount(expectedProfit) > 0" class="info-value profit-value">{{
@@ -275,7 +278,8 @@
 
                             <button class="tp-submit-btn blue" @click="submitBet"
                                 :disabled="isSubmitting || isPreviewLoading || !canSubmit">
-                                {{ selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 ? '比赛已结束' : (isSubmitting ? '下注中...' : '确认下注') }}
+                                {{ selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 ? '比赛已结束' :
+                                    (isSubmitting ? '下注中...' : '确认下注') }}
                             </button>
                         </template>
                         <div v-else class="empty-selection-hint">
@@ -554,6 +558,7 @@ export default {
                             matchId: match.id,
                             title: match.matchName,
                             time: match.startTime,
+                            closeTime: market.closeTime,
                             marketCount: 1,
                             matchStatus: match.matchStatus,
                             statusText: this.getMatchStatusText(match.matchStatus),
