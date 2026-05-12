@@ -53,13 +53,7 @@
                         </button>
                     </div>
                     <div class="filters-right">
-                        <el-select v-model="filterLeague" placeholder="全部联赛" size="small" class="filter-select">
-                            <el-option label="全部联赛" value="all"></el-option>
-                        </el-select>
-                        <el-select v-model="filterTime" placeholder="全部时间" size="small" class="filter-select">
-                            <el-option label="全部时间" value="all"></el-option>
-                        </el-select>
-                        <el-input placeholder="搜索赛事/球队" prefix-icon="el-icon-search" size="small"
+                        <el-input v-model="searchKeyword" placeholder="搜索赛事/球队" prefix-icon="el-icon-search" size="small"
                             class="filter-search"></el-input>
                     </div>
                 </div>
@@ -88,25 +82,13 @@
                                                 </div>
                                                 <div class="group-header-center">
                                                     <div class="team home-team">
-                                                        <img v-if="event.teams[0].icon && event.teams[0].icon.startsWith('http')"
-                                                            :src="event.teams[0].icon" class="team-logo-small" />
-                                                        <span v-else class="team-icon-emoji">{{ event.teams[0].icon
-                                                            }}</span>
                                                         <span class="team-name" :title="event.teams[0].name">{{
                                                             event.teams[0].name }}</span>
                                                     </div>
                                                     <div class="score-display">
-                                                        <span class="score-text">{{ event.teams[0].score }} - {{
-                                                            event.teams[1].score }}</span>
-                                                        <span class="status-badge"
-                                                            :class="statusClass(event.statusText)">{{ event.statusText
-                                                            }}</span>
+                                                        VS
                                                     </div>
                                                     <div class="team away-team">
-                                                        <img v-if="event.teams[1].icon && event.teams[1].icon.startsWith('http')"
-                                                            :src="event.teams[1].icon" class="team-logo-small" />
-                                                        <span v-else class="team-icon-emoji">{{ event.teams[1].icon
-                                                            }}</span>
                                                         <span class="team-name" :title="event.teams[1].name">{{
                                                             event.teams[1].name }}</span>
                                                     </div>
@@ -120,7 +102,7 @@
                                                                 :disabled="!event.teams[0].optionData.bettable"
                                                                 @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
                                                                 <span class="header-odd-label">{{ event.teams[0].name
-                                                                }}</span>
+                                                                    }}</span>
                                                                 <span class="header-odd-value">{{
                                                                     formatOddsLabel(event.teams[0].optionData) }}</span>
                                                             </button>
@@ -131,7 +113,7 @@
                                                                 :disabled="!event.teams[1].optionData.bettable"
                                                                 @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
                                                                 <span class="header-odd-label">{{ event.teams[1].name
-                                                                }}</span>
+                                                                    }}</span>
                                                                 <span class="header-odd-value">{{
                                                                     formatOddsLabel(event.teams[1].optionData) }}</span>
                                                             </button>
@@ -156,7 +138,7 @@
                                 :class="{ active: activeOrderTab === tab.key }" @click="activeOrderTab = tab.key">
                                 {{ tab.label }}
                                 <span class="tab-count" v-if="tab.key === 'active'">{{ getOrderTabCount(tab.key)
-                                }}</span>
+                                    }}</span>
                             </button>
                         </div>
                     </div>
@@ -208,19 +190,23 @@
                 <div class="panel-header">
                     <h3>投注清单</h3>
                 </div>
-                <div class="slip-tabs">
-                    <button class="slip-tab" :class="{ active: betType === 'single' }"
-                        @click="betType = 'single'">单注</button>
-                </div>
-
                 <template v-if="selectedEvent">
                     <div class="slip-content">
                         <div class="selected-bet-card">
-                            <div class="bet-info-top">
-                                <span class="bet-league">{{ selectedEvent.markets && selectedEvent.markets[0] ?
-                                    selectedEvent.markets[0].marketTitle : '赛事投注' }}</span>
+                            <div class="bet-match-header">
+                                <div class="match-info">
+                                    <div class="match-title">{{ selectedEvent.title }}</div>
+                                    <div class="bet-status-row">
+                                        <span
+                                            :class="selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 ? 'status-badge-gray' : 'status-badge-green'">
+                                            {{ selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 ?
+                                                selectedEvent.statusText : '可下注' }}
+                                        </span>
+                                        <span class="deadline-text">截止 {{ selectedEvent.time ?
+                                            selectedEvent.time.substring(5, 16).replace('T', ' ') : '--' }}</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="bet-match-title">{{ selectedEvent.title }}</div>
 
                             <div class="slip-options-group" v-if="selectedEvent.teams">
                                 <button v-for="(team, index) in selectedEvent.teams" :key="index" v-if="team.optionData"
@@ -235,29 +221,49 @@
                         </div>
 
                         <template v-if="selectedTeam && selectedTeam.marketData">
-                            <div class="quick-amounts-label">快捷金额</div>
+                            <div class="stake-section">
+                                <div class="stake-input-label">下注金额</div>
+                                <div class="stake-input-wrap">
+                                    <input type="number" v-model.number="tradeAmount" min="0" step="1"
+                                        placeholder="输入下注金额" />
+                                    <span class="stake-unit">USDT</span>
+                                </div>
+                                <div class="stake-balance-row">
+                                    <span class="balance-text">可用余额: {{ walletBalance !== null ?
+                                        formatAmount(walletBalance) : '--' }} USDT</span>
+                                    <a href="javascript:void(0)" class="recharge-link"
+                                        @click="$router.push('/recharge')">充值</a>
+                                </div>
+                            </div>
+
                             <div class="tp-quick-amounts">
                                 <button v-for="amount in quickAmounts" :key="amount" @click="setTradeAmount(amount)">
                                     {{ amount }}
                                 </button>
                             </div>
 
-                            <div class="stake-input-label">投注金额</div>
-                            <div class="stake-input-wrap">
-                                <input type="number" v-model.number="tradeAmount" min="0" step="1" />
-                                <span class="stake-unit">USDT</span>
-                            </div>
-                            <div class="global-balance-container">
-                                <div class="balance-row global-balance">
-                                    <span>可用余额: {{ walletBalance !== null ? formatAmount(walletBalance) : '--' }}
-                                        USDT</span>
-                                    <a href="javascript:void(0)" class="recharge-link" @click="$router.push('/recharge')">充值</a>
+                            <div class="odds-info-card">
+                                <div class="odds-info-row">
+                                    <span class="info-label">当前赔率</span>
+                                    <span class="info-value odds-value">{{ formatOddsLabel(selectedTeam.optionData)
+                                    }}</span>
                                 </div>
                             </div>
 
-                            <div class="expected-return">
-                                <div class="return-label">预计可得</div>
-                                <div class="return-value">{{ formatAmount(betPreview.expectReturnAmount) }} USDT</div>
+                            <div class="odds-info-card">
+                                <div class="odds-info-row">
+                                    <span class="info-label">预计可得</span>
+                                    <span class="info-value return-value">{{ formatAmount(betPreview.expectReturnAmount)
+                                    }} USDT</span>
+                                </div>
+                            </div>
+
+                            <div class="odds-info-card">
+                                <div class="odds-info-row">
+                                    <span class="info-label">预计盈利</span>
+                                    <span class="info-value profit-value">{{ formatAmount(betPreview.expectReturnAmount
+                                        - (tradeAmount || 0)) }} USDT</span>
+                                </div>
                             </div>
 
                             <div class="tp-notice" v-if="previewError">
@@ -318,7 +324,8 @@ export default {
             filterLeague: 'all',
             filterTime: 'all',
             acceptHigherOdds: true,
-            oddsChangeOption: 'any'
+            oddsChangeOption: 'any',
+            searchKeyword: ''
         }
     },
     computed: {
@@ -610,7 +617,18 @@ export default {
             return event.matchStatus === 1;
         },
         filteredEvents(category) {
-            const events = category.events || [];
+            let events = category.events || [];
+            
+            // Apply search filter
+            if (this.searchKeyword && this.searchKeyword.trim() !== '') {
+                const keyword = this.searchKeyword.trim().toLowerCase();
+                events = events.filter(event => {
+                    const titleMatch = event.title && event.title.toLowerCase().includes(keyword);
+                    const teamMatch = event.teams && event.teams.some(team => team.name && team.name.toLowerCase().includes(keyword));
+                    return titleMatch || teamMatch;
+                });
+            }
+
             if (this.activeTab === 'live') {
                 return events.filter(event => event.matchStatus === 2);
             }
@@ -1215,7 +1233,7 @@ export default {
 }
 
 .group-header-left {
-    flex: 0 0 200px;
+    flex: 0 0 300px;
     display: flex;
     align-items: center;
     border-right: 1px solid #f3f4f6;
@@ -1237,6 +1255,7 @@ export default {
     align-items: center;
     gap: 4px;
     min-width: 80px;
+    font-weight: 700;
 }
 
 .score-text {
@@ -1371,7 +1390,7 @@ export default {
     font-size: 11px;
     color: #6b7280;
     font-weight: 500;
-    max-width: 80px;
+    max-width: 100px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1385,24 +1404,24 @@ export default {
 
 .match-time-display {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    min-width: 50px;
-    color: #6b7280;
+    gap: 15px;
+    min-width: 100px;
+    color: #737985;
     margin-right: 12px;
     padding-right: 12px;
     border-right: 1px solid #e5e7eb;
 }
 
 .time-date {
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 14px;
+    color: #737985;
+
 }
 
 .time-hour {
     font-size: 14px;
-    font-weight: 700;
-    color: #4b5563;
+    color: #737985;
 }
 
 .league-title-display {
@@ -1638,18 +1657,9 @@ export default {
 }
 
 .selected-bet-card {
-    background: #f8fafc;
-    border: 1px solid #eef2f7;
     border-radius: 8px;
-    padding: 16px;
     margin-bottom: 20px;
     position: relative;
-}
-
-.bet-info-top {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
 }
 
 .bet-league {
@@ -1981,5 +1991,147 @@ export default {
         width: 100%;
         overflow-y: visible;
     }
+}
+
+.bet-match-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.team-icon {
+    width: 40px;
+    height: 40px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.match-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.match-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1.2;
+}
+
+.match-subtitle {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.bet-status-row {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    gap: 8px;
+}
+
+.status-badge-green {
+    background: #dcfce7;
+    color: #166534;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-badge-gray {
+    background: #f3f4f6;
+    color: #6b7280;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.deadline-text {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.stake-section {
+    margin-bottom: 16px;
+}
+
+.stake-input-wrap {
+    margin-top: 8px;
+}
+
+.stake-input-wrap input {
+    padding: 12px 60px 12px 16px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.stake-input-wrap input::placeholder {
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+.stake-balance-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    font-size: 13px;
+}
+
+.balance-text {
+    color: #6b7280;
+}
+
+.recharge-link {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.odds-info-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+}
+
+.odds-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.info-label {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.info-value {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.odds-value {
+    color: #1f2937;
+}
+
+.return-value {
+    color: #2563eb;
+}
+
+.profit-value {
+    color: #16a34a;
 }
 </style>
