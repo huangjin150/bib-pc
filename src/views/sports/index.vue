@@ -21,7 +21,7 @@
 
         <div class="main-column">
             <!-- Top Featured Match Banner -->
-            <div class="featured-match-banner">
+            <!-- <div class="featured-match-banner">
                 <div class="league-info">
                     <div class="league-name">英超 联赛</div>
                     <div class="match-time">05/17 23:00</div>
@@ -40,7 +40,7 @@
                 <div class="banner-action">
                     <button class="bet-now-btn">立即投注</button>
                 </div>
-            </div>
+            </div> -->
 
             <div class="match-section">
                 <div class="match-filters-top">
@@ -53,8 +53,8 @@
                         </button>
                     </div>
                     <div class="filters-right">
-                        <el-input v-model="searchKeyword" placeholder="搜索赛事/球队" prefix-icon="el-icon-search" size="small"
-                            class="filter-search"></el-input>
+                        <el-input v-model="searchKeyword" placeholder="搜索赛事/球队" prefix-icon="el-icon-search"
+                            size="small" class="filter-search"></el-input>
                     </div>
                 </div>
 
@@ -102,7 +102,7 @@
                                                                 :disabled="!event.teams[0].optionData.bettable"
                                                                 @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
                                                                 <span class="header-odd-label">{{ event.teams[0].name
-                                                                    }}</span>
+                                                                }}</span>
                                                                 <span class="header-odd-value">{{
                                                                     formatOddsLabel(event.teams[0].optionData) }}</span>
                                                             </button>
@@ -113,7 +113,7 @@
                                                                 :disabled="!event.teams[1].optionData.bettable"
                                                                 @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
                                                                 <span class="header-odd-label">{{ event.teams[1].name
-                                                                    }}</span>
+                                                                }}</span>
                                                                 <span class="header-odd-value">{{
                                                                     formatOddsLabel(event.teams[1].optionData) }}</span>
                                                             </button>
@@ -138,7 +138,7 @@
                                 :class="{ active: activeOrderTab === tab.key }" @click="activeOrderTab = tab.key">
                                 {{ tab.label }}
                                 <span class="tab-count" v-if="tab.key === 'active'">{{ getOrderTabCount(tab.key)
-                                    }}</span>
+                                }}</span>
                             </button>
                         </div>
                     </div>
@@ -246,7 +246,7 @@
                                 <div class="odds-info-row">
                                     <span class="info-label">当前赔率</span>
                                     <span class="info-value odds-value">{{ formatOddsLabel(selectedTeam.optionData)
-                                    }}</span>
+                                        }}</span>
                                 </div>
                             </div>
 
@@ -254,7 +254,7 @@
                                 <div class="odds-info-row">
                                     <span class="info-label">预计可得</span>
                                     <span class="info-value return-value">{{ formatAmount(betPreview.expectReturnAmount)
-                                    }} USDT</span>
+                                        }} USDT</span>
                                 </div>
                             </div>
 
@@ -618,7 +618,7 @@ export default {
         },
         filteredEvents(category) {
             let events = category.events || [];
-            
+
             // Apply search filter
             if (this.searchKeyword && this.searchKeyword.trim() !== '') {
                 const keyword = this.searchKeyword.trim().toLowerCase();
