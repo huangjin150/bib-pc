@@ -11,7 +11,7 @@
                     <div class="menu-country-header">{{ country }}</div>
                     <div class="menu-item" v-for="league in leagues" :key="league.id"
                         :class="{ active: activeLeagueId === league.id }" @click="activeLeagueId = league.id">
-                        <span class="menu-icon">🏆</span>
+                        <img v-if="leagues.imgurl" style="width: 20px; height: 20px;" :src="leagues.imgurl" alt="">
                         <span class="menu-text">{{ league.name }}</span>
                         <span class="menu-count">{{ league.matchCount }}</span>
                     </div>
@@ -211,8 +211,8 @@
                             <div class="slip-options-group" v-if="selectedEvent.teams">
                                 <button v-for="(team, index) in selectedEvent.teams" :key="index" v-if="team.optionData"
                                     class="slip-opt-btn"
-                                    :class="{ 'active': selectedTeam && selectedTeam.id === team.optionData.id, 'disabled': !team.optionData.bettable }"
-                                    :disabled="!team.optionData.bettable"
+                                    :class="{ 'active': selectedTeam && selectedTeam.id === team.optionData.id, 'disabled': !team.optionData.bettable || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 }"
+                                    :disabled="!team.optionData.bettable || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4"
                                     @click="openTrade(selectedEvent, team.optionData, team.marketData)">
                                     <span class="opt-name">{{ team.name }}</span>
                                     <span class="opt-odds">{{ formatOddsLabel(team.optionData) }}</span>
@@ -225,18 +225,20 @@
                                 <div class="stake-input-label">下注金额</div>
                                 <div class="stake-input-wrap">
                                     <input type="number" v-model.number="tradeAmount" min="0" step="1"
-                                        placeholder="输入下注金额" />
+                                        placeholder="输入下注金额"
+                                        :disabled="selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4" />
                                     <span class="stake-unit">USDT</span>
                                 </div>
                                 <div class="stake-balance-row">
                                     <span class="balance-text">可用余额: {{ walletBalance !== null ?
                                         formatAmount(walletBalance) : '--' }} USDT</span>
-                                    <a href="javascript:void(0)" class="recharge-link"
+                                    <a v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4"
+                                        href="javascript:void(0)" class="recharge-link"
                                         @click="$router.push('/recharge')">充值</a>
                                 </div>
                             </div>
 
-                            <div class="tp-quick-amounts">
+                            <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4" class="tp-quick-amounts">
                                 <button v-for="amount in quickAmounts" :key="amount" @click="setTradeAmount(amount)">
                                     {{ amount }}
                                 </button>
@@ -250,19 +252,20 @@
                                 </div>
                             </div>
 
-                            <div class="odds-info-card">
+                            <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4" class="odds-info-card">
                                 <div class="odds-info-row">
                                     <span class="info-label">预计可得</span>
-                                    <span class="info-value return-value">{{ formatAmount(betPreview.expectReturnAmount)
-                                        }} USDT</span>
+                                    <span class="info-value return-value">{{ formatAmount(betPreview.expectReturnAmount
+                                        || 0) }} USDT</span>
                                 </div>
                             </div>
 
-                            <div class="odds-info-card">
+                            <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4" class="odds-info-card">
                                 <div class="odds-info-row">
                                     <span class="info-label">预计盈利</span>
-                                    <span class="info-value profit-value">{{ formatAmount(betPreview.expectReturnAmount
-                                        - (tradeAmount || 0)) }} USDT</span>
+                                    <span v-if="formatAmount(expectedProfit) > 0" class="info-value profit-value">{{
+                                        formatAmount(expectedProfit) }} USDT</span>
+                                    <span v-else class="info-value profit-value">0.00 USDT</span>
                                 </div>
                             </div>
 
@@ -272,7 +275,7 @@
 
                             <button class="tp-submit-btn blue" @click="submitBet"
                                 :disabled="isSubmitting || isPreviewLoading || !canSubmit">
-                                {{ isSubmitting ? '下注中...' : '确认下注' }}
+                                {{ selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 ? '比赛已结束' : (isSubmitting ? '下注中...' : '确认下注') }}
                             </button>
                         </template>
                         <div v-else class="empty-selection-hint">
@@ -345,6 +348,9 @@ export default {
         },
         canSubmit() {
             return Boolean(
+                this.selectedEvent &&
+                this.selectedEvent.matchStatus !== 3 &&
+                this.selectedEvent.matchStatus !== 4 &&
                 this.selectedTeam &&
                 this.selectedTeam.optionData &&
                 this.selectedTeam.marketData &&
@@ -356,6 +362,18 @@ export default {
         },
         hasVisibleEvents() {
             return this.categories.some(category => this.filteredEvents(category).length > 0);
+        },
+        expectedReturn() {
+            if (!this.betPreview || this.betPreview.expectReturnAmount == null) {
+                return 0;
+            }
+            return this.betPreview.expectReturnAmount;
+        },
+        expectedProfit() {
+            if (!this.betPreview || this.betPreview.expectReturnAmount == null || !this.tradeAmount) {
+                return 0;
+            }
+            return this.betPreview.expectReturnAmount - this.tradeAmount;
         },
         filteredOrders() {
             if (this.activeOrderTab === 'active') {
@@ -690,9 +708,11 @@ export default {
             this.selectedEvent = event;
             this.toggleExpand(event);
 
-            const firstBettable = this.findFirstBettableOption(event);
-            if (firstBettable) {
-                this.openTrade(event, firstBettable.option, firstBettable.market);
+            if (event.matchStatus !== 3 && event.matchStatus !== 4) {
+                const firstBettable = this.findFirstBettableOption(event);
+                if (firstBettable) {
+                    this.openTrade(event, firstBettable.option, firstBettable.market);
+                }
             }
         },
         selectEvent(event) {
@@ -709,6 +729,9 @@ export default {
             return null;
         },
         openTrade(event, option, market) {
+            if (event.matchStatus === 3 || event.matchStatus === 4) {
+                return;
+            }
             if (!option || !market || !option.bettable) {
                 return;
             }
@@ -748,19 +771,31 @@ export default {
                 return;
             }
 
+            // Immediately clear the preview when amount changes to prevent mismatch before API returns
+            this.betPreview = this.createEmptyPreview();
+            this.isPreviewLoading = true;
+
             this.previewTimer = setTimeout(() => {
                 this.fetchBetPreview();
             }, 250);
         },
         fetchBetPreview() {
             if (!this.selectedTeam || !this.selectedTeam.optionData || !this.selectedTeam.marketData || !(this.tradeAmount > 0)) {
+                this.isPreviewLoading = false;
                 return;
             }
 
-            this.isPreviewLoading = true;
             this.previewError = '';
+            // 记录发起请求时的金额
+            const requestAmount = this.tradeAmount;
+
             const url = `${this.swapHost}/quiz/bet/preview?marketId=${this.selectedTeam.marketData.id}&optionId=${this.selectedTeam.optionData.id}&betAmount=${this.tradeAmount}`;
             this.$http.get(url).then(response => {
+                // 如果当前金额已经改变，说明有新的请求发出了，直接丢弃这次响应
+                if (this.tradeAmount !== requestAmount) {
+                    return;
+                }
+
                 this.isPreviewLoading = false;
                 const resp = response.body;
                 if (resp && resp.code === 0 && resp.data) {
@@ -791,6 +826,10 @@ export default {
             });
         },
         submitBet() {
+            if (!this.selectedEvent || this.selectedEvent.matchStatus === 3 || this.selectedEvent.matchStatus === 4) {
+                this.$message.warning('该比赛已结束，无法下注');
+                return;
+            }
             if (!this.selectedTeam || !this.selectedTeam.marketData || !this.selectedTeam.optionData) {
                 this.$message.warning('请选择有效的下注选项');
                 return;
