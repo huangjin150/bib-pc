@@ -102,7 +102,7 @@
                                                                 :disabled="!event.teams[0].optionData.bettable"
                                                                 @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
                                                                 <span class="header-odd-label">{{ event.teams[0].name
-                                                                    }}</span>
+                                                                }}</span>
                                                                 <span class="header-odd-value">{{
                                                                     formatOddsLabel(event.teams[0].optionData) }}</span>
                                                             </button>
@@ -113,7 +113,7 @@
                                                                 :disabled="!event.teams[1].optionData.bettable"
                                                                 @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
                                                                 <span class="header-odd-label">{{ event.teams[1].name
-                                                                    }}</span>
+                                                                }}</span>
                                                                 <span class="header-odd-value">{{
                                                                     formatOddsLabel(event.teams[1].optionData) }}</span>
                                                             </button>
@@ -133,12 +133,11 @@
                 <div class="orders-panel-top">
                     <div class="orders-header">
                         <div class="order-tabs">
-                            <span class="order-tab-title">我的订单</span>
                             <button v-for="tab in orderTabs" :key="tab.key" class="order-tab"
                                 :class="{ active: activeOrderTab === tab.key }" @click="activeOrderTab = tab.key">
                                 {{ tab.label }}
                                 <span class="tab-count" v-if="tab.key === 'active'">{{ getOrderTabCount(tab.key)
-                                    }}</span>
+                                }}</span>
                             </button>
                         </div>
                     </div>
@@ -146,15 +145,27 @@
 
                 <div v-if="filteredOrders.length" class="orders-table-container">
                     <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>赛事</th>
+                                <th>选项</th>
+                                <th>时间</th>
+                                <th>下注金额</th>
+                                <th>赔率</th>
+                                <th>预计可得</th>
+                                <th>实际回报</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             <tr v-for="order in visibleOrders" :key="order.id">
-                                <td class="time-col">{{ formatDateTime(order.betTime) }}</td>
                                 <td>
                                     <div class="order-title">{{ order.marketTitle }}</div>
                                 </td>
                                 <td>
                                     <span class="order-option">{{ order.optionName }}</span>
                                 </td>
+                                <td class="time-col">{{ formatDateTime(order.betTime) }}</td>
                                 <td><strong>{{ formatAmount(order.betAmount) }} USDT</strong></td>
                                 <td><strong>{{ formatOdds(order.odds) }}</strong></td>
                                 <td><strong>{{ formatAmount(order.expectReturnAmount) }} USDT</strong></td>
@@ -188,7 +199,7 @@
         <div class="right-sidebar">
             <div class="betting-slip-panel">
                 <div class="panel-header">
-                    <h3>投注清单</h3>
+                    <h3>下单</h3>
                 </div>
                 <template v-if="selectedEvent">
                     <div class="slip-content">
@@ -249,7 +260,7 @@
                                 <div class="odds-info-row">
                                     <span class="info-label">当前赔率</span>
                                     <span class="info-value odds-value">{{ formatOddsLabel(selectedTeam.optionData)
-                                    }}</span>
+                                        }}</span>
                                 </div>
                             </div>
 
@@ -1277,7 +1288,7 @@ export default {
 }
 
 .group-header-left {
-    flex: 0 0 300px;
+    flex: 0 0 600px;
     display: flex;
     align-items: center;
     border-right: 1px solid #f3f4f6;
