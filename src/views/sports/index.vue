@@ -1,274 +1,282 @@
 <template>
     <div class="sports-page">
-        <div class="main-content">
-            <div class="header">
-                <div>
-                    <h1>体育竞猜</h1>
-                </div>
+        <!-- Left Sidebar: Sports Categories & Promotion -->
+        <div class="left-sidebar">
+            <div class="ls-header">
+                <i class="el-icon-trophy"></i>
+                <h2>体育竞猜</h2>
             </div>
-
-            <div class="match-tabs">
-                <button
-                    v-for="tab in tabs"
-                    :key="tab.key"
-                    class="match-tab"
-                    :class="{ active: activeTab === tab.key }"
-                    @click="activeTab = tab.key"
-                >
-                    {{ tab.label }}
-                    <span class="tab-count">{{ getTabEventCount(tab.key) }}</span>
-                </button>
-            </div>
-
-            <div v-for="category in categories" :key="category.id" class="category-section">
-                <template v-if="filteredEvents(category).length">
-                    <h2 class="category-title">{{ category.name }}</h2>
-
-                    <div v-for="event in filteredEvents(category)" :key="event.id" class="event-card" @click="handleCardClick(event)">
-                        <div class="event-header">
-                            <div class="event-info">
-                                <span v-if="event.matchStatus === 2" class="live-badge"><span class="dot"></span>进行中</span>
-                                <span class="time-info">{{ event.time }}</span>
-                                <span class="title-info">{{ event.title }}</span>
-                            </div>
-                            <div class="event-actions">
-                                <span class="market-count">{{ event.marketCount }} 个市场</span>
-                                <span class="match-status" :class="statusClass(event.statusText)">{{ event.statusText }}</span>
-                            </div>
-                        </div>
-
-                        <div class="event-body">
-                            <div class="teams-list">
-                                <div v-for="team in event.teams" :key="team.id" class="team-row">
-                                    <div class="team-info">
-                                        <span class="team-icon">{{ team.icon }}</span>
-                                        <span class="team-name">{{ team.name }}</span>
-                                    </div>
-                                    <span class="team-score">{{ team.score }}</span>
-                                </div>
-                            </div>
-
-                            <div class="odds-list">
-                                <button
-                                    v-for="team in event.teams"
-                                    :key="'odd-' + team.id"
-                                    class="odd-btn"
-                                    :class="[team.color, { disabled: !team.bettable }]"
-                                    :disabled="!team.bettable"
-                                    @click.stop="openTrade(event, team.optionData, team.marketData)"
-                                >
-                                    <span class="team-short">{{ team.shortName }}</span>
-                                    <span class="team-price">{{ formatOddsLabel(team.optionData) }}</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <el-collapse-transition>
-                            <div class="expanded-section" v-show="event.expanded" @click.stop>
-                                <div class="markets-container" v-if="event.markets && event.markets.length">
-                                    <div v-for="market in event.markets" :key="'market-' + market.id" class="expanded-market-section">
-                                        <div class="market-header">
-                                            <div class="market-title-wrap">
-                                                <span class="market-blue-bar"></span>
-                                                <div>
-                                                    <div class="market-title-text">{{ market.marketTitle }}</div>
-                                                    <div class="market-meta">
-                                                        <span :class="['status-pill', statusClass(market.marketStatusText)]">
-                                                            {{ market.marketStatusText }}
-                                                        </span>
-                                                        <span>截止 {{ formatDateTime(market.closeTime) }}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="market-stats">
-                                                <div class="stat-item">总下注: {{ formatAmount(market.totalBetAmount) }} USDT</div>
-                                                <div class="stat-item">参与人数: {{ market.totalUserCount || 0 }}</div>
-                                            </div>
-                                        </div>
-
-                                        <div class="market-options-grid">
-                                            <button
-                                                v-for="option in market.options"
-                                                :key="'opt-' + option.id"
-                                                class="option-row-btn"
-                                                :class="{ disabled: !option.bettable, active: isSelectedOption(option) }"
-                                                :disabled="!option.bettable"
-                                                @click.stop="openTrade(event, option, market)"
-                                            >
-                                                <span class="opt-name">{{ option.optionName }}</span>
-                                                <span class="opt-values">
-                                                    <span class="opt-odds">{{ formatOdds(option.currentOdds) }}</span>
-                                                    <span class="opt-price">{{ formatPrice(option.currentPrice) }}</span>
-                                                </span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="no-data" v-else>
-                                    暂无可展示市场
-                                </div>
-                            </div>
-                        </el-collapse-transition>
+            <div class="ls-menu">
+                <div v-for="(leagues, country) in groupedLeagues" :key="country">
+                    <div class="menu-country-header">{{ country }}</div>
+                    <div class="menu-item" v-for="league in leagues" :key="league.id"
+                        :class="{ active: activeLeagueId === league.id }" @click="activeLeagueId = league.id">
+                        <span class="menu-icon">🏆</span>
+                        <span class="menu-text">{{ league.name }}</span>
+                        <span class="menu-count">{{ league.matchCount }}</span>
                     </div>
-                </template>
-            </div>
-
-            <div v-if="!hasVisibleEvents" class="empty-list-state">
-                当前分类下暂无赛事
+                </div>
             </div>
         </div>
 
-        <div class="sidebar">
-            <div class="trade-panel" v-if="selectedEvent && selectedTeam && selectedTeam.marketData">
-                <div class="tp-header">
-                    <div class="tp-match">
-                        <span class="tp-icon">{{ selectedTeam.icon || '🏳️' }}</span>
-                        <div class="tp-title-col">
-                            <div class="tp-title">{{ selectedEvent.title }}</div>
-                            <div class="tp-subtitle">{{ selectedTeam.marketData.marketTitle }}</div>
-                        </div>
+        <div class="main-column">
+            <!-- Top Featured Match Banner -->
+            <div class="featured-match-banner">
+                <div class="league-info">
+                    <div class="league-name">英超 联赛</div>
+                    <div class="match-time">05/17 23:00</div>
+                </div>
+                <div class="match-teams">
+                    <div class="team team-home">
+                        <span class="team-name">曼彻斯特城</span>
+                        <div class="team-logo"></div>
+                    </div>
+                    <div class="vs-text">VS</div>
+                    <div class="team team-away">
+                        <div class="team-logo"></div>
+                        <span class="team-name">利物浦</span>
                     </div>
                 </div>
-
-                <div class="tp-market-status">
-                    <span :class="['status-pill', statusClass(selectedTeam.marketData.marketStatusText)]">
-                        {{ selectedTeam.marketData.marketStatusText }}
-                    </span>
-                    <span>截止 {{ formatDateTime(selectedTeam.marketData.closeTime) }}</span>
+                <div class="banner-action">
+                    <button class="bet-now-btn">立即投注</button>
                 </div>
+            </div>
 
-                <div class="tp-outcomes">
-                    <button
-                        v-for="option in selectedTeam.marketData.options"
-                        :key="'tp-' + option.id"
-                        class="tp-outcome-btn"
-                        :class="{
-                            active: selectedTeam.id === option.id,
-                            disabled: !option.bettable
-                        }"
-                        :disabled="!option.bettable"
-                        @click="openTrade(selectedEvent, option, selectedTeam.marketData)"
-                    >
-                        <span>{{ option.optionName }}</span>
-                        <span>{{ formatOdds(option.currentOdds) }}</span>
-                    </button>
-                </div>
-
-                <div class="stake-panel">
-                    <div class="stake-header">
-                        <span>下注金额</span>
-                        <span v-if="betPreview.walletBalance !== null">余额 {{ formatAmount(betPreview.walletBalance) }} USDT</span>
-                    </div>
-
-                    <div class="stake-input-wrap">
-                        <input
-                            type="number"
-                            v-model.number="tradeAmount"
-                            min="0"
-                            step="1"
-                            placeholder="输入下注金额"
-                        />
-                        <span class="stake-unit">USDT</span>
-                    </div>
-
-                    <div class="stake-range" v-if="betPreview.minBetAmount || betPreview.maxBetAmount">
-                        <span>最小 {{ formatAmount(betPreview.minBetAmount) }}</span>
-                        <span v-if="betPreview.maxBetAmount">最大 {{ formatAmount(betPreview.maxBetAmount) }}</span>
-                    </div>
-
-                    <div class="tp-quick-amounts">
-                        <button v-for="amount in quickAmounts" :key="amount" @click="setTradeAmount(amount)">
-                            {{ amount }}
+            <div class="match-section">
+                <div class="match-filters-top">
+                    <div class="match-tabs">
+                        <button v-for="tab in tabs" :key="tab.key" class="match-tab"
+                            :class="{ active: activeTab === tab.key }" @click="activeTab = tab.key">
+                            {{ tab.label }}
+                            <span class="tab-badge" v-if="getTabEventCount(tab.key) > 0">{{
+                                getTabEventCount(tab.key) }}</span>
                         </button>
                     </div>
-                </div>
-
-                <div class="tp-summary">
-                    <div class="summary-card">
-                        <span class="summary-label">当前赔率</span>
-                        <span class="summary-value">{{ formatOdds(betPreview.odds || selectedTeam.optionData.currentOdds) }}</span>
-                    </div>
-                    <div class="summary-card">
-                        <span class="summary-label">预计可得</span>
-                        <span class="summary-value emphasis">{{ formatAmount(betPreview.expectReturnAmount) }} USDT</span>
-                    </div>
-                    <div class="summary-card">
-                        <span class="summary-label">预计盈利</span>
-                        <span class="summary-value profit">{{ formatAmount(betPreview.expectProfit) }} USDT</span>
+                    <div class="filters-right">
+                        <el-select v-model="filterLeague" placeholder="全部联赛" size="small" class="filter-select">
+                            <el-option label="全部联赛" value="all"></el-option>
+                        </el-select>
+                        <el-select v-model="filterTime" placeholder="全部时间" size="small" class="filter-select">
+                            <el-option label="全部时间" value="all"></el-option>
+                        </el-select>
+                        <el-input placeholder="搜索赛事/球队" prefix-icon="el-icon-search" size="small"
+                            class="filter-search"></el-input>
                     </div>
                 </div>
 
-                <div class="tp-notice" v-if="previewError">
-                    {{ previewError }}
+                <!-- Match List Table Layout -->
+                <div class="match-table-container">
+                    <table class="match-table">
+                        <tbody v-if="activeCategory">
+                            <template v-if="filteredEvents(activeCategory).length">
+                                <template v-for="(event, index) in filteredEvents(activeCategory)">
+                                    <tr class="sport-group-header" :key="'header-' + index"
+                                        @click="handleCardClick(event)">
+                                        <td colspan="7">
+                                            <div class="group-header-content">
+                                                <div class="group-header-left">
+                                                    <div class="match-time-display header-time">
+                                                        <span class="time-date">{{ event.time ? event.time.substring(5,
+                                                            10).replace('-', '/') : '--' }}</span>
+                                                        <span class="time-hour">{{ event.time ? event.time.substring(11,
+                                                            16) : '--' }}</span>
+                                                    </div>
+                                                    <div class="league-title-display">
+                                                        <span class="market-title">{{ event.markets && event.markets[0]
+                                                            ? event.markets[0].marketTitle : event.title }}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="group-header-center">
+                                                    <div class="team home-team">
+                                                        <img v-if="event.teams[0].icon && event.teams[0].icon.startsWith('http')"
+                                                            :src="event.teams[0].icon" class="team-logo-small" />
+                                                        <span v-else class="team-icon-emoji">{{ event.teams[0].icon
+                                                            }}</span>
+                                                        <span class="team-name" :title="event.teams[0].name">{{
+                                                            event.teams[0].name }}</span>
+                                                    </div>
+                                                    <div class="score-display">
+                                                        <span class="score-text">{{ event.teams[0].score }} - {{
+                                                            event.teams[1].score }}</span>
+                                                        <span class="status-badge"
+                                                            :class="statusClass(event.statusText)">{{ event.statusText
+                                                            }}</span>
+                                                    </div>
+                                                    <div class="team away-team">
+                                                        <img v-if="event.teams[1].icon && event.teams[1].icon.startsWith('http')"
+                                                            :src="event.teams[1].icon" class="team-logo-small" />
+                                                        <span v-else class="team-icon-emoji">{{ event.teams[1].icon
+                                                            }}</span>
+                                                        <span class="team-name" :title="event.teams[1].name">{{
+                                                            event.teams[1].name }}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="group-header-right">
+                                                    <div class="header-odds"
+                                                        v-if="event.teams[0].optionData || event.teams[1].optionData">
+                                                        <div class="header-odd-item" v-if="event.teams[0].optionData">
+                                                            <button class="table-odd-btn mini-btn"
+                                                                :class="{ 'disabled': !event.teams[0].optionData.bettable, 'active': isSelectedOption(event.teams[0].optionData) }"
+                                                                :disabled="!event.teams[0].optionData.bettable"
+                                                                @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
+                                                                <span class="header-odd-label">{{ event.teams[0].name
+                                                                }}</span>
+                                                                <span class="header-odd-value">{{
+                                                                    formatOddsLabel(event.teams[0].optionData) }}</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="header-odd-item" v-if="event.teams[1].optionData">
+                                                            <button class="table-odd-btn mini-btn"
+                                                                :class="{ 'disabled': !event.teams[1].optionData.bettable, 'active': isSelectedOption(event.teams[1].optionData) }"
+                                                                :disabled="!event.teams[1].optionData.bettable"
+                                                                @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
+                                                                <span class="header-odd-label">{{ event.teams[1].name
+                                                                }}</span>
+                                                                <span class="header-odd-value">{{
+                                                                    formatOddsLabel(event.teams[1].optionData) }}</span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </template>
+                        </tbody>
+                    </table>
                 </div>
-
-                <button
-                    class="tp-submit-btn"
-                    :class="selectedTeam.color"
-                    @click="submitBet"
-                    :disabled="isSubmitting || isPreviewLoading || !canSubmit"
-                >
-                    {{ isSubmitting ? '下注中...' : '确认下注' }}
-                </button>
             </div>
-
-            <div v-else class="empty-trade-panel">
-                请选择左侧比赛结果开始下注
-            </div>
-
             <div class="orders-panel">
-                <div class="orders-header">
-                    <h3>我的订单</h3>
-                    <button class="refresh-orders-btn" @click="getMyOrders">刷新</button>
+                <div class="orders-panel-top">
+                    <div class="orders-header">
+                        <div class="order-tabs">
+                            <span class="order-tab-title">我的订单</span>
+                            <button v-for="tab in orderTabs" :key="tab.key" class="order-tab"
+                                :class="{ active: activeOrderTab === tab.key }" @click="activeOrderTab = tab.key">
+                                {{ tab.label }}
+                                <span class="tab-count" v-if="tab.key === 'active'">{{ getOrderTabCount(tab.key)
+                                }}</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="order-tabs">
-                    <button
-                        v-for="tab in orderTabs"
-                        :key="tab.key"
-                        class="order-tab"
-                        :class="{ active: activeOrderTab === tab.key }"
-                        @click="activeOrderTab = tab.key"
-                    >
-                        {{ tab.label }}
-                        <span class="tab-count">{{ getOrderTabCount(tab.key) }}</span>
-                    </button>
-                </div>
+                <div v-if="filteredOrders.length" class="orders-table-container">
+                    <table class="orders-table">
+                        <tbody>
+                            <tr v-for="order in visibleOrders" :key="order.id">
+                                <td class="time-col">{{ formatDateTime(order.betTime) }}</td>
+                                <td>
+                                    <div class="order-title">{{ order.marketTitle }}</div>
+                                </td>
+                                <td>
+                                    <span class="order-option">{{ order.optionName }}</span>
+                                </td>
+                                <td><strong>{{ formatAmount(order.betAmount) }} USDT</strong></td>
+                                <td><strong>{{ formatOdds(order.odds) }}</strong></td>
+                                <td><strong>{{ formatAmount(order.expectReturnAmount) }} USDT</strong></td>
+                                <td>
+                                    <strong v-if="order.settleStatus === 1">{{ formatAmount(order.actualReturnAmount) }}
+                                        USDT</strong>
+                                    <span v-else>--</span>
+                                </td>
+                                <td>
+                                    <span class="order-status" :class="getOrderStatusClass(order)">
+                                        {{ getOrderStatusText(order) }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-                <div v-if="visibleOrders.length" class="orders-list">
-                    <div v-for="order in visibleOrders" :key="order.id" class="order-card">
-                        <div class="order-top">
-                            <div class="order-title">{{ order.marketTitle }}</div>
-                            <div class="order-status" :class="getOrderStatusClass(order)">
-                                {{ getOrderStatusText(order) }}
-                            </div>
-                        </div>
-                        <div class="order-option">{{ order.optionName }}</div>
-                        <div class="order-metrics">
-                            <div class="metric-item">
-                                <span>下注</span>
-                                <strong>{{ formatAmount(order.betAmount) }} USDT</strong>
-                            </div>
-                            <div class="metric-item">
-                                <span>赔率</span>
-                                <strong>{{ formatOdds(order.odds) }}</strong>
-                            </div>
-                            <div class="metric-item">
-                                <span>预计可得</span>
-                                <strong>{{ formatAmount(order.expectReturnAmount) }} USDT</strong>
-                            </div>
-                            <div class="metric-item" v-if="order.settleStatus === 1">
-                                <span>实际返还</span>
-                                <strong>{{ formatAmount(order.actualReturnAmount) }} USDT</strong>
-                            </div>
-                        </div>
-                        <div class="order-time">{{ formatDateTime(order.betTime) }}</div>
+                    <div class="pagination-container" v-if="orderTotal > orderPageSize">
+                        <el-pagination @current-change="handlePageChange" :current-page="orderCurrentPage"
+                            :page-size="orderPageSize" layout="prev, pager, next" :total="orderTotal" background>
+                        </el-pagination>
                     </div>
                 </div>
 
                 <div v-else class="empty-orders-state">
                     当前暂无订单
+                </div>
+            </div>
+        </div>
+
+        <div class="right-sidebar">
+            <div class="betting-slip-panel">
+                <div class="panel-header">
+                    <h3>投注清单</h3>
+                </div>
+                <div class="slip-tabs">
+                    <button class="slip-tab" :class="{ active: betType === 'single' }"
+                        @click="betType = 'single'">单注</button>
+                </div>
+
+                <template v-if="selectedEvent">
+                    <div class="slip-content">
+                        <div class="selected-bet-card">
+                            <div class="bet-info-top">
+                                <span class="bet-league">{{ selectedEvent.markets && selectedEvent.markets[0] ?
+                                    selectedEvent.markets[0].marketTitle : '赛事投注' }}</span>
+                            </div>
+                            <div class="bet-match-title">{{ selectedEvent.title }}</div>
+
+                            <div class="slip-options-group" v-if="selectedEvent.teams">
+                                <button v-for="(team, index) in selectedEvent.teams" :key="index" v-if="team.optionData"
+                                    class="slip-opt-btn"
+                                    :class="{ 'active': selectedTeam && selectedTeam.id === team.optionData.id, 'disabled': !team.optionData.bettable }"
+                                    :disabled="!team.optionData.bettable"
+                                    @click="openTrade(selectedEvent, team.optionData, team.marketData)">
+                                    <span class="opt-name">{{ team.name }}</span>
+                                    <span class="opt-odds">{{ formatOddsLabel(team.optionData) }}</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <template v-if="selectedTeam && selectedTeam.marketData">
+                            <div class="quick-amounts-label">快捷金额</div>
+                            <div class="tp-quick-amounts">
+                                <button v-for="amount in quickAmounts" :key="amount" @click="setTradeAmount(amount)">
+                                    {{ amount }}
+                                </button>
+                            </div>
+
+                            <div class="stake-input-label">投注金额</div>
+                            <div class="stake-input-wrap">
+                                <input type="number" v-model.number="tradeAmount" min="0" step="1" />
+                                <span class="stake-unit">USDT</span>
+                            </div>
+                            <div class="global-balance-container">
+                                <div class="balance-row global-balance">
+                                    <span>可用余额: {{ walletBalance !== null ? formatAmount(walletBalance) : '--' }}
+                                        USDT</span>
+                                    <a href="javascript:void(0)" class="recharge-link" @click="$router.push('/recharge')">充值</a>
+                                </div>
+                            </div>
+
+                            <div class="expected-return">
+                                <div class="return-label">预计可得</div>
+                                <div class="return-value">{{ formatAmount(betPreview.expectReturnAmount) }} USDT</div>
+                            </div>
+
+                            <div class="tp-notice" v-if="previewError">
+                                {{ previewError }}
+                            </div>
+
+                            <button class="tp-submit-btn blue" @click="submitBet"
+                                :disabled="isSubmitting || isPreviewLoading || !canSubmit">
+                                {{ isSubmitting ? '下注中...' : '确认下注' }}
+                            </button>
+                        </template>
+                        <div v-else class="empty-selection-hint">
+                            请在上方选择你要下注的赛果
+                        </div>
+                    </div>
+                </template>
+
+                <div v-else class="empty-slip">
+                    请选择比赛或赛果开始下注
                 </div>
             </div>
         </div>
@@ -281,6 +289,7 @@ export default {
     data() {
         return {
             categories: [],
+            activeLeagueId: null,
             selectedEvent: null,
             selectedTeam: null,
             tradeAmount: null,
@@ -301,10 +310,32 @@ export default {
             ],
             activeOrderTab: 'active',
             orders: [],
-            betPreview: this.createEmptyPreview()
+            orderCurrentPage: 1,
+            orderPageSize: 5,
+            betType: 'single', // 'single' 单注, 'multi' 串关
+            betPreview: this.createEmptyPreview(),
+            walletBalance: null, // Track wallet balance separately
+            filterLeague: 'all',
+            filterTime: 'all',
+            acceptHigherOdds: true,
+            oddsChangeOption: 'any'
         }
     },
     computed: {
+        groupedLeagues() {
+            const groups = {};
+            this.categories.forEach(league => {
+                const country = league.country || '其他';
+                if (!groups[country]) {
+                    groups[country] = [];
+                }
+                groups[country].push(league);
+            });
+            return groups;
+        },
+        activeCategory() {
+            return this.categories.find(cat => cat.id === this.activeLeagueId) || null;
+        },
         canSubmit() {
             return Boolean(
                 this.selectedTeam &&
@@ -319,14 +350,25 @@ export default {
         hasVisibleEvents() {
             return this.categories.some(category => this.filteredEvents(category).length > 0);
         },
-        visibleOrders() {
+        filteredOrders() {
             if (this.activeOrderTab === 'active') {
                 return this.orders.filter(order => !this.isHistoryOrder(order));
             }
             return this.orders.filter(order => this.isHistoryOrder(order));
+        },
+        visibleOrders() {
+            const start = (this.orderCurrentPage - 1) * this.orderPageSize;
+            const end = start + this.orderPageSize;
+            return this.filteredOrders.slice(start, end);
+        },
+        orderTotal() {
+            return this.filteredOrders.length;
         }
     },
     watch: {
+        activeOrderTab() {
+            this.orderCurrentPage = 1;
+        },
         tradeAmount() {
             this.schedulePreview();
         },
@@ -334,6 +376,12 @@ export default {
             deep: true,
             handler() {
                 this.schedulePreview();
+            }
+        },
+        activeCategory: {
+            deep: true,
+            handler(newVal) {
+                console.log('activeCategory changed:', newVal);
             }
         }
     },
@@ -385,6 +433,43 @@ export default {
         setTradeAmount(amount) {
             this.tradeAmount = amount;
         },
+        clearSelectedBet() {
+            this.selectedEvent = null;
+            this.selectedTeam = null;
+            this.betPreview = this.createEmptyPreview();
+            this.previewError = '';
+        },
+        getDrawOption(event) {
+            if (!event || !event.markets || event.markets.length === 0) return null;
+            const mainMarket = event.markets[0];
+            if (!mainMarket.options) return null;
+
+            // Usually draw is the middle option or has a specific name/id
+            // This is a simple heuristic: find option that is not team 1 or team 2
+            const t1Id = event.teams[0].optionData ? event.teams[0].optionData.id : null;
+            const t2Id = event.teams[1].optionData ? event.teams[1].optionData.id : null;
+
+            const drawOption = mainMarket.options.find(opt => opt.id !== t1Id && opt.id !== t2Id);
+
+            if (drawOption) {
+                return {
+                    market: mainMarket,
+                    option: drawOption
+                };
+            }
+            return null;
+        },
+        getSportIcon(sportType) {
+            const icons = {
+                1: '⚽', // Football
+                2: '🏀', // Basketball
+                3: '🎾', // Tennis
+                4: '🏐', // Volleyball
+                5: '🏒', // Ice Hockey
+                6: '⚾', // Baseball
+            };
+            return icons[sportType] || '🏆';
+        },
         getLeagues() {
             this.$http.get(this.swapHost + '/quiz/leagues').then(response => {
                 const resp = response.body;
@@ -396,32 +481,93 @@ export default {
                         country: item.country,
                         sportType: item.sportType,
                         matchCount: item.matchCount,
+                        expanded: true,
                         events: []
                     }));
+                    if (this.categories.length > 0) {
+                        this.activeLeagueId = this.categories[0].id;
+                    }
                     this.getMatches();
                 }
             });
         },
         getMatches() {
-            this.categories.forEach(league => {
-                this.$http.get(this.swapHost + `/quiz/matches?leagueId=${league.id}`).then(response => {
-                    const resp = response.body;
-                    if (!(resp && resp.code === 0 && resp.data)) {
-                        return;
+            this.$http.get(this.swapHost + `/quiz/matches/displayed`).then(response => {
+                const resp = response.body;
+                if (!(resp && resp.code === 0 && resp.data)) {
+                    return;
+                }
+
+                // Clear previous events
+                this.categories.forEach(league => {
+                    league.events = [];
+                });
+
+                resp.data.forEach(item => {
+                    const match = item.match;
+                    const leagueData = item.league;
+                    const markets = item.markets || [];
+
+                    let league = this.categories.find(c => c.id === leagueData.id);
+                    if (!league) {
+                        league = {
+                            id: leagueData.id,
+                            name: leagueData.leagueName,
+                            leagueCode: leagueData.leagueCode,
+                            country: leagueData.country,
+                            sportType: leagueData.sportType,
+                            matchCount: 0,
+                            expanded: true,
+                            events: []
+                        };
+                        this.categories.push(league);
                     }
 
-                    resp.data.forEach(match => {
+                    markets.forEach(market => {
                         const event = {
-                            id: match.id,
+                            id: match.id + '_' + market.id, // Ensure unique ID for each market
+                            matchId: match.id,
                             title: match.matchName,
-                            time: this.formatDateTime(match.startTime),
-                            marketCount: match.marketCount || 0,
+                            time: match.startTime,
+                            marketCount: 1,
                             matchStatus: match.matchStatus,
                             statusText: this.getMatchStatusText(match.matchStatus),
                             expanded: false,
-                            teams: [
+                            markets: [market], // Keep single market in array to match existing logic
+                            teams: []
+                        };
+
+                        // Map options to teams for UI rendering
+                        if (market.options) {
+                            const options = market.options;
+                            event.teams = [
                                 {
-                                    id: 't1_' + match.id,
+                                    id: 't1_' + match.id + '_' + market.id,
+                                    name: options.length > 0 ? options[0].optionName : (match.homeTeam || '主队'),
+                                    shortName: (options.length > 0 ? options[0].optionName : (match.homeTeam || '主队')).substring(0, 4).toUpperCase(),
+                                    score: match.homeScore == null ? '-' : match.homeScore,
+                                    color: 'light-blue',
+                                    icon: match.homeLogo || '🏳️',
+                                    optionData: options.length > 0 ? options[0] : null,
+                                    marketData: market,
+                                    bettable: options.length > 0 ? Boolean(options[0].bettable) : false
+                                },
+                                {
+                                    id: 't2_' + match.id + '_' + market.id,
+                                    name: options.length > 1 ? options[1].optionName : (match.awayTeam || '客队'),
+                                    shortName: (options.length > 1 ? options[1].optionName : (match.awayTeam || '客队')).substring(0, 4).toUpperCase(),
+                                    score: match.awayScore == null ? '-' : match.awayScore,
+                                    color: 'dark-red',
+                                    icon: match.awayLogo || '🏳️',
+                                    optionData: options.length > 1 ? options[1] : null,
+                                    marketData: market,
+                                    bettable: options.length > 1 ? Boolean(options[1].bettable) : false
+                                }
+                            ];
+                        } else {
+                            event.teams = [
+                                {
+                                    id: 't1_' + match.id + '_' + market.id,
                                     name: match.homeTeam || '主队',
                                     shortName: (match.homeTeam || '主队').substring(0, 4).toUpperCase(),
                                     score: match.homeScore == null ? '-' : match.homeScore,
@@ -432,7 +578,7 @@ export default {
                                     bettable: false
                                 },
                                 {
-                                    id: 't2_' + match.id,
+                                    id: 't2_' + match.id + '_' + market.id,
                                     name: match.awayTeam || '客队',
                                     shortName: (match.awayTeam || '客队').substring(0, 4).toUpperCase(),
                                     score: match.awayScore == null ? '-' : match.awayScore,
@@ -442,15 +588,11 @@ export default {
                                     marketData: null,
                                     bettable: false
                                 }
-                            ],
-                            markets: []
-                        };
+                            ];
+                        }
+
                         league.events.push(event);
                     });
-
-                    if (!this.selectedEvent && league.events.length > 0) {
-                        this.selectEvent(league.events[0]);
-                    }
                 });
             });
         },
@@ -478,20 +620,15 @@ export default {
             return events.filter(event => this.isEndedEvent(event));
         },
         getTabEventCount(tabKey) {
-            let total = 0;
-            this.categories.forEach(category => {
-                const events = category.events || [];
-                if (tabKey === 'live') {
-                    total += events.filter(event => event.matchStatus === 2).length;
-                    return;
-                }
-                if (tabKey === 'upcoming') {
-                    total += events.filter(event => this.isUpcomingEvent(event)).length;
-                    return;
-                }
-                total += events.filter(event => this.isEndedEvent(event)).length;
-            });
-            return total;
+            if (!this.activeCategory) return 0;
+            const events = this.activeCategory.events || [];
+            if (tabKey === 'live') {
+                return events.filter(event => event.matchStatus === 2).length;
+            }
+            if (tabKey === 'upcoming') {
+                return events.filter(event => this.isUpcomingEvent(event)).length;
+            }
+            return events.filter(event => this.isEndedEvent(event)).length;
         },
         getOrderStatusText(order) {
             if (order.settleStatus === 1) {
@@ -520,6 +657,9 @@ export default {
             }
             return this.orders.filter(order => this.isHistoryOrder(order)).length;
         },
+        handlePageChange(page) {
+            this.orderCurrentPage = page;
+        },
         getMyOrders() {
             this.$http.get(this.swapHost + '/quiz/orders').then(response => {
                 const resp = response.body;
@@ -529,67 +669,16 @@ export default {
             });
         },
         handleCardClick(event) {
-            this.selectEvent(event);
+            this.selectedEvent = event;
             this.toggleExpand(event);
+
+            const firstBettable = this.findFirstBettableOption(event);
+            if (firstBettable) {
+                this.openTrade(event, firstBettable.option, firstBettable.market);
+            }
         },
         selectEvent(event) {
             this.selectedEvent = event;
-            this.getMatchDetails(event.id);
-        },
-        getMatchDetails(matchId) {
-            this.$http.get(this.swapHost + `/quiz/matches/${matchId}`).then(response => {
-                const resp = response.body;
-                if (!(resp && resp.code === 0 && resp.data)) {
-                    return;
-                }
-
-                const matchData = resp.data;
-                for (const league of this.categories) {
-                    const event = league.events.find(item => item.id === matchId);
-                    if (!event) {
-                        continue;
-                    }
-
-                    event.markets = (matchData.markets || []).map(market => ({
-                        ...market,
-                        options: (market.options || []).map(option => ({
-                            ...option,
-                            currentOdds: option.currentOdds || 0,
-                            currentPrice: option.currentPrice || 0
-                        }))
-                    }));
-                    event.matchStatus = matchData.match ? matchData.match.matchStatus : event.matchStatus;
-                    event.statusText = this.getMatchStatusText(event.matchStatus);
-                    this.bindPrimaryTeams(event);
-
-                    if (this.selectedEvent && this.selectedEvent.id === matchId) {
-                        const defaultOption = this.findFirstBettableOption(event);
-                        if (defaultOption) {
-                            this.openTrade(event, defaultOption.option, defaultOption.market);
-                        } else {
-                            this.selectedTeam = null;
-                            this.betPreview = this.createEmptyPreview();
-                        }
-                    }
-
-                    this.$forceUpdate();
-                    break;
-                }
-            });
-        },
-        bindPrimaryTeams(event) {
-            const mainMarket = event.markets && event.markets.length ? event.markets[0] : null;
-            if (!mainMarket || !mainMarket.options || mainMarket.options.length < 2) {
-                return;
-            }
-
-            event.teams[0].optionData = mainMarket.options[0];
-            event.teams[0].marketData = mainMarket;
-            event.teams[0].bettable = Boolean(mainMarket.options[0].bettable);
-
-            event.teams[1].optionData = mainMarket.options[1];
-            event.teams[1].marketData = mainMarket;
-            event.teams[1].bettable = Boolean(mainMarket.options[1].bettable);
         },
         findFirstBettableOption(event) {
             const markets = event.markets || [];
@@ -658,6 +747,10 @@ export default {
                 const resp = response.body;
                 if (resp && resp.code === 0 && resp.data) {
                     this.betPreview = Object.assign(this.createEmptyPreview(), resp.data);
+                    // Update global wallet balance if provided in preview response
+                    if (resp.data.walletBalance !== undefined) {
+                        this.walletBalance = resp.data.walletBalance;
+                    }
                     return;
                 }
                 this.betPreview = this.createEmptyPreview();
@@ -666,6 +759,17 @@ export default {
                 this.isPreviewLoading = false;
                 this.betPreview = this.createEmptyPreview();
                 this.previewError = '预览失败，请稍后重试';
+            });
+        },
+        fetchWalletBalance() {
+            this.$http.post(this.host + '/asset/wallet').then(response => {
+                const resp = response.body;
+                if (resp && resp.code === 0 && resp.data) {
+                    const usdtWallet = resp.data.find(w => w.coin === 'USDT');
+                    this.walletBalance = usdtWallet ? usdtWallet.balance : 0;
+                }
+            }).catch(err => {
+                console.error('Failed to fetch wallet balance', err);
             });
         },
         submitBet() {
@@ -696,7 +800,7 @@ export default {
                 if (resp && resp.code === 0) {
                     this.$message.success('下注成功');
                     this.tradeAmount = null;
-                    this.getMatchDetails(this.selectedEvent.id);
+                    this.getMatches(); // Refresh matches to update odds
                     this.getMyOrders();
                     return;
                 }
@@ -710,6 +814,7 @@ export default {
     mounted() {
         this.getLeagues();
         this.getMyOrders();
+        this.fetchWalletBalance();
     },
     beforeDestroy() {
         if (this.previewTimer) {
@@ -722,667 +827,722 @@ export default {
 <style lang="scss" scoped>
 .sports-page {
     display: flex;
-    max-width: 1400px;
+    flex-direction: row;
     margin: 0 auto;
     padding: 20px;
     gap: 20px;
-    min-height: 100vh;
+    height: calc(100vh - 70px);
     color: #1f2937;
-    background: #f5f7fb;
+    background: #f0f2f5;
+    box-sizing: border-box;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-.main-content {
+/* Left Sidebar */
+.left-sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.ls-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    color: #2563eb;
+    border-bottom: 1px solid #f3f4f6;
+
+    i {
+        font-size: 20px;
+    }
+
+    h2 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+    }
+}
+
+.ls-menu {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #4b5563;
+    margin-bottom: 4px;
+
+    &:hover {
+        background: #f8fafc;
+    }
+
+    &.active {
+        background: #eff6ff;
+        color: #2563eb;
+        font-weight: 600;
+
+        .menu-count {
+            color: #2563eb;
+        }
+    }
+}
+
+.menu-icon {
+    font-size: 18px;
+    margin-right: 12px;
+    width: 24px;
+    text-align: center;
+}
+
+.menu-text {
+    flex: 1;
+    font-size: 14px;
+}
+
+.menu-count {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.menu-country-header {
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ls-banner {
+    padding: 16px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.banner-content {
+    background: linear-gradient(135deg, #4f46e5, #3b82f6);
+    border-radius: 12px;
+    padding: 20px 16px;
+    color: #fff;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '💰';
+        position: absolute;
+        font-size: 60px;
+        opacity: 0.2;
+        right: -10px;
+        bottom: -10px;
+    }
+}
+
+.banner-tag {
+    font-size: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.banner-title {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 4px;
+
+    span {
+        font-size: 16px;
+        font-weight: 600;
+    }
+}
+
+.banner-desc {
+    font-size: 13px;
+    opacity: 0.9;
+    margin-bottom: 16px;
+}
+
+.banner-btn {
+    width: 100%;
+    background: #fff;
+    color: #2563eb;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.1s;
+
+    &:active {
+        transform: scale(0.98);
+    }
+}
+
+/* Main Column */
+.main-column {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 100%;
 }
 
-.header {
+.featured-match-banner {
+    flex: 1;
+    /* 1/6 of total height */
+    min-height: 0;
+    background: linear-gradient(90deg, #1e3a8a, #1e40af, #1e3a8a);
+    border-radius: 12px;
+    padding: 10px 20px;
+    color: #fff;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+}
+
+.league-info {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.league-name {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.match-time {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.match-teams {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.team {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.team-home {
+    flex-direction: row;
+}
+
+.team-away {
+    flex-direction: row;
+}
+
+.team-name {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.team-logo {
+    width: 40px;
+    height: 40px;
+    background: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.vs-text {
+    font-size: 24px;
+    font-weight: 900;
+    color: #60a5fa;
+    font-style: italic;
+}
+
+.bet-now-btn {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    transition: background 0.2s;
+
+    &:hover {
+        background: #1d4ed8;
+    }
+}
+
+.match-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    flex: 3;
+    /* 3/6 of total height */
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.match-filters-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
-
-    h1 {
-        margin: 0;
-        font-size: 30px;
-        font-weight: 800;
-    }
-
-    .header-subtitle {
-        margin: 8px 0 0;
-        color: #6b7280;
-        font-size: 14px;
-    }
 }
 
 .match-tabs {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 24px;
 }
 
 .match-tab {
-    height: 40px;
-    padding: 0 16px;
-    border: 1px solid #dbe3f0;
-    border-radius: 999px;
-    background: #fff;
-    color: #4b5563;
-    font-size: 14px;
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    color: #6b7280;
     font-weight: 600;
     cursor: pointer;
+    padding: 0 0 8px 0;
+    position: relative;
 
     &.active {
-        border-color: #2563eb;
         color: #2563eb;
-        background: #eff6ff;
+
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #2563eb;
+            border-radius: 2px;
+        }
     }
 }
 
-.tab-count {
-    margin-left: 6px;
-    font-size: 12px;
+.tab-badge {
+    position: absolute;
+    top: -8px;
+    right: -16px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
 }
 
-.category-section {
-    margin-bottom: 28px;
-}
-
-.category-title {
-    margin: 0 0 14px;
-    font-size: 16px;
-    font-weight: 700;
-}
-
-.event-card {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 14px;
-    cursor: pointer;
-    transition: box-shadow 0.2s ease;
-
-    &:hover {
-        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
-    }
-}
-
-.event-header,
-.market-header,
-.summary-row,
-.stake-header,
-.tp-market-status,
-.event-body,
-.team-row,
-.option-row-btn,
-.tp-outcome-btn {
+.filters-right {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.event-header {
-    margin-bottom: 14px;
     gap: 12px;
 }
 
-.event-info {
+.filter-select {
+    width: 120px;
+}
+
+.filter-search {
+    width: 200px;
+}
+
+/* Match Table */
+.match-table-container {
+    overflow-x: auto;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.match-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 12px;
+    text-align: center;
+    table-layout: fixed;
+}
+
+.sport-group-header td {
+    padding: 0;
+    border: none;
+}
+
+.group-header-content {
     display: flex;
     align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
+    justify-content: space-between;
+    background: #fff;
+    padding: 16px 20px;
+    border-radius: 12px;
+    border: 1px solid #f3f4f6;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    min-height: 80px;
 }
 
-.event-actions {
+.group-header-content:hover {
+    border-color: #d1d5db;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+}
+
+.group-header-left {
+    flex: 0 0 200px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+    border-right: 1px solid #f3f4f6;
+    padding-right: 16px;
 }
 
-.market-count,
-.time-info,
-.title-info {
-    font-size: 13px;
-    color: #6b7280;
+.group-header-center {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 0 20px;
 }
 
-.title-info {
-    color: #111827;
-    font-weight: 600;
-}
-
-.live-badge,
-.status-pill,
-.match-status {
-    display: inline-flex;
+.score-display {
+    display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 4px;
-    padding: 3px 8px;
-    border-radius: 999px;
-    font-size: 12px;
+    min-width: 80px;
+}
+
+.score-text {
+    font-size: 20px;
+    font-weight: 800;
+    color: #2563eb;
+    letter-spacing: 2px;
+}
+
+.status-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
     font-weight: 600;
+
+    &.is-live {
+        background: #fee2e2;
+        color: #ef4444;
+    }
+
+    &.is-pending {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+
+    &.is-closed {
+        background: #f3f4f6;
+        color: #9ca3af;
+    }
 }
 
-.live-badge,
-.is-live {
-    background: #fee2e2;
-    color: #dc2626;
-}
-
-.is-open {
-    background: #dcfce7;
-    color: #15803d;
-}
-
-.is-pending {
-    background: #dbeafe;
-    color: #1d4ed8;
-}
-
-.is-closed {
-    background: #f3f4f6;
-    color: #6b7280;
-}
-
-.dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: currentColor;
-}
-
-.event-body {
-    gap: 16px;
-}
-
-.teams-list {
+.team {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     flex: 1;
 }
 
-.team-row + .team-row {
-    margin-top: 12px;
+.team-logo-small {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: contain;
+    background: #f9fafb;
+    border: 1px solid #f3f4f6;
+    flex-shrink: 0;
 }
 
-.team-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-width: 0;
+.home-team {
+    justify-content: flex-end;
+}
+
+.away-team {
+    justify-content: flex-start;
 }
 
 .team-name {
     font-size: 15px;
     font-weight: 600;
+    color: #1f2937;
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.team-score {
-    color: #6b7280;
-    font-size: 14px;
-    margin-left: 8px;
+.team-icon-emoji {
+    font-size: 24px;
+    line-height: 1;
 }
 
-.odds-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    min-width: 220px;
-}
-
-.odd-btn,
-.tp-submit-btn,
-.tp-quick-amounts button,
-.option-row-btn,
-.tp-outcome-btn {
-    transition: all 0.2s ease;
-}
-
-.odd-btn {
-    width: 100%;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 12px;
-    color: #fff;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    &.light-blue {
-        background: #2563eb;
-    }
-
-    &.dark-red {
-        background: #dc2626;
-    }
-
-    &.blue {
-        background: #2563eb;
-    }
-}
-
-.odd-btn.disabled,
-.option-row-btn.disabled,
-.tp-outcome-btn.disabled {
-    background: #f3f4f6;
-    color: #9ca3af;
-    border-color: #e5e7eb;
-    cursor: not-allowed;
-}
-
-.expanded-section {
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid #e5e7eb;
-}
-
-.markets-container {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.expanded-market-section {
-    border: 1px solid #eef2f7;
-    border-radius: 8px;
-    padding: 14px;
-    background: #fbfcfe;
-}
-
-.market-title-wrap {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-}
-
-.market-blue-bar {
-    width: 3px;
-    height: 28px;
-    background: #2563eb;
-    border-radius: 999px;
-}
-
-.market-title-text {
-    font-size: 15px;
-    font-weight: 700;
-    color: #111827;
-}
-
-.market-meta {
-    margin-top: 6px;
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    font-size: 12px;
-    color: #6b7280;
-}
-
-.market-stats {
-    text-align: right;
-    font-size: 12px;
-    color: #6b7280;
-}
-
-.stat-item + .stat-item {
-    margin-top: 4px;
-}
-
-.market-options-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 10px;
-    margin-top: 14px;
-}
-
-.option-row-btn {
-    width: 100%;
-    border: 1px solid #dbe3f0;
-    border-radius: 8px;
-    padding: 12px;
-    background: #fff;
-    cursor: pointer;
-    text-align: left;
-
-    &.active {
-        border-color: #2563eb;
-        box-shadow: inset 0 0 0 1px #2563eb;
-    }
-}
-
-.opt-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: #111827;
-}
-
-.opt-values {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 2px;
-}
-
-.opt-odds {
-    font-size: 14px;
-    font-weight: 700;
-    color: #2563eb;
-}
-
-.opt-price {
-    font-size: 12px;
-    color: #6b7280;
-}
-
-.sidebar {
-    width: 360px;
-    flex-shrink: 0;
-}
-
-.trade-panel,
-.empty-trade-panel,
-.orders-panel {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 20px;
-}
-
-.trade-panel,
-.empty-trade-panel {
-    position: sticky;
-    top: 80px;
-}
-
-.tp-header {
-    margin-bottom: 16px;
-}
-
-.tp-match {
+.group-header-right {
+    flex: 0 0 220px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: flex-end;
+    border-left: 1px solid #f3f4f6;
+    padding-left: 16px;
 }
 
-.tp-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: #eff6ff;
+.header-odds {
     display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.header-odd-item {
+    flex: 1;
+}
+
+.table-odd-btn {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
-}
-
-.tp-title {
-    font-size: 17px;
-    font-weight: 700;
-    color: #111827;
-}
-
-.tp-subtitle {
-    margin-top: 4px;
-    font-size: 13px;
-    color: #6b7280;
-}
-
-.tp-market-status {
-    margin-bottom: 16px;
-    font-size: 12px;
-    color: #6b7280;
-}
-
-.tp-outcomes {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 18px;
-}
-
-.tp-outcome-btn {
-    border: 1px solid #dbe3f0;
-    background: #fff;
+    gap: 4px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
-    padding: 12px;
+    padding: 8px;
     cursor: pointer;
-    color: #111827;
-    font-weight: 600;
+    transition: all 0.2s;
+
+    &:hover:not(:disabled) {
+        background: #eff6ff;
+        border-color: #bfdbfe;
+        transform: translateY(-2px);
+    }
 
     &.active {
-        border-color: #2563eb;
-        color: #2563eb;
-        box-shadow: inset 0 0 0 1px #2563eb;
-    }
-}
-
-.stake-panel {
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 14px;
-    background: #f9fafb;
-    margin-bottom: 16px;
-}
-
-.stake-header,
-.stake-range {
-    font-size: 12px;
-    color: #6b7280;
-}
-
-.stake-input-wrap {
-    margin-top: 10px;
-    position: relative;
-
-    input {
-        width: 100%;
-        height: 48px;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        padding: 0 72px 0 14px;
-        font-size: 20px;
-        font-weight: 700;
-        color: #111827;
-        outline: none;
-        background: #fff;
-    }
-}
-
-.stake-unit {
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 13px;
-    color: #6b7280;
-}
-
-.stake-range {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-    gap: 10px;
-}
-
-.tp-quick-amounts {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    margin-top: 12px;
-
-    button {
-        height: 34px;
-        border: 1px solid #dbe3f0;
-        border-radius: 8px;
-        background: #fff;
-        cursor: pointer;
-        font-size: 13px;
-        color: #374151;
-    }
-}
-
-.tp-summary {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-    margin-bottom: 16px;
-}
-
-.summary-card {
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 12px 14px;
-    background: #fff;
-}
-
-.summary-label {
-    display: block;
-    font-size: 12px;
-    color: #6b7280;
-    margin-bottom: 6px;
-}
-
-.summary-value {
-    font-size: 20px;
-    font-weight: 700;
-    color: #111827;
-}
-
-.summary-value.emphasis {
-    color: #2563eb;
-}
-
-.summary-value.profit {
-    color: #15803d;
-}
-
-.tp-notice {
-    margin-bottom: 12px;
-    padding: 10px 12px;
-    border-radius: 8px;
-    background: #fef2f2;
-    color: #b91c1c;
-    font-size: 13px;
-}
-
-.tp-submit-btn {
-    width: 100%;
-    height: 46px;
-    border: none;
-    border-radius: 8px;
-    color: #fff;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-
-    &.light-blue,
-    &.blue {
         background: #2563eb;
-    }
+        border-color: #2563eb;
 
-    &.dark-red {
-        background: #dc2626;
+        .header-odd-label {
+            color: #bfdbfe;
+        }
+
+        .header-odd-value {
+            color: #fff;
+        }
     }
 
     &:disabled {
-        background: #cbd5e1;
+        opacity: 0.5;
         cursor: not-allowed;
+        background: #f1f5f9;
     }
 }
 
-.empty-trade-panel {
-    text-align: center;
+.header-odd-label {
+    font-size: 11px;
     color: #6b7280;
+    font-weight: 500;
+    max-width: 80px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.orders-panel {
-    margin-top: 16px;
+.header-odd-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f2937;
 }
 
-.orders-header {
+.match-time-display {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
-
-    h3 {
-        margin: 0;
-        font-size: 16px;
-        font-weight: 700;
-        color: #111827;
-    }
+    min-width: 50px;
+    color: #6b7280;
+    margin-right: 12px;
+    padding-right: 12px;
+    border-right: 1px solid #e5e7eb;
 }
 
-.refresh-orders-btn {
-    height: 32px;
-    padding: 0 12px;
-    border: 1px solid #dbe3f0;
-    border-radius: 8px;
-    background: #fff;
-    color: #4b5563;
+.time-date {
     font-size: 12px;
-    cursor: pointer;
+    font-weight: 500;
+}
+
+.time-hour {
+    font-size: 14px;
+    font-weight: 700;
+    color: #4b5563;
+}
+
+.league-title-display {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sport-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #374151;
+}
+
+.market-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #000;
+}
+
+.sport-icon {
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+/* remove legacy class */
+
+/* Orders Panel */
+.orders-panel {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    flex: 2;
+    /* 2/6 of total height */
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.orders-table-container {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.orders-panel-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.order-tab-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-right: 20px;
 }
 
 .order-tabs {
     display: flex;
-    gap: 8px;
-    margin-bottom: 14px;
+    align-items: center;
+    gap: 24px;
 }
 
 .order-tab {
-    flex: 1;
-    height: 36px;
-    border: 1px solid #dbe3f0;
-    border-radius: 8px;
-    background: #fff;
-    color: #4b5563;
-    font-size: 13px;
-    font-weight: 600;
+    background: transparent;
+    border: none;
+    font-size: 14px;
+    color: #6b7280;
     cursor: pointer;
+    padding: 8px 0;
+    position: relative;
 
     &.active {
-        border-color: #2563eb;
         color: #2563eb;
-        background: #eff6ff;
+        font-weight: 600;
+
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #2563eb;
+        }
     }
 }
 
-.orders-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+.view-all-orders {
+    color: #2563eb;
+    font-size: 14px;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
 }
 
-.order-card {
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 14px;
-    background: #fbfcfe;
+.orders-table-container {
+    width: 100%;
+    overflow-x: auto;
 }
 
-.order-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 10px;
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+
+    th {
+        color: #9ca3af;
+        font-weight: 500;
+        font-size: 13px;
+        padding: 12px 16px;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f9fafb;
+        font-size: 14px;
+    }
+}
+
+.time-col {
+    color: #6b7280;
 }
 
 .order-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: #111827;
-}
-
-.order-option {
-    margin-top: 6px;
-    font-size: 13px;
-    color: #2563eb;
     font-weight: 600;
 }
 
+.order-option {
+    color: #111827;
+}
+
 .order-status {
-    flex-shrink: 0;
-    padding: 3px 8px;
-    border-radius: 999px;
+    padding: 4px 12px;
+    border-radius: 4px;
     font-size: 12px;
     font-weight: 600;
 
@@ -1392,8 +1552,8 @@ export default {
     }
 
     &.is-settled {
-        background: #dbeafe;
-        color: #1d4ed8;
+        background: #eff6ff;
+        color: #2563eb;
     }
 
     &.is-cancelled {
@@ -1402,68 +1562,424 @@ export default {
     }
 }
 
-.order-metrics {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 12px;
+.pagination-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
 }
 
-.metric-item {
+/* Right Sidebar */
+.right-sidebar {
+    width: 320px;
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 20px;
+    overflow-y: auto;
 
-    span {
-        font-size: 12px;
-        color: #6b7280;
-    }
-
-    strong {
-        font-size: 13px;
-        color: #111827;
+    &::-webkit-scrollbar {
+        width: 0;
     }
 }
 
-.order-time {
-    margin-top: 12px;
+.betting-slip-panel {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f3f4f6;
+
+    h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    i {
+        color: #9ca3af;
+        cursor: pointer;
+    }
+}
+
+.slip-tabs {
+    display: flex;
+    background: #f8fafc;
+    padding: 10px 20px;
+    gap: 10px;
+}
+
+.slip-tab {
+    flex: 1;
+    background: transparent;
+    border: 1px solid transparent;
+    padding: 8px;
+    border-radius: 6px;
+    color: #6b7280;
+    font-weight: 600;
+    cursor: pointer;
+
+    &.active {
+        background: #fff;
+        color: #2563eb;
+        border-color: #e5e7eb;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+}
+
+.slip-content {
+    padding: 20px;
+}
+
+.selected-bet-card {
+    background: #f8fafc;
+    border: 1px solid #eef2f7;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.bet-info-top {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.bet-league {
     font-size: 12px;
-    color: #9ca3af;
+    color: #6b7280;
 }
 
-.empty-orders-state {
-    padding: 32px 0;
+.close-bet {
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 14px;
+
+    &:hover {
+        color: #ef4444;
+    }
+}
+
+.bet-match-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.slip-options-group {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.slip-opt-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover:not(:disabled) {
+        border-color: #93c5fd;
+        background: #eff6ff;
+    }
+
+    &.active {
+        background: #2563eb;
+        border-color: #2563eb;
+        color: #fff;
+
+        .opt-name {
+            color: #bfdbfe;
+        }
+
+        .opt-odds {
+            color: #fff;
+        }
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: #f1f5f9;
+    }
+}
+
+.opt-name {
+    font-size: 12px;
+    color: #6b7280;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.opt-odds {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.empty-selection-hint {
     text-align: center;
     color: #9ca3af;
     font-size: 13px;
+    padding: 20px 0;
 }
 
-.no-data {
-    text-align: center;
-    color: #9ca3af;
-    padding: 24px 0;
-    font-size: 13px;
+.quick-amounts-label,
+.stake-input-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 8px;
 }
 
-.empty-list-state {
-    padding: 48px 0;
+.tp-quick-amounts {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+
+    button {
+        flex: 1;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        padding: 6px 0;
+        color: #4b5563;
+        cursor: pointer;
+
+        &:hover {
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+    }
+}
+
+.stake-input-wrap {
+    position: relative;
+    margin-bottom: 12px;
+
+    input {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        padding: 12px 60px 12px 16px;
+        font-size: 18px;
+        font-weight: 700;
+        outline: none;
+
+        &:focus {
+            border-color: #2563eb;
+        }
+    }
+}
+
+.stake-unit {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.balance-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 24px;
+}
+
+.global-balance-container {
+    background: #fff;
+    border-radius: 0 0 12px 12px;
+}
+
+.global-balance {
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f3f4f6;
+    margin-bottom: 10px;
+}
+
+.recharge-link {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.expected-return {
+    margin-bottom: 24px;
+}
+
+.return-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.return-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #2563eb;
+}
+
+.tp-submit-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+
+    &.blue {
+        background: #2563eb;
+
+        &:hover {
+            background: #1d4ed8;
+        }
+    }
+
+    &:disabled {
+        background: #cbd5e1;
+        cursor: not-allowed;
+    }
+}
+
+.empty-slip {
+    padding: 40px 20px;
     text-align: center;
     color: #9ca3af;
     font-size: 14px;
 }
 
-@media (max-width: 1100px) {
+.settings-panel {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+    h3 {
+        margin: 0 0 16px 0;
+        font-size: 16px;
+        font-weight: 700;
+    }
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: #4b5563;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.odds-select {
+    width: 120px;
+}
+
+.promo-banner-right {
+    background: linear-gradient(135deg, #2563eb, #60a5fa);
+    border-radius: 12px;
+    padding: 24px 20px;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+
+    &::after {
+        content: '🎁';
+        position: absolute;
+        font-size: 80px;
+        right: -10px;
+        bottom: -20px;
+        opacity: 0.8;
+    }
+}
+
+.promo-content {
+    position: relative;
+    z-index: 1;
+}
+
+.promo-title {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.promo-desc {
+    font-size: 13px;
+    opacity: 0.9;
+    margin-bottom: 12px;
+}
+
+.promo-amount {
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 20px;
+
+    span {
+        font-size: 16px;
+        font-weight: 600;
+    }
+}
+
+.promo-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    color: #fff;
+    padding: 8px 24px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+}
+
+@media (max-width: 1200px) {
     .sports-page {
-        flex-direction: column;
+        flex-wrap: wrap;
+        overflow-y: auto;
     }
 
-    .sidebar {
+    .left-sidebar {
+        display: none;
+    }
+
+    .main-column {
+        flex: 1 1 100%;
+    }
+
+    .right-sidebar {
+        flex: 1 1 100%;
         width: 100%;
-    }
-
-    .trade-panel,
-    .empty-trade-panel {
-        position: static;
+        overflow-y: visible;
     }
 }
 </style>
