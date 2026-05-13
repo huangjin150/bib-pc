@@ -98,8 +98,8 @@
                                                         v-if="event.teams[0].optionData || event.teams[1].optionData">
                                                         <div class="header-odd-item" v-if="event.teams[0].optionData">
                                                             <button class="table-odd-btn mini-btn"
-                                                                :class="{ 'disabled': (!event.teams[0].optionData.bettable && event.matchStatus !== 2), 'active': isSelectedOption(event.teams[0].optionData) }"
-                                                                :disabled="(!event.teams[0].optionData.bettable && event.matchStatus !== 2)"
+                                                                :class="{ 'disabled': !event.teams[0].optionData.bettable, 'active': isSelectedOption(event.teams[0].optionData) }"
+                                                                :disabled="!event.teams[0].optionData.bettable"
                                                                 @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
                                                                 <span class="header-odd-label">{{ event.teams[0].name
                                                                     }}</span>
@@ -109,8 +109,8 @@
                                                         </div>
                                                         <div class="header-odd-item" v-if="event.teams[1].optionData">
                                                             <button class="table-odd-btn mini-btn"
-                                                                :class="{ 'disabled': (!event.teams[1].optionData.bettable && event.matchStatus !== 2), 'active': isSelectedOption(event.teams[1].optionData) }"
-                                                                :disabled="(!event.teams[1].optionData.bettable && event.matchStatus !== 2)"
+                                                                :class="{ 'disabled': !event.teams[1].optionData.bettable, 'active': isSelectedOption(event.teams[1].optionData) }"
+                                                                :disabled="!event.teams[1].optionData.bettable"
                                                                 @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
                                                                 <span class="header-odd-label">{{ event.teams[1].name
                                                                     }}</span>
@@ -136,13 +136,13 @@
                             <button v-for="tab in orderTabs" :key="tab.key" class="order-tab"
                                 :class="{ active: activeOrderTab === tab.key }" @click="activeOrderTab = tab.key">
                                 {{ tab.label }}
-                                <span class="tab-count" v-if="tab.key === activeOrderTab">{{ totalOrders }}</span>
+                                <span class="tab-count">({{ tab.count }})</span>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div v-if="filteredOrders.length" class="orders-table-container">
+                <div v-if="filteredOrders.length" class="orders-table-container" @scroll="handleOrderScroll">
                     <table class="orders-table">
                         <thead>
                             <tr>
@@ -151,7 +151,7 @@
                                 <th>下单时间</th>
                                 <th>下注金额</th>
                                 <th>赔率</th>
-                                <th>获胜可得</th>
+                                <th>预计可得</th>
                                 <th v-if="activeOrderTab === 'history'">实际回报</th>
                                 <th>状态</th>
                             </tr>
@@ -181,16 +181,15 @@
                             </tr>
                         </tbody>
                     </table>
+                    <div v-if="isLoadingOrders" class="loading-more">
+                        加载中...
+                    </div>
+                    <div v-if="!hasMoreOrders && orders.length > 0" class="no-more-data">
+                        没有更多数据了
+                    </div>
                 </div>
 
-                <div class="pagination-container" v-if="filteredOrders.length > 0">
-                    <el-pagination @current-change="handlePageChange" :current-page.sync="orderCurrentPage"
-                        :page-size="orderPageSize" layout="prev, slot, next" :total="orderTotal" background>
-                        <span style="padding: 0 15px; font-weight: 600; color: #374151;">{{ orderCurrentPage }}</span>
-                    </el-pagination>
-                </div>
-
-                <div v-if="!filteredOrders.length" class="empty-orders-state">
+                <div v-if="!filteredOrders.length && !isLoadingOrders" class="empty-orders-state">
                     当前暂无订单
                 </div>
             </div>
@@ -222,8 +221,8 @@
                             <div class="slip-options-group" v-if="selectedEvent.teams">
                                 <button v-for="(team, index) in selectedEvent.teams" :key="index" v-if="team.optionData"
                                     class="slip-opt-btn"
-                                    :class="{ 'active': selectedTeam && selectedTeam.id === team.optionData.id, 'disabled': (!team.optionData.bettable && selectedEvent.matchStatus !== 2) || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 }"
-                                    :disabled="(!team.optionData.bettable && selectedEvent.matchStatus !== 2) || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4"
+                                    :class="{ 'active': selectedTeam && selectedTeam.id === team.optionData.id, 'disabled': !team.optionData.bettable || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 }"
+                                    :disabled="!team.optionData.bettable || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4"
                                     @click="openTrade(selectedEvent, team.optionData, team.marketData)">
                                     <span class="opt-name">{{ team.name }}</span>
                                     <span class="opt-odds">{{ formatOddsLabel(team.optionData) }}</span>
@@ -231,7 +230,8 @@
                             </div>
                         </div>
 
-                        <template v-if="selectedTeam && selectedTeam.marketData">
+                        <template
+                            v-if="selectedTeam && selectedTeam.marketData && selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4 && isAnyOptionBettable(selectedEvent)">
                             <div class="stake-section">
                                 <div class="stake-input-label">下注金额</div>
                                 <div class="stake-input-wrap">
@@ -260,7 +260,7 @@
                                 <div class="odds-info-row">
                                     <span class="info-label">当前赔率</span>
                                     <span class="info-value odds-value">{{ formatOddsLabel(selectedTeam.optionData)
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </div>
 
@@ -283,7 +283,7 @@
                                 </div>
                             </div>
 
-                            <div class="tp-notice" v-if="previewError && tradeAmount > 0">
+                            <div class="tp-notice" v-if="previewError">
                                 {{ previewError }}
                             </div>
 
@@ -329,14 +329,15 @@ export default {
             ],
             activeTab: 'live',
             orderTabs: [
-                { key: 'active', label: '当前记录' },
-                { key: 'history', label: '历史订单' }
+                { key: 'active', label: '当前记录', count: 0 },
+                { key: 'history', label: '历史订单', count: 0 }
             ],
             activeOrderTab: 'active',
             orders: [],
             totalOrders: 0,
             orderCurrentPage: 1,
             orderPageSize: 5,
+            isLoadingOrders: false,
             betType: 'single', // 'single' 单注, 'multi' 串关
             betPreview: this.createEmptyPreview(),
             walletBalance: null, // Track wallet balance separately
@@ -370,9 +371,10 @@ export default {
                 this.selectedTeam &&
                 this.selectedTeam.optionData &&
                 this.selectedTeam.marketData &&
-                (this.selectedEvent.matchStatus === 2 || this.selectedTeam.optionData.bettable) &&
+                this.selectedTeam.optionData.bettable &&
                 this.tradeAmount > 0 &&
-                !this.previewError
+                !this.previewError &&
+                this.betPreview.bettable !== false
             );
         },
         hasVisibleEvents() {
@@ -396,14 +398,8 @@ export default {
         visibleOrders() {
             return this.orders;
         },
-        orderTotal() {
-            if (this.orders.length < this.orderPageSize) {
-                return this.orderCurrentPage * this.orderPageSize;
-            }
-            if (this.totalOrders > 0) {
-                return Math.max(this.totalOrders, this.orderCurrentPage * this.orderPageSize);
-            }
-            return this.orderCurrentPage * this.orderPageSize + 1;
+        hasMoreOrders() {
+            return this.orders.length < this.totalOrders;
         }
     },
     watch: {
@@ -437,7 +433,8 @@ export default {
                 expectReturnAmount: 0,
                 walletBalance: null,
                 minBetAmount: null,
-                maxBetAmount: null
+                maxBetAmount: null,
+                bettable: false
             };
         },
         statusClass(statusText) {
@@ -577,10 +574,11 @@ export default {
                             matchStatus: match.matchStatus,
                             statusText: this.getMatchStatusText(match.matchStatus),
                             expanded: false,
-                            markets: [market],
+                            markets: [market], // Keep single market in array to match existing logic
                             teams: []
                         };
 
+                        // Map options to teams for UI rendering
                         if (market.options) {
                             const options = market.options;
                             event.teams = [
@@ -593,7 +591,7 @@ export default {
                                     icon: match.homeLogo || '🏳️',
                                     optionData: options.length > 0 ? options[0] : null,
                                     marketData: market,
-                                    bettable: options.length > 0 ? (match.matchStatus === 2 ? true : Boolean(options[0].bettable)) : (match.matchStatus === 2 ? true : false)
+                                    bettable: options.length > 0 ? Boolean(options[0].bettable) : false
                                 },
                                 {
                                     id: 't2_' + match.id + '_' + market.id,
@@ -604,7 +602,7 @@ export default {
                                     icon: match.awayLogo || '🏳️',
                                     optionData: options.length > 1 ? options[1] : null,
                                     marketData: market,
-                                    bettable: options.length > 1 ? (match.matchStatus === 2 ? true : Boolean(options[1].bettable)) : (match.matchStatus === 2 ? true : false)
+                                    bettable: options.length > 1 ? Boolean(options[1].bettable) : false
                                 }
                             ];
                         } else {
@@ -618,7 +616,7 @@ export default {
                                     icon: match.homeLogo || '🏳️',
                                     optionData: null,
                                     marketData: null,
-                                    bettable: match.matchStatus === 2 ? true : false
+                                    bettable: false
                                 },
                                 {
                                     id: 't2_' + match.id + '_' + market.id,
@@ -629,7 +627,7 @@ export default {
                                     icon: match.awayLogo || '🏳️',
                                     optionData: null,
                                     marketData: null,
-                                    bettable: match.matchStatus === 2 ? true : false
+                                    bettable: false
                                 }
                             ];
                         }
@@ -702,10 +700,22 @@ export default {
             return order.orderStatus === 2 || order.orderStatus === 3 || order.orderStatus === 4;
         },
         handlePageChange(page) {
-            this.orderCurrentPage = page;
-            this.getMyOrders();
+            // Keep for backwards compatibility
         },
-        getMyOrders() {
+        handleOrderScroll(e) {
+            const container = e.target;
+            // 距离底部 20px 时触发加载
+            const isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 20;
+
+            if (isAtBottom && !this.isLoadingOrders && this.hasMoreOrders) {
+                this.orderCurrentPage++;
+                this.getMyOrders(true); // append data
+            }
+        },
+        getMyOrders(isAppend = false) {
+            if (this.isLoadingOrders) return;
+
+            this.isLoadingOrders = true;
             const status = this.activeOrderTab === 'active' ? 1 : 2;
             const params = {
                 pageNo: this.orderCurrentPage,
@@ -713,21 +723,74 @@ export default {
                 status: status
             };
             this.$http.get(this.swapHost + '/quiz/orders', { params }).then(response => {
+                this.isLoadingOrders = false;
                 const resp = response.body;
-                console.log('resp', resp)
+                if (resp.code === 0) {
+                    let newOrders = [];
+                    let total = 0;
+                    newOrders = resp.data || [];
+                    total = resp.totalElement || 0;
 
-                if (resp.code == 0) {
-                    this.orders = resp.data || [];
-                    this.totalOrders = resp.totalElement || 0;
+                    if (isAppend) {
+                        this.orders = [...this.orders, ...newOrders];
+                    } else {
+                        this.orders = newOrders;
+                    }
+                    this.totalOrders = total;
+
+                    // Update tab count
+                    const tab = this.orderTabs.find(t => t.key === this.activeOrderTab);
+                    if (tab) {
+                        tab.count = total;
+                    }
                 } else {
+                    if (!isAppend) {
+                        this.orders = [];
+                        this.totalOrders = 0;
+                    }
+                }
+            }).catch(() => {
+                this.isLoadingOrders = false;
+                if (!isAppend) {
                     this.orders = [];
                     this.totalOrders = 0;
+                }
+            });
+        },
+        getOrderCounts() {
+            // Fetch active orders count
+            this.$http.get(this.swapHost + '/quiz/orders', { params: { pageNo: 1, pageSize: 1, status: 1 } }).then(response => {
+                const resp = response.body;
+                if (resp.code === 0) {
+                    const tab = this.orderTabs.find(t => t.key === 'active');
+                    if (tab) tab.count = resp.totalElement || 0;
+                }
+            });
+            // Fetch history orders count
+            this.$http.get(this.swapHost + '/quiz/orders', { params: { pageNo: 1, pageSize: 1, status: 2 } }).then(response => {
+                const resp = response.body;
+                if (resp.code === 0) {
+                    const tab = this.orderTabs.find(t => t.key === 'history');
+                    if (tab) tab.count = resp.totalElement || 0;
                 }
             });
         },
         handleCardClick(event) {
             this.selectedEvent = event;
             this.toggleExpand(event);
+
+            if (event.matchStatus !== 3 && event.matchStatus !== 4) {
+                const firstBettable = this.findFirstBettableOption(event);
+                if (firstBettable) {
+                    this.openTrade(event, firstBettable.option, firstBettable.market);
+                } else {
+                    this.clearSelectedBet();
+                    this.selectedEvent = event; // Keep event selected for UI, but clear the bet details
+                }
+            } else {
+                this.clearSelectedBet();
+                this.selectedEvent = event; // Keep event selected for UI to show "Ended" status
+            }
         },
         selectEvent(event) {
             this.selectedEvent = event;
@@ -742,20 +805,24 @@ export default {
             }
             return null;
         },
+        isAnyOptionBettable(event) {
+            if (!event || !event.teams) return false;
+            return event.teams.some(team => team.optionData && team.optionData.bettable);
+        },
         openTrade(event, option, market) {
             if (event.matchStatus === 3 || event.matchStatus === 4) {
                 return;
             }
-            if (event.matchStatus !== 2 && (!option || !market || !option.bettable)) {
+            if (!option || !market || !option.bettable) {
                 return;
             }
 
             this.selectedEvent = event;
-            const matchingTeam = event.teams.find(team => team.optionData && team.optionData.id === option?.id);
+            const matchingTeam = event.teams.find(team => team.optionData && team.optionData.id === option.id);
             this.selectedTeam = {
-                id: option ? option.id : null,
-                name: matchingTeam ? matchingTeam.name : (option ? option.optionName : '未知选项'),
-                shortName: (matchingTeam ? matchingTeam.name : (option ? option.optionName : '未知选项')).substring(0, 4).toUpperCase(),
+                id: option.id,
+                name: option.optionName,
+                shortName: option.optionName.substring(0, 4).toUpperCase(),
                 color: matchingTeam ? matchingTeam.color : 'blue',
                 icon: matchingTeam ? matchingTeam.icon : '🎯',
                 optionData: option,
@@ -796,7 +863,6 @@ export default {
         fetchBetPreview() {
             if (!this.selectedTeam || !this.selectedTeam.optionData || !this.selectedTeam.marketData || !(this.tradeAmount > 0)) {
                 this.isPreviewLoading = false;
-                this.previewError = '';
                 return;
             }
 
@@ -822,7 +888,7 @@ export default {
                     return;
                 }
                 this.betPreview = this.createEmptyPreview();
-                this.previewError = resp && resp.msg ? resp.msg : '';
+                this.previewError = resp && resp.msg ? resp.msg : '当前无法下注';
             }).catch(() => {
                 this.isPreviewLoading = false;
                 this.betPreview = this.createEmptyPreview();
@@ -854,7 +920,7 @@ export default {
                 return;
             }
             if (!this.canSubmit) {
-                this.$message.warning(this.previewError || '当前无法下注，请检查选项');
+                this.$message.warning(this.previewError || '当前选项不可下注');
                 return;
             }
 
@@ -886,6 +952,7 @@ export default {
     mounted() {
         this.getLeagues();
         this.getMyOrders();
+        this.getOrderCounts();
         this.fetchWalletBalance();
     },
     beforeDestroy() {
@@ -902,7 +969,7 @@ export default {
     flex-direction: row;
     margin: 0 auto;
     padding: 20px;
-    gap: 10px;
+    gap: 20px;
     height: calc(100vh - 70px);
     color: #1f2937;
     background: #f0f2f5;
@@ -1071,7 +1138,7 @@ export default {
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 20px;
     height: 100%;
 }
 
@@ -1277,7 +1344,7 @@ export default {
 .match-table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0 8px;
+    border-spacing: 0 7px;
     text-align: center;
     table-layout: fixed;
 }
@@ -1292,7 +1359,7 @@ export default {
     align-items: center;
     justify-content: space-between;
     background: #fff;
-    padding: 4px 16px;
+    padding: 6px 20px;
     border-radius: 12px;
     border: 1px solid #f3f4f6;
     cursor: pointer;
@@ -1319,8 +1386,8 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 16px;
-    padding: 0 16px;
+    gap: 24px;
+    padding: 0 20px;
 }
 
 .score-display {
@@ -1364,7 +1431,7 @@ export default {
 .team {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
     flex: 1;
 }
 
@@ -1478,8 +1545,8 @@ export default {
 .match-time-display {
     display: flex;
     align-items: center;
-    gap: 10px;
-    min-width: 90px;
+    gap: 15px;
+    min-width: 100px;
     color: #737985;
     margin-right: 12px;
     padding-right: 12px;
@@ -1526,7 +1593,7 @@ export default {
 .orders-panel {
     background: #fff;
     border-radius: 12px;
-    padding: 20px 20px 10px 20px;
+    padding: 20px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     flex: 2;
     /* 2/6 of total height */
@@ -1534,11 +1601,6 @@ export default {
     flex-direction: column;
     min-height: 0;
     overflow: hidden;
-}
-
-.orders-table-container {
-    flex: 1;
-    overflow-y: auto;
 }
 
 .orders-panel-top {
@@ -1568,6 +1630,8 @@ export default {
     cursor: pointer;
     padding: 8px 0;
     position: relative;
+    display: flex;
+    align-items: center;
 
     &.active {
         color: #2563eb;
@@ -1582,7 +1646,20 @@ export default {
             height: 2px;
             background: #2563eb;
         }
+
+        .tab-count {
+            color: #2563eb;
+        }
     }
+}
+
+.tab-count {
+    color: #6b7280;
+    font-size: 12px;
+    padding: 2px 4px;
+    border-radius: 10px;
+    margin-left: 2px;
+    font-weight: 600;
 }
 
 .view-all-orders {
@@ -1600,22 +1677,20 @@ export default {
     overflow-x: auto;
     overflow-y: auto;
     flex: 1;
+    position: relative;
 }
 
 .orders-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     text-align: left;
 
-    thead {
+    th {
         position: sticky;
         top: 0;
         background-color: #fff;
-        z-index: 1;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    }
-
-    th {
+        z-index: 10;
         color: #9ca3af;
         font-weight: 500;
         font-size: 13px;
@@ -1627,6 +1702,7 @@ export default {
         padding: 12px 16px;
         border-bottom: 1px solid #f9fafb;
         font-size: 14px;
+        background-color: #fff;
     }
 }
 
@@ -1635,7 +1711,6 @@ export default {
 }
 
 .order-title {
-    width: 200px;
     font-weight: 600;
 }
 
@@ -1678,8 +1753,22 @@ export default {
 .pagination-container {
     display: flex;
     justify-content: flex-end;
-    margin-top: auto;
-    padding-top: 20px;
+    margin-top: 20px;
+}
+
+.empty-orders-state {
+    text-align: center;
+    padding-top: 100px;
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+.loading-more,
+.no-more-data {
+    text-align: center;
+    padding: 15px;
+    color: #9ca3af;
+    font-size: 13px;
 }
 
 /* Right Sidebar */
@@ -2233,5 +2322,7 @@ export default {
 .empty-orders-state {
     text-align: center;
     padding-top: 100px;
+    color: #9ca3af;
+    font-size: 14px;
 }
 </style>
