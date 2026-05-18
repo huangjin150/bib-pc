@@ -186,7 +186,7 @@ module.exports = {
         sulkt5: "극도 의 탐욕",
         sulktip: "극도 의 공 포 는 투자 자 들 이 지나치게 걱정 하 는 것 이 매입 기회 일 수도 있다 는 것 을 보 여 준다.지나친 탐욕 은 투자 자가 지나치게 흥분 한 것 을 나타 내 고 시장 이 조 정 될 수 있다."
     },
-  
+
     exchange: {
         coin: "통화",
         symbol: "거래 쌍",
@@ -1834,7 +1834,7 @@ module.exports = {
         tsjb: "불만",
         apidoc: "API 인터페이스",
         zwkf: "아직 열리지 않음",
-        yxxx: "bityondsup@gmail.com",
+        yxxx: "bibcex@gmail.com",
     },
     financeNav: {
         wdzc: "내 자산"

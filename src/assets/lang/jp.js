@@ -1704,7 +1704,7 @@ module.exports = {
         tsjb: "苦情通報",
         apidoc: "APIインターフェース",
         zwkf: "未開放",
-        yxxx: "bityondsup@gmail.com",
+        yxxx: "bibcex@gmail.com",
     },
     financeNav: {
         wdzc: "私の資産"

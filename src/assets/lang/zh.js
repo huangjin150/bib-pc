@@ -1765,7 +1765,7 @@
         tsjb: "投诉举报",
         apidoc: "API接口",
         zwkf: "暂未开放",
-        yxxx: "bityondsup@gmail.com",
+        yxxx: "bibcex@gmail.com",
     },
     financeNav: {
         wdzc: '我的资产'

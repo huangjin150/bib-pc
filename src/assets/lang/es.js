@@ -1826,7 +1826,7 @@ module.exports = {
         tsjb: "Reporte",
         apidoc: "Api Doc",
         zwkf: "ven pronto",
-        yxxx: "bityondsup@gmail.com",
+        yxxx: "bibcex@gmail.com",
     },
     index: {
         circulation: "Circulación de fondos para la seguridad y el desarrollo",

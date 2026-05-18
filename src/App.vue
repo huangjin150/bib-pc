@@ -184,4 +184,12 @@ textarea {
 * {
   font-size: 14px;
 }
+
+.ivu-poptip-popper {
+  width: 170px !important;
+}
+
+.ivu-poptip-body-content {
+  overflow: hidden !important;
+}
 </style>

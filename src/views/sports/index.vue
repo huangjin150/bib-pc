@@ -60,70 +60,74 @@
 
                 <!-- Match List Table Layout -->
                 <div class="match-table-container">
-                    <table class="match-table">
-                        <tbody v-if="activeCategory">
-                            <template v-if="filteredEvents(activeCategory).length">
-                                <template v-for="(event, index) in filteredEvents(activeCategory)">
-                                    <tr class="sport-group-header" :key="'header-' + index"
-                                        @click="handleCardClick(event)">
-                                        <td colspan="7">
-                                            <div class="group-header-content">
-                                                <div class="group-header-left">
-                                                    <div class="match-time-display header-time">
-                                                        <span class="time-date">{{ event.time ? event.time.substring(5,
-                                                            10).replace('-', '/') : '--' }}</span>
-                                                        <span class="time-hour">{{ event.time ? event.time.substring(11,
-                                                            16) : '--' }}</span>
-                                                    </div>
-                                                    <div class="league-title-display">
-                                                        <span class="market-title">{{ event.markets && event.markets[0]
-                                                            ? event.markets[0].marketTitle : event.title }}</span>
-                                                    </div>
+                    <!-- Empty State -->
+                    <div v-if="!activeCategory || !filteredEvents(activeCategory).length" class="empty-match-state">
+                        <div class="empty-text">暂无赛事</div>
+                    </div>
+                    <!-- Match List -->
+                    <table v-else class="match-table">
+                        <tbody>
+                            <template v-for="(event, index) in filteredEvents(activeCategory)">
+                                <tr class="sport-group-header" :key="'header-' + index" @click="handleCardClick(event)">
+                                    <td colspan="7">
+                                        <div class="group-header-content">
+                                            <div class="group-header-left">
+                                                <div class="match-time-display header-time">
+                                                    <span class="time-date">{{ event.time ? event.time.substring(5,
+                                                        10).replace('-', '/') : '--' }}</span>
+                                                    <span class="time-hour">{{ event.time ? event.time.substring(11,
+                                                        16) : '--' }}</span>
                                                 </div>
-                                                <div class="group-header-center">
-                                                    <div class="team home-team">
-                                                        <span class="team-name" :title="event.teams[0].name">{{
-                                                            event.teams[0].name }}</span>
-                                                    </div>
-                                                    <div class="score-display">
-                                                        VS
-                                                    </div>
-                                                    <div class="team away-team">
-                                                        <span class="team-name" :title="event.teams[1].name">{{
-                                                            event.teams[1].name }}</span>
-                                                    </div>
+                                                <div class="league-title-display">
+                                                    <span class="market-title">{{ event.markets && event.markets[0]
+                                                        ? event.markets[0].marketTitle : event.title }}</span>
                                                 </div>
-                                                <div class="group-header-right">
-                                                    <div class="header-odds"
-                                                        v-if="event.teams[0].optionData || event.teams[1].optionData">
-                                                        <div class="header-odd-item" v-if="event.teams[0].optionData">
-                                                            <button class="table-odd-btn mini-btn"
-                                                                :class="{ 'disabled': !event.teams[0].optionData.bettable, 'active': isSelectedOption(event.teams[0].optionData) }"
-                                                                :disabled="!event.teams[0].optionData.bettable"
-                                                                @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
-                                                                <span class="header-odd-label">{{ event.teams[0].name
-                                                                    }}</span>
-                                                                <span class="header-odd-value">{{
-                                                                    formatOddsLabel(event.teams[0].optionData) }}</span>
-                                                            </button>
-                                                        </div>
-                                                        <div class="header-odd-item" v-if="event.teams[1].optionData">
-                                                            <button class="table-odd-btn mini-btn"
-                                                                :class="{ 'disabled': !event.teams[1].optionData.bettable, 'active': isSelectedOption(event.teams[1].optionData) }"
-                                                                :disabled="!event.teams[1].optionData.bettable"
-                                                                @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
-                                                                <span class="header-odd-label">{{ event.teams[1].name
-                                                                    }}</span>
-                                                                <span class="header-odd-value">{{
-                                                                    formatOddsLabel(event.teams[1].optionData) }}</span>
-                                                            </button>
-                                                        </div>
+                                            </div>
+                                            <div class="group-header-center">
+                                                <div class="team home-team">
+                                                    <img v-if="event.homeLogo" class="team-logo" :src="event.homeLogo" alt="" />
+                                                    <span class="team-name" :title="event.teams[0].name">{{
+                                                        event.teams[0].name }}</span>
+                                                </div>
+                                                <div class="score-display">
+                                                    VS
+                                                </div>
+                                                <div class="team away-team">
+                                                    <span class="team-name" :title="event.teams[1].name">{{
+                                                        event.teams[1].name }}</span>
+                                                    <img v-if="event.awayLogo" class="team-logo" :src="event.awayLogo" alt="" />
+                                                </div>
+                                            </div>
+                                            <div class="group-header-right">
+                                                <div class="header-odds"
+                                                    v-if="event.teams[0].optionData || event.teams[1].optionData">
+                                                    <div class="header-odd-item" v-if="event.teams[0].optionData">
+                                                        <button class="table-odd-btn mini-btn"
+                                                            :class="{ 'disabled': !event.teams[0].optionData.bettable, 'active': isSelectedOption(event.teams[0].optionData) }"
+                                                            :disabled="!event.teams[0].optionData.bettable"
+                                                            @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
+                                                            <span class="header-odd-label">{{ event.teams[0].name
+                                                                }}</span>
+                                                            <span class="header-odd-value">{{
+                                                                formatOddsLabel(event.teams[0].optionData) }}</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="header-odd-item" v-if="event.teams[1].optionData">
+                                                        <button class="table-odd-btn mini-btn"
+                                                            :class="{ 'disabled': !event.teams[1].optionData.bettable, 'active': isSelectedOption(event.teams[1].optionData) }"
+                                                            :disabled="!event.teams[1].optionData.bettable"
+                                                            @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
+                                                            <span class="header-odd-label">{{ event.teams[1].name
+                                                                }}</span>
+                                                            <span class="header-odd-value">{{
+                                                                formatOddsLabel(event.teams[1].optionData) }}</span>
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </td>
-                                    </tr>
-                                </template>
+                                        </div>
+                                    </td>
+                                </tr>
                             </template>
                         </tbody>
                     </table>
@@ -224,6 +228,10 @@
                                     :class="{ 'active': selectedTeam && selectedTeam.id === team.optionData.id, 'disabled': !team.optionData.bettable || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 }"
                                     :disabled="!team.optionData.bettable || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4"
                                     @click="openTrade(selectedEvent, team.optionData, team.marketData)">
+                                    <img v-if="(index === 0 && selectedEvent.homeLogo) || (index === 1 && selectedEvent.awayLogo)" 
+                                        class="slip-team-logo" 
+                                        :src="index === 0 ? selectedEvent.homeLogo : selectedEvent.awayLogo" 
+                                        alt="" />
                                     <span class="opt-name">{{ team.name }}</span>
                                     <span class="opt-odds">{{ formatOddsLabel(team.optionData) }}</span>
                                 </button>
@@ -532,109 +540,123 @@ export default {
             });
         },
         getMatches() {
+            console.log('=== 开始加载比赛数据 ===');
+            console.log('请求地址:', this.swapHost + '/quiz/matches/displayed');
             this.$http.get(this.swapHost + `/quiz/matches/displayed`).then(response => {
+                console.log('比赛接口响应:', response);
                 const resp = response.body;
-                if (!(resp && resp.code === 0 && resp.data)) {
-                    return;
-                }
+                console.log('响应体:', resp);
 
                 // Clear previous events
                 this.categories.forEach(league => {
                     league.events = [];
                 });
 
-                resp.data.forEach(item => {
-                    const match = item.match;
-                    const leagueData = item.league;
-                    const markets = item.markets || [];
+                if (resp && resp.code === 0 && resp.data) {
+                    console.log('比赛数据解析成功:', resp.data);
+                    resp.data.forEach(item => {
+                        const match = item.match;
+                        const leagueData = item.league;
+                        const markets = item.markets || [];
 
-                    let league = this.categories.find(c => c.id === leagueData.id);
-                    if (!league) {
-                        league = {
-                            id: leagueData.id,
-                            name: leagueData.leagueName,
-                            leagueCode: leagueData.leagueCode,
-                            country: leagueData.country,
-                            sportType: leagueData.sportType,
-                            matchCount: 0,
-                            expanded: true,
-                            events: []
-                        };
-                        this.categories.push(league);
-                    }
-
-                    markets.forEach(market => {
-                        const event = {
-                            id: match.id + '_' + market.id, // Ensure unique ID for each market
-                            matchId: match.id,
-                            title: match.matchName,
-                            time: match.startTime,
-                            closeTime: market.closeTime,
-                            marketCount: 1,
-                            matchStatus: match.matchStatus,
-                            statusText: this.getMatchStatusText(match.matchStatus),
-                            expanded: false,
-                            markets: [market], // Keep single market in array to match existing logic
-                            teams: []
-                        };
-
-                        // Map options to teams for UI rendering
-                        if (market.options) {
-                            const options = market.options;
-                            event.teams = [
-                                {
-                                    id: 't1_' + match.id + '_' + market.id,
-                                    name: options.length > 0 ? options[0].optionName : (match.homeTeam || '主队'),
-                                    shortName: (options.length > 0 ? options[0].optionName : (match.homeTeam || '主队')).substring(0, 4).toUpperCase(),
-                                    score: match.homeScore == null ? '-' : match.homeScore,
-                                    color: 'light-blue',
-                                    icon: match.homeLogo || '🏳️',
-                                    optionData: options.length > 0 ? options[0] : null,
-                                    marketData: market,
-                                    bettable: options.length > 0 ? Boolean(options[0].bettable) : false
-                                },
-                                {
-                                    id: 't2_' + match.id + '_' + market.id,
-                                    name: options.length > 1 ? options[1].optionName : (match.awayTeam || '客队'),
-                                    shortName: (options.length > 1 ? options[1].optionName : (match.awayTeam || '客队')).substring(0, 4).toUpperCase(),
-                                    score: match.awayScore == null ? '-' : match.awayScore,
-                                    color: 'dark-red',
-                                    icon: match.awayLogo || '🏳️',
-                                    optionData: options.length > 1 ? options[1] : null,
-                                    marketData: market,
-                                    bettable: options.length > 1 ? Boolean(options[1].bettable) : false
-                                }
-                            ];
-                        } else {
-                            event.teams = [
-                                {
-                                    id: 't1_' + match.id + '_' + market.id,
-                                    name: match.homeTeam || '主队',
-                                    shortName: (match.homeTeam || '主队').substring(0, 4).toUpperCase(),
-                                    score: match.homeScore == null ? '-' : match.homeScore,
-                                    color: 'light-blue',
-                                    icon: match.homeLogo || '🏳️',
-                                    optionData: null,
-                                    marketData: null,
-                                    bettable: false
-                                },
-                                {
-                                    id: 't2_' + match.id + '_' + market.id,
-                                    name: match.awayTeam || '客队',
-                                    shortName: (match.awayTeam || '客队').substring(0, 4).toUpperCase(),
-                                    score: match.awayScore == null ? '-' : match.awayScore,
-                                    color: 'dark-red',
-                                    icon: match.awayLogo || '🏳️',
-                                    optionData: null,
-                                    marketData: null,
-                                    bettable: false
-                                }
-                            ];
+                        let league = this.categories.find(c => c.id === leagueData.id);
+                        if (!league) {
+                            league = {
+                                id: leagueData.id,
+                                name: leagueData.leagueName,
+                                leagueCode: leagueData.leagueCode,
+                                country: leagueData.country,
+                                sportType: leagueData.sportType,
+                                matchCount: 0,
+                                expanded: true,
+                                events: []
+                            };
+                            this.categories.push(league);
                         }
 
-                        league.events.push(event);
+                        markets.forEach(market => {
+                            const event = {
+                                id: match.id + '_' + market.id, // Ensure unique ID for each market
+                                matchId: match.id,
+                                title: match.matchName,
+                                time: match.startTime,
+                                closeTime: market.closeTime,
+                                marketCount: 1,
+                                matchStatus: match.matchStatus,
+                                statusText: this.getMatchStatusText(match.matchStatus),
+                                expanded: false,
+                                markets: [market], // Keep single market in array to match existing logic
+                                teams: [],
+                                homeLogo: match.homeLogo,
+                                awayLogo: match.awayLogo
+                            };
+
+                            // Map options to teams for UI rendering
+                            if (market.options) {
+                                const options = market.options;
+                                event.teams = [
+                                    {
+                                        id: 't1_' + match.id + '_' + market.id,
+                                        name: options.length > 0 ? options[0].optionName : (match.homeTeam || '主队'),
+                                        shortName: (options.length > 0 ? options[0].optionName : (match.homeTeam || '主队')).substring(0, 4).toUpperCase(),
+                                        score: match.homeScore == null ? '-' : match.homeScore,
+                                        color: 'light-blue',
+                                        icon: match.homeLogo || '🏳️',
+                                        optionData: options.length > 0 ? options[0] : null,
+                                        marketData: market,
+                                        bettable: options.length > 0 ? Boolean(options[0].bettable) : false
+                                    },
+                                    {
+                                        id: 't2_' + match.id + '_' + market.id,
+                                        name: options.length > 1 ? options[1].optionName : (match.awayTeam || '客队'),
+                                        shortName: (options.length > 1 ? options[1].optionName : (match.awayTeam || '客队')).substring(0, 4).toUpperCase(),
+                                        score: match.awayScore == null ? '-' : match.awayScore,
+                                        color: 'dark-red',
+                                        icon: match.awayLogo || '🏳️',
+                                        optionData: options.length > 1 ? options[1] : null,
+                                        marketData: market,
+                                        bettable: options.length > 1 ? Boolean(options[1].bettable) : false
+                                    }
+                                ];
+                            } else {
+                                event.teams = [
+                                    {
+                                        id: 't1_' + match.id + '_' + market.id,
+                                        name: match.homeTeam || '主队',
+                                        shortName: (match.homeTeam || '主队').substring(0, 4).toUpperCase(),
+                                        score: match.homeScore == null ? '-' : match.homeScore,
+                                        color: 'light-blue',
+                                        icon: match.homeLogo || '🏳️',
+                                        optionData: null,
+                                        marketData: null,
+                                        bettable: false
+                                    },
+                                    {
+                                        id: 't2_' + match.id + '_' + market.id,
+                                        name: match.awayTeam || '客队',
+                                        shortName: (match.awayTeam || '客队').substring(0, 4).toUpperCase(),
+                                        score: match.awayScore == null ? '-' : match.awayScore,
+                                        color: 'dark-red',
+                                        icon: match.awayLogo || '🏳️',
+                                        optionData: null,
+                                        marketData: null,
+                                        bettable: false
+                                    }
+                                ];
+                            }
+
+                            league.events.push(event);
+                        });
                     });
-                });
+                } else {
+                    console.log('比赛数据为空或响应格式不正确');
+                }
+                this.isLoading = false;
+                console.log('=== 数据加载完成 ===');
+            }).catch(err => {
+                console.error('加载比赛数据失败:', err);
+                this.isLoading = false;
+                this.$message.error('加载比赛数据失败');
             });
         },
         getMatchStatusText(status) {
@@ -1207,12 +1229,14 @@ export default {
 .team-logo {
     width: 40px;
     height: 40px;
-    background: #fff;
+    object-fit: cover;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    background: #fff;
+    border: 2px solid #f3f4f6;
 }
 
 .vs-text {
@@ -1320,6 +1344,7 @@ export default {
     flex: 1;
     overflow-y: auto;
     min-height: 0;
+    position: relative;
 
     &::-webkit-scrollbar {
         width: 8px;
@@ -1339,6 +1364,35 @@ export default {
             background: #94a3b8;
         }
     }
+}
+
+.empty-match-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 300px;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.6;
+}
+
+.empty-text {
+    font-size: 18px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.empty-hint {
+    font-size: 14px;
+    color: #9ca3af;
 }
 
 .match-table {
@@ -1926,6 +1980,16 @@ export default {
     font-size: 14px;
     font-weight: 700;
     color: #1f2937;
+}
+
+.slip-team-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #f3f4f6;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 .empty-selection-hint {
