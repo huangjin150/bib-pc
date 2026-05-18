@@ -66,7 +66,7 @@
         <div v-else class="register-section">
           <div class="register-container">
             <div class="panel-header">
-              <h1 class="panel-title">欢迎来到 EasiCoin</h1>
+              <h1 class="panel-title">欢迎来到 Bib Coin</h1>
               <button class="switch-btn" @click="registrationStatus = false">返回登录</button>
             </div>
 
