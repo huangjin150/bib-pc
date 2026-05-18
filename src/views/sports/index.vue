@@ -193,7 +193,10 @@
                     </div>
                 </div>
 
-                <div v-if="!filteredOrders.length && !isLoadingOrders" class="empty-orders-state">
+                <div v-if="!isLogin" class="empty-orders-state">
+                    <span @click="$router.push('/login')" style="cursor: pointer; color: #0066ff; text-decoration: underline;">登录</span>后查看订单
+                </div>
+                <div v-else-if="!filteredOrders.length && !isLoadingOrders" class="empty-orders-state">
                     当前暂无订单
                 </div>
             </div>
@@ -295,7 +298,10 @@
                                 {{ previewError }}
                             </div>
 
-                            <button class="tp-submit-btn blue" @click="submitBet"
+                            <button v-if="!isLogin" class="tp-submit-btn blue" @click="$router.push('/login')">
+                                请先登录
+                            </button>
+                            <button v-else class="tp-submit-btn blue" @click="submitBet"
                                 :disabled="isSubmitting || isPreviewLoading || !canSubmit">
                                 {{ selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 ? '比赛已结束' :
                                     (isSubmitting ? '下注中...' : '确认下注') }}
@@ -408,6 +414,9 @@ export default {
         },
         hasMoreOrders() {
             return this.orders.length < this.totalOrders;
+        },
+        isLogin() {
+            return this.$store.getters.isLogin;
         }
     },
     watch: {
@@ -735,6 +744,7 @@ export default {
             }
         },
         getMyOrders(isAppend = false) {
+            if (!this.isLogin) return;
             if (this.isLoadingOrders) return;
 
             this.isLoadingOrders = true;
@@ -780,6 +790,7 @@ export default {
             });
         },
         getOrderCounts() {
+            if (!this.isLogin) return;
             // Fetch active orders count
             this.$http.get(this.swapHost + '/quiz/orders', { params: { pageNo: 1, pageSize: 1, status: 1 } }).then(response => {
                 const resp = response.body;
@@ -883,6 +894,7 @@ export default {
             }, 250);
         },
         fetchBetPreview() {
+            if (!this.isLogin) return;
             if (!this.selectedTeam || !this.selectedTeam.optionData || !this.selectedTeam.marketData || !(this.tradeAmount > 0)) {
                 this.isPreviewLoading = false;
                 return;
@@ -918,6 +930,7 @@ export default {
             });
         },
         fetchWalletBalance() {
+            if (!this.isLogin) return;
             this.$http.post(this.host + '/asset/wallet').then(response => {
                 const resp = response.body;
                 if (resp && resp.code === 0 && resp.data) {
@@ -929,6 +942,11 @@ export default {
             });
         },
         submitBet() {
+            if (!this.$store.getters.isLogin) {
+                this.$message.warning('请先登录');
+                this.$router.push('/login');
+                return;
+            }
             if (!this.selectedEvent || this.selectedEvent.matchStatus === 3 || this.selectedEvent.matchStatus === 4) {
                 this.$message.warning('该比赛已结束，无法下注');
                 return;
