@@ -51,8 +51,13 @@
                                         <div class="group-header-content">
                                             <div class="group-header-left">
                                                 <div class="match-time-display header-time">
-                                                    <span class="time-date">{{ (event.markets && event.markets[0] && event.markets[0].matchTime) ? event.markets[0].matchTime.substring(5, 10).replace('-', '/') : '--' }}</span>
-                                                    <span class="time-hour">{{ (event.markets && event.markets[0] && event.markets[0].matchTime) ? event.markets[0].matchTime.substring(11, 16) : '--' }}</span>
+                                                    <span class="time-date">{{ (event.markets && event.markets[0] &&
+                                                        event.markets[0].matchTime) ?
+                                                        event.markets[0].matchTime.substring(5, 10).replace('-', '/') :
+                                                        '--' }}</span>
+                                                    <span class="time-hour">{{ (event.markets && event.markets[0] &&
+                                                        event.markets[0].matchTime) ?
+                                                        event.markets[0].matchTime.substring(11, 16) : '--' }}</span>
                                                 </div>
                                                 <div class="league-title-display">
                                                     <span class="market-title">{{ event.markets && event.markets[0]
@@ -70,9 +75,9 @@
                                                             :disabled="!option.bettable"
                                                             @click.stop="openTrade(event, option, event.markets[0])">
                                                             <span class="header-odd-label">{{ option.optionName
-                                                                }}</span>
+                                                            }}</span>
                                                             <span class="header-odd-value">{{ formatOddsLabel(option)
-                                                                }}</span>
+                                                            }}</span>
                                                         </button>
                                                     </div>
                                                     <div class="header-odd-item"
@@ -113,7 +118,7 @@
                                                                 :disabled="!event.teams[0].optionData.bettable"
                                                                 @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
                                                                 <span class="header-odd-label">{{ event.teams[0].name
-                                                                    }}</span>
+                                                                }}</span>
                                                                 <span class="header-odd-value">{{
                                                                     formatOddsLabel(event.teams[0].optionData) }}</span>
                                                             </button>
@@ -124,7 +129,7 @@
                                                                 :disabled="!event.teams[1].optionData.bettable"
                                                                 @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
                                                                 <span class="header-odd-label">{{ event.teams[1].name
-                                                                    }}</span>
+                                                                }}</span>
                                                                 <span class="header-odd-value">{{
                                                                     formatOddsLabel(event.teams[1].optionData) }}</span>
                                                             </button>
@@ -278,7 +283,7 @@
                                 <div class="odds-info-row">
                                     <span class="info-label">当前赔率</span>
                                     <span class="info-value odds-value">{{ formatOddsLabel(selectedTeam.optionData)
-                                    }}</span>
+                                        }}</span>
                                 </div>
                             </div>
 
@@ -1033,6 +1038,7 @@ export default {
                 marketId: this.selectedTeam.marketData.id,
                 optionId: this.selectedTeam.optionData.id,
                 betAmount: this.tradeAmount,
+                expectedOdds: this.selectedTeam.optionData.currentOdds,
                 deviceId: 'pc'
             };
 
@@ -1046,7 +1052,7 @@ export default {
                     this.getMyOrders();
                     return;
                 }
-                this.$message.error(resp && resp.msg ? resp.msg : '下注失败');
+                this.$message.error(resp.message ? resp.message : '下注失败');
             }).catch(() => {
                 this.isSubmitting = false;
                 this.$message.error('网络请求失败，请稍后重试');
@@ -1851,6 +1857,25 @@ export default {
     overflow-y: auto;
     flex: 1;
     position: relative;
+
+    &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+
+        &:hover {
+            background: #94a3b8;
+        }
+    }
 }
 
 .orders-table {
