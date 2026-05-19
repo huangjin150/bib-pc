@@ -20,28 +20,6 @@
         </div>
 
         <div class="main-column">
-            <!-- Top Featured Match Banner -->
-            <!-- <div class="featured-match-banner">
-                <div class="league-info">
-                    <div class="league-name">英超 联赛</div>
-                    <div class="match-time">05/17 23:00</div>
-                </div>
-                <div class="match-teams">
-                    <div class="team team-home">
-                        <span class="team-name">曼彻斯特城</span>
-                        <div class="team-logo"></div>
-                    </div>
-                    <div class="vs-text">VS</div>
-                    <div class="team team-away">
-                        <div class="team-logo"></div>
-                        <span class="team-name">利物浦</span>
-                    </div>
-                </div>
-                <div class="banner-action">
-                    <button class="bet-now-btn">立即投注</button>
-                </div>
-            </div> -->
-
             <div class="match-section">
                 <div class="match-filters-top">
                     <div class="match-tabs">
@@ -83,48 +61,79 @@
                                                         ? event.markets[0].marketTitle : event.title }}</span>
                                                 </div>
                                             </div>
-                                            <div class="group-header-center">
-                                                <div class="team home-team">
-                                                    <img v-if="event.homeLogo" class="team-logo" :src="event.homeLogo" alt="" />
-                                                    <span class="team-name" :title="event.teams[0].name">{{
-                                                        event.teams[0].name }}</span>
-                                                </div>
-                                                <div class="score-display">
-                                                    VS
-                                                </div>
-                                                <div class="team away-team">
-                                                    <span class="team-name" :title="event.teams[1].name">{{
-                                                        event.teams[1].name }}</span>
-                                                    <img v-if="event.awayLogo" class="team-logo" :src="event.awayLogo" alt="" />
-                                                </div>
-                                            </div>
-                                            <div class="group-header-right">
-                                                <div class="header-odds"
-                                                    v-if="event.teams[0].optionData || event.teams[1].optionData">
-                                                    <div class="header-odd-item" v-if="event.teams[0].optionData">
+                                            <template
+                                                v-if="event.markets && event.markets[0] && event.markets[0].options && event.markets[0].options.length > 2">
+                                                <div class="group-header-options-full">
+                                                    <div class="header-odd-item"
+                                                        v-for="option in event.markets[0].options.slice(0, 6)"
+                                                        :key="option.id">
                                                         <button class="table-odd-btn mini-btn"
-                                                            :class="{ 'disabled': !event.teams[0].optionData.bettable, 'active': isSelectedOption(event.teams[0].optionData) }"
-                                                            :disabled="!event.teams[0].optionData.bettable"
-                                                            @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
-                                                            <span class="header-odd-label">{{ event.teams[0].name
-                                                                }}</span>
-                                                            <span class="header-odd-value">{{
-                                                                formatOddsLabel(event.teams[0].optionData) }}</span>
+                                                            :class="{ 'disabled': !option.bettable, 'active': isSelectedOption(option) }"
+                                                            :disabled="!option.bettable"
+                                                            @click.stop="openTrade(event, option, event.markets[0])">
+                                                            <span class="header-odd-label">{{ option.optionName
+                                                            }}</span>
+                                                            <span class="header-odd-value">{{ formatOddsLabel(option)
+                                                            }}</span>
                                                         </button>
                                                     </div>
-                                                    <div class="header-odd-item" v-if="event.teams[1].optionData">
-                                                        <button class="table-odd-btn mini-btn"
-                                                            :class="{ 'disabled': !event.teams[1].optionData.bettable, 'active': isSelectedOption(event.teams[1].optionData) }"
-                                                            :disabled="!event.teams[1].optionData.bettable"
-                                                            @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
-                                                            <span class="header-odd-label">{{ event.teams[1].name
-                                                                }}</span>
-                                                            <span class="header-odd-value">{{
-                                                                formatOddsLabel(event.teams[1].optionData) }}</span>
+                                                    <div class="header-odd-item"
+                                                        v-if="event.markets[0].options.length > 6">
+                                                        <button style="border: none; background-color: transparent;"
+                                                            class="table-odd-btn mini-btn more-btn"
+                                                            @click.stop="openMoreOptionsDialog(event)">
+                                                            <span class="header-odd-label">更多选项</span>
+                                                            <i class="el-icon-arrow-right more-icon"></i>
                                                         </button>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </template>
+                                            <template v-else>
+                                                <div class="group-header-center">
+                                                    <div class="team home-team">
+                                                        <img v-if="event.homeLogo" class="team-logo"
+                                                            :src="event.homeLogo" alt="" />
+                                                        <span class="team-name" :title="event.teams[0].name">{{
+                                                            event.teams[0].name }}</span>
+                                                    </div>
+                                                    <div class="score-display">
+                                                        VS
+                                                    </div>
+                                                    <div class="team away-team">
+                                                        <span class="team-name" :title="event.teams[1].name">{{
+                                                            event.teams[1].name }}</span>
+                                                        <img v-if="event.awayLogo" class="team-logo"
+                                                            :src="event.awayLogo" alt="" />
+                                                    </div>
+                                                </div>
+                                                <div class="group-header-right">
+                                                    <div class="header-odds"
+                                                        v-if="event.teams[0].optionData || event.teams[1].optionData">
+                                                        <div class="header-odd-item" v-if="event.teams[0].optionData">
+                                                            <button class="table-odd-btn mini-btn"
+                                                                :class="{ 'disabled': !event.teams[0].optionData.bettable, 'active': isSelectedOption(event.teams[0].optionData) }"
+                                                                :disabled="!event.teams[0].optionData.bettable"
+                                                                @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
+                                                                <span class="header-odd-label">{{ event.teams[0].name
+                                                                }}</span>
+                                                                <span class="header-odd-value">{{
+                                                                    formatOddsLabel(event.teams[0].optionData) }}</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="header-odd-item" v-if="event.teams[1].optionData">
+                                                            <button class="table-odd-btn mini-btn"
+                                                                :class="{ 'disabled': !event.teams[1].optionData.bettable, 'active': isSelectedOption(event.teams[1].optionData) }"
+                                                                :disabled="!event.teams[1].optionData.bettable"
+                                                                @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
+                                                                <span class="header-odd-label">{{ event.teams[1].name
+                                                                }}</span>
+                                                                <span class="header-odd-value">{{
+                                                                    formatOddsLabel(event.teams[1].optionData) }}</span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
                                         </div>
                                     </td>
                                 </tr>
@@ -194,7 +203,8 @@
                 </div>
 
                 <div v-if="!isLogin" class="empty-orders-state">
-                    <span @click="$router.push('/login')" style="cursor: pointer; color: #0066ff; text-decoration: underline;">登录</span>后查看订单
+                    <span @click="$router.push('/login')"
+                        style="cursor: pointer; color: #0066ff; text-decoration: underline;">登录</span>后查看订单
                 </div>
                 <div v-else-if="!filteredOrders.length && !isLoadingOrders" class="empty-orders-state">
                     当前暂无订单
@@ -231,10 +241,9 @@
                                     :class="{ 'active': selectedTeam && selectedTeam.id === team.optionData.id, 'disabled': !team.optionData.bettable || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 }"
                                     :disabled="!team.optionData.bettable || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4"
                                     @click="openTrade(selectedEvent, team.optionData, team.marketData)">
-                                    <img v-if="(index === 0 && selectedEvent.homeLogo) || (index === 1 && selectedEvent.awayLogo)" 
-                                        class="slip-team-logo" 
-                                        :src="index === 0 ? selectedEvent.homeLogo : selectedEvent.awayLogo" 
-                                        alt="" />
+                                    <img v-if="(index === 0 && selectedEvent.homeLogo) || (index === 1 && selectedEvent.awayLogo)"
+                                        class="slip-team-logo"
+                                        :src="index === 0 ? selectedEvent.homeLogo : selectedEvent.awayLogo" alt="" />
                                     <span class="opt-name">{{ team.name }}</span>
                                     <span class="opt-odds">{{ formatOddsLabel(team.optionData) }}</span>
                                 </button>
@@ -271,7 +280,7 @@
                                 <div class="odds-info-row">
                                     <span class="info-label">当前赔率</span>
                                     <span class="info-value odds-value">{{ formatOddsLabel(selectedTeam.optionData)
-                                    }}</span>
+                                        }}</span>
                                 </div>
                             </div>
 
@@ -318,6 +327,24 @@
                 </div>
             </div>
         </div>
+
+        <!-- More Options Dialog -->
+        <el-dialog :visible.sync="showMoreOptionsDialog" title="更多选项" width="600px" custom-class="more-options-dialog"
+            @close="currentMoreOptionsEvent = null">
+            <div v-if="currentMoreOptionsEvent && currentMoreOptionsEvent.markets && currentMoreOptionsEvent.markets[0]"
+                class="more-options-grid">
+                <div v-for="option in currentMoreOptionsEvent.markets[0].options" :key="option.id"
+                    class="more-option-item">
+                    <button class="table-odd-btn mini-btn"
+                        :class="{ 'disabled': !option.bettable, 'active': isSelectedOption(option) }"
+                        :disabled="!option.bettable"
+                        @click.stop="openTradeAndCloseDialog(currentMoreOptionsEvent, option, currentMoreOptionsEvent.markets[0])">
+                        <span class="header-odd-label">{{ option.optionName }}</span>
+                        <span class="header-odd-value">{{ formatOddsLabel(option) }}</span>
+                    </button>
+                </div>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -359,7 +386,9 @@ export default {
             filterTime: 'all',
             acceptHigherOdds: true,
             oddsChangeOption: 'any',
-            searchKeyword: ''
+            searchKeyword: '',
+            showMoreOptionsDialog: false,
+            currentMoreOptionsEvent: null
         }
     },
     computed: {
@@ -603,30 +632,58 @@ export default {
                             // Map options to teams for UI rendering
                             if (market.options) {
                                 const options = market.options;
-                                event.teams = [
-                                    {
-                                        id: 't1_' + match.id + '_' + market.id,
-                                        name: options.length > 0 ? options[0].optionName : (match.homeTeam || '主队'),
-                                        shortName: (options.length > 0 ? options[0].optionName : (match.homeTeam || '主队')).substring(0, 4).toUpperCase(),
-                                        score: match.homeScore == null ? '-' : match.homeScore,
-                                        color: 'light-blue',
-                                        icon: match.homeLogo || '🏳️',
-                                        optionData: options.length > 0 ? options[0] : null,
+                                event.teams = options.map((opt, idx) => {
+                                    return {
+                                        id: 't' + (idx + 1) + '_' + match.id + '_' + market.id,
+                                        name: opt.optionName,
+                                        shortName: opt.optionName.substring(0, 4).toUpperCase(),
+                                        score: idx === 0 ? (match.homeScore == null ? '-' : match.homeScore) : (idx === 1 ? (match.awayScore == null ? '-' : match.awayScore) : '-'),
+                                        color: idx === 0 ? 'light-blue' : (idx === 1 ? 'dark-red' : 'blue'),
+                                        icon: idx === 0 ? (match.homeLogo || '🏳️') : (idx === 1 ? (match.awayLogo || '🏳️') : '🎯'),
+                                        optionData: opt,
                                         marketData: market,
-                                        bettable: options.length > 0 ? Boolean(options[0].bettable) : false
-                                    },
-                                    {
+                                        bettable: Boolean(opt.bettable)
+                                    };
+                                });
+                                // fallback if options are less than 2
+                                if (options.length === 0) {
+                                    event.teams = [
+                                        {
+                                            id: 't1_' + match.id + '_' + market.id,
+                                            name: match.homeTeam || '主队',
+                                            shortName: (match.homeTeam || '主队').substring(0, 4).toUpperCase(),
+                                            score: match.homeScore == null ? '-' : match.homeScore,
+                                            color: 'light-blue',
+                                            icon: match.homeLogo || '🏳️',
+                                            optionData: null,
+                                            marketData: null,
+                                            bettable: false
+                                        },
+                                        {
+                                            id: 't2_' + match.id + '_' + market.id,
+                                            name: match.awayTeam || '客队',
+                                            shortName: (match.awayTeam || '客队').substring(0, 4).toUpperCase(),
+                                            score: match.awayScore == null ? '-' : match.awayScore,
+                                            color: 'dark-red',
+                                            icon: match.awayLogo || '🏳️',
+                                            optionData: null,
+                                            marketData: null,
+                                            bettable: false
+                                        }
+                                    ];
+                                } else if (options.length === 1) {
+                                    event.teams.push({
                                         id: 't2_' + match.id + '_' + market.id,
-                                        name: options.length > 1 ? options[1].optionName : (match.awayTeam || '客队'),
-                                        shortName: (options.length > 1 ? options[1].optionName : (match.awayTeam || '客队')).substring(0, 4).toUpperCase(),
+                                        name: match.awayTeam || '客队',
+                                        shortName: (match.awayTeam || '客队').substring(0, 4).toUpperCase(),
                                         score: match.awayScore == null ? '-' : match.awayScore,
                                         color: 'dark-red',
                                         icon: match.awayLogo || '🏳️',
-                                        optionData: options.length > 1 ? options[1] : null,
-                                        marketData: market,
-                                        bettable: options.length > 1 ? Boolean(options[1].bettable) : false
-                                    }
-                                ];
+                                        optionData: null,
+                                        marketData: null,
+                                        bettable: false
+                                    });
+                                }
                             } else {
                                 event.teams = [
                                     {
@@ -841,6 +898,14 @@ export default {
         isAnyOptionBettable(event) {
             if (!event || !event.teams) return false;
             return event.teams.some(team => team.optionData && team.optionData.bettable);
+        },
+        openTradeAndCloseDialog(event, option, market) {
+            this.openTrade(event, option, market);
+            this.showMoreOptionsDialog = false;
+        },
+        openMoreOptionsDialog(event) {
+            this.currentMoreOptionsEvent = event;
+            this.showMoreOptionsDialog = true;
         },
         openTrade(event, option, market) {
             if (event.matchStatus === 3 || event.matchStatus === 4) {
@@ -1431,7 +1496,7 @@ export default {
     align-items: center;
     justify-content: space-between;
     background: #fff;
-    padding: 6px 20px;
+    padding: 12px 20px 6px 20px;
     border-radius: 12px;
     border: 1px solid #f3f4f6;
     cursor: pointer;
@@ -1446,7 +1511,7 @@ export default {
 }
 
 .group-header-left {
-    flex: 0 0 600px;
+    flex: 0 0 300px;
     display: flex;
     align-items: center;
     border-right: 1px solid #f3f4f6;
@@ -1538,6 +1603,44 @@ export default {
 .team-icon-emoji {
     font-size: 24px;
     line-height: 1;
+}
+
+.group-header-options-full {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-left: 20px;
+    padding-bottom: 6px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scroll-behavior: smooth;
+
+    &::-webkit-scrollbar {
+        display: block;
+        height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 3px;
+        margin-left: 20px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+
+        &:hover {
+            background: #94a3b8;
+        }
+    }
+
+    .header-odd-item {
+        flex: 0 0 auto;
+        width: 90px;
+    }
 }
 
 .group-header-right {
@@ -1883,6 +1986,29 @@ export default {
     }
 }
 
+.more-btn {
+    flex-direction: row;
+    gap: 6px;
+    height: 100%;
+}
+
+.more-options-dialog {
+    border-radius: 12px;
+}
+
+.more-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+    padding: 10px 0;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.more-option-item {
+    width: 100%;
+}
+
 .slip-tabs {
     display: flex;
     background: #f8fafc;
@@ -1940,13 +2066,13 @@ export default {
 }
 
 .slip-options-group {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
     gap: 8px;
     margin-top: 12px;
 }
 
 .slip-opt-btn {
-    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;

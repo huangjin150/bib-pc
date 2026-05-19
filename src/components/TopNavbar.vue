@@ -183,7 +183,7 @@ export default {
         { name: '合约', path: '/swap' },
         // { name: '预测市场', path: '/eventContract' },
         // { name: '预测合约', path: '/prediction' },
-        // { name: '体育', path: '/sports' },
+        { name: '体育', path: '/sports' },
         { name: '公告中心', path: '/announcement/0' },
         { name: '平台介绍', path: '/introduce' },
       ]
@@ -241,8 +241,6 @@ export default {
     setUpColor(color) {
       this.upColor = color;
       localStorage.setItem('upColor', color);
-      // Optional: trigger an event or Vuex mutation if other components need to react instantly without reload
-      // We will reload the page for simplicity to apply changes everywhere easily
       window.location.reload();
     }
   },
