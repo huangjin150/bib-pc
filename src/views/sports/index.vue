@@ -75,9 +75,9 @@
                                                             :disabled="!option.bettable"
                                                             @click.stop="openTrade(event, option, event.markets[0])">
                                                             <span class="header-odd-label">{{ option.optionName
-                                                            }}</span>
+                                                                }}</span>
                                                             <span class="header-odd-value">{{ formatOddsLabel(option)
-                                                            }}</span>
+                                                                }}</span>
                                                         </button>
                                                     </div>
                                                     <div class="header-odd-item"
@@ -118,7 +118,7 @@
                                                                 :disabled="!event.teams[0].optionData.bettable"
                                                                 @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
                                                                 <span class="header-odd-label">{{ event.teams[0].name
-                                                                }}</span>
+                                                                    }}</span>
                                                                 <span class="header-odd-value">{{
                                                                     formatOddsLabel(event.teams[0].optionData) }}</span>
                                                             </button>
@@ -129,7 +129,7 @@
                                                                 :disabled="!event.teams[1].optionData.bettable"
                                                                 @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
                                                                 <span class="header-odd-label">{{ event.teams[1].name
-                                                                }}</span>
+                                                                    }}</span>
                                                                 <span class="header-odd-value">{{
                                                                     formatOddsLabel(event.teams[1].optionData) }}</span>
                                                             </button>
@@ -283,7 +283,7 @@
                                 <div class="odds-info-row">
                                     <span class="info-label">当前赔率</span>
                                     <span class="info-value odds-value">{{ formatOddsLabel(selectedTeam.optionData)
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </div>
 
@@ -352,6 +352,8 @@
 </template>
 
 <script>
+var SockJS = require("sockjs-client");
+
 export default {
     name: 'SportsPage',
     data() {
@@ -581,20 +583,13 @@ export default {
             });
         },
         getMatches() {
-            console.log('=== 开始加载比赛数据 ===');
-            console.log('请求地址:', this.swapHost + '/quiz/matches/displayed');
             this.$http.get(this.swapHost + `/quiz/matches/displayed`).then(response => {
-                console.log('比赛接口响应:', response);
                 const resp = response.body;
-                console.log('响应体:', resp);
-
-                // Clear previous events
                 this.categories.forEach(league => {
                     league.events = [];
                 });
 
                 if (resp && resp.code === 0 && resp.data) {
-                    console.log('比赛数据解析成功:', resp.data);
                     resp.data.forEach(item => {
                         console.log('item', item)
                         const match = item.match;
@@ -718,11 +713,37 @@ export default {
                             league.events.push(event);
                         });
                     });
+                    
+                    // Re-bind selected event and team if they exist
+                    if (this.selectedEvent) {
+                        let newSelectedEvent = null;
+                        this.categories.forEach(cat => {
+                            const found = cat.events.find(e => e.id === this.selectedEvent.id);
+                            if (found) newSelectedEvent = found;
+                        });
+                        
+                        if (newSelectedEvent) {
+                            this.selectedEvent = newSelectedEvent;
+                            if (this.selectedTeam && this.selectedTeam.optionData) {
+                                const newOptionTeam = newSelectedEvent.teams.find(t => t.optionData && t.optionData.id === this.selectedTeam.optionData.id);
+                                if (newOptionTeam) {
+                                    this.selectedTeam = {
+                                        id: newOptionTeam.optionData.id,
+                                        name: newOptionTeam.optionData.optionName,
+                                        shortName: newOptionTeam.optionData.optionName.substring(0, 4).toUpperCase(),
+                                        color: newOptionTeam.color,
+                                        icon: newOptionTeam.icon,
+                                        optionData: newOptionTeam.optionData,
+                                        marketData: newOptionTeam.marketData
+                                    };
+                                    this.schedulePreview();
+                                }
+                            }
+                        }
+                    }
                 } else {
-                    console.log('比赛数据为空或响应格式不正确');
                 }
                 this.isLoading = false;
-                console.log('=== 数据加载完成 ===');
             }).catch(err => {
                 console.error('加载比赛数据失败:', err);
                 this.isLoading = false;
@@ -1057,6 +1078,91 @@ export default {
                 this.isSubmitting = false;
                 this.$message.error('网络请求失败，请稍后重试');
             });
+        },
+        startWebsock() {
+            console.log('change')
+            if (this.stompClient) {
+                this.stompClient.ws.close();
+            }
+            let stompClient = null;
+            const that = this;
+            const socket = new SockJS(that.swapHost + that.api.swap.ws);
+            stompClient = Stomp.over(socket);
+            this.stompClient = stompClient;
+            stompClient.debug = false;
+
+            stompClient.connect({}, function (frame) {
+                stompClient.subscribe("/topic/quiz/odds/change", function (msg) {
+                    that.getMatches();
+                    try {
+                        const resp = JSON.parse(msg.body);
+                        if (resp) {
+                            that.updateOddsFromWebsocket(resp);
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse odds change message', e);
+                    }
+                });
+            });
+        },
+        updateOddsFromWebsocket(data) {
+            // Find the event that needs updating
+            let eventFound = null;
+            this.categories.forEach(category => {
+                const event = category.events.find(e => e.matchId === data.matchId && e.markets && e.markets.some(m => m.id === data.marketId));
+                if (event) {
+                    eventFound = event;
+                }
+            });
+
+            if (eventFound && data.options && Array.isArray(data.options)) {
+                // Update market options
+                const market = eventFound.markets.find(m => m.id === data.marketId);
+                if (market) {
+                    data.options.forEach(newOption => {
+                        // Update in market options array
+                        const optIndex = market.options.findIndex(o => o.id === newOption.id);
+                        if (optIndex !== -1) {
+                            this.$set(market.options[optIndex], 'currentOdds', newOption.currentOdds);
+                            this.$set(market.options[optIndex], 'currentPrice', newOption.currentPrice);
+                        }
+
+                        // Update in mapped teams array
+                        if (eventFound.teams) {
+                            const team = eventFound.teams.find(t => t.optionData && t.optionData.id === newOption.id);
+                            if (team) {
+                                this.$set(team.optionData, 'currentOdds', newOption.currentOdds);
+                                this.$set(team.optionData, 'currentPrice', newOption.currentPrice);
+                            }
+                        }
+                        
+                        // Update currently selected option in right panel if it matches
+                        if (this.selectedTeam && this.selectedTeam.optionData && this.selectedTeam.optionData.id === newOption.id) {
+                             this.$set(this.selectedTeam.optionData, 'currentOdds', newOption.currentOdds);
+                             this.$set(this.selectedTeam.optionData, 'currentPrice', newOption.currentPrice);
+                             this.schedulePreview(); // re-calculate expected profit
+                        }
+                    });
+                }
+            }
+        },
+        stopWebsock() {
+            if (this.stompClient) {
+                try {
+                    if (this.stompClient.ws && this.stompClient.ws.readyState === WebSocket.OPEN) {
+                        this.stompClient.ws.close();
+                    }
+                    if (this.stompClient.connected) {
+                        this.stompClient.disconnect(() => {
+                            console.log("WebSocket 已断开");
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error stopping websocket", error);
+                } finally {
+                    this.stompClient = null;
+                }
+            }
         }
     },
     mounted() {
@@ -1064,11 +1170,13 @@ export default {
         this.getMyOrders();
         this.getOrderCounts();
         this.fetchWalletBalance();
+        this.startWebsock();
     },
     beforeDestroy() {
         if (this.previewTimer) {
             clearTimeout(this.previewTimer);
         }
+        this.stopWebsock();
     }
 }
 </script>
