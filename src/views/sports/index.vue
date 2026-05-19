@@ -51,10 +51,8 @@
                                         <div class="group-header-content">
                                             <div class="group-header-left">
                                                 <div class="match-time-display header-time">
-                                                    <span class="time-date">{{ event.time ? event.time.substring(5,
-                                                        10).replace('-', '/') : '--' }}</span>
-                                                    <span class="time-hour">{{ event.time ? event.time.substring(11,
-                                                        16) : '--' }}</span>
+                                                    <span class="time-date">{{ (event.markets && event.markets[0] && event.markets[0].matchTime) ? event.markets[0].matchTime.substring(5, 10).replace('-', '/') : '--' }}</span>
+                                                    <span class="time-hour">{{ (event.markets && event.markets[0] && event.markets[0].matchTime) ? event.markets[0].matchTime.substring(11, 16) : '--' }}</span>
                                                 </div>
                                                 <div class="league-title-display">
                                                     <span class="market-title">{{ event.markets && event.markets[0]
@@ -593,6 +591,7 @@ export default {
                 if (resp && resp.code === 0 && resp.data) {
                     console.log('比赛数据解析成功:', resp.data);
                     resp.data.forEach(item => {
+                        console.log('item', item)
                         const match = item.match;
                         const leagueData = item.league;
                         const markets = item.markets || [];
