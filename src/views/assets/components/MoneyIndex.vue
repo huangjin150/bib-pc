@@ -707,6 +707,8 @@ export default {
             str = that.$t("uc.finance.record.transMessage37");
           } else if (type == 38) {
             str = that.$t("uc.finance.record.transMessage38");
+          } else if (type == 39) {
+            str = that.$t("uc.finance.record.transMessage39");
           } else {
             str = that.$t("uc.finance.record.other");
           }

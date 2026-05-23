@@ -306,7 +306,18 @@
                                 </div>
                             </div>
 
-                            <div class="tp-notice" v-if="previewError">
+                            <div class="tp-notice warning" v-if="insufficientBalance">
+                                <i class="el-icon-warning-outline"></i>
+                                <span>
+                                    资金账户余额不足，
+                                    <a v-if="contractWalletBalance >= 0.01" href="javascript:void(0)"
+                                        class="action-link" @click="$router.push('/assets/transfer')">去划转</a>
+                                    <a v-else href="javascript:void(0)" class="action-link"
+                                        @click="$router.push('/recharge')">去充值</a>
+                                </span>
+                            </div>
+                            <div class="tp-notice error" v-else-if="previewError">
+                                <i class="el-icon-circle-close"></i>
                                 {{ previewError }}
                             </div>
 
@@ -387,6 +398,7 @@ export default {
             betType: 'single', // 'single' 单注, 'multi' 串关
             betPreview: this.createEmptyPreview(),
             walletBalance: null, // Track wallet balance separately
+            contractWalletBalance: null, // Track contract wallet balance
             filterLeague: 'all',
             filterTime: 'all',
             acceptHigherOdds: true,
@@ -451,6 +463,16 @@ export default {
         },
         isLogin() {
             return this.$store.getters.isLogin;
+        },
+        insufficientBalance() {
+            console.log('tradeAmount', this.tradeAmount)
+            console.log('walletBalance', this.walletBalance)
+            if (!this.isLogin || this.walletBalance === null) return false;
+
+            if (Number(this.tradeAmount) > 0) {
+                return Number(this.tradeAmount) > Number(this.walletBalance);
+            }
+            return Number(this.walletBalance) < 0.01;
         }
     },
     watch: {
@@ -713,7 +735,7 @@ export default {
                             league.events.push(event);
                         });
                     });
-                    
+
                     // Re-bind selected event and team if they exist
                     if (this.selectedEvent) {
                         let newSelectedEvent = null;
@@ -721,7 +743,7 @@ export default {
                             const found = cat.events.find(e => e.id === this.selectedEvent.id);
                             if (found) newSelectedEvent = found;
                         });
-                        
+
                         if (newSelectedEvent) {
                             this.selectedEvent = newSelectedEvent;
                             if (this.selectedTeam && this.selectedTeam.optionData) {
@@ -996,7 +1018,6 @@ export default {
 
             const url = `${this.swapHost}/quiz/bet/preview?marketId=${this.selectedTeam.marketData.id}&optionId=${this.selectedTeam.optionData.id}&betAmount=${this.tradeAmount}`;
             this.$http.get(url).then(response => {
-                // 如果当前金额已经改变，说明有新的请求发出了，直接丢弃这次响应
                 if (this.tradeAmount !== requestAmount) {
                     return;
                 }
@@ -1005,13 +1026,13 @@ export default {
                 const resp = response.body;
                 if (resp && resp.code === 0 && resp.data) {
                     this.betPreview = Object.assign(this.createEmptyPreview(), resp.data);
-                    // Update global wallet balance if provided in preview response
                     if (resp.data.walletBalance !== undefined) {
                         this.walletBalance = resp.data.walletBalance;
                     }
                     return;
                 }
                 this.betPreview = this.createEmptyPreview();
+                console.log('resp', resp)
                 this.previewError = resp && resp.msg ? resp.msg : '当前无法下注';
             }).catch(() => {
                 this.isPreviewLoading = false;
@@ -1021,14 +1042,24 @@ export default {
         },
         fetchWalletBalance() {
             if (!this.isLogin) return;
+            // 获取资金账户余额 (USDT)
             this.$http.post(this.host + '/asset/wallet').then(response => {
                 const resp = response.body;
                 if (resp && resp.code === 0 && resp.data) {
-                    const usdtWallet = resp.data.find(w => w.coin === 'USDT');
-                    this.walletBalance = usdtWallet ? usdtWallet.balance : 0;
+                    const usdtWallet = resp.data[0]
+                    this.walletBalance = usdtWallet.balance
                 }
             }).catch(err => {
-                console.error('Failed to fetch wallet balance', err);
+                console.error('Failed to fetch asset wallet balance', err);
+            });
+            // 获取合约账户余额 (USDT)
+            this.$http.post(this.swapHost + '/wallet/list').then(response => {
+                const resp = response.body;
+                if (resp && resp.code === 0 && resp.data) {
+                    this.contractWalletBalance = Number(resp.data.usdtBalance) || 0;
+                }
+            }).catch(err => {
+                console.error('Failed to fetch contract wallet balance', err);
             });
         },
         submitBet() {
@@ -1047,6 +1078,14 @@ export default {
             }
             if (!(this.tradeAmount > 0)) {
                 this.$message.warning('请输入有效的下注金额');
+                return;
+            }
+            if (this.insufficientBalance) {
+                if (this.contractWalletBalance > 0) {
+                    this.$router.push('/assets/transfer');
+                } else {
+                    this.$router.push('/recharge');
+                }
                 return;
             }
             if (!this.canSubmit) {
@@ -1135,12 +1174,12 @@ export default {
                                 this.$set(team.optionData, 'currentPrice', newOption.currentPrice);
                             }
                         }
-                        
+
                         // Update currently selected option in right panel if it matches
                         if (this.selectedTeam && this.selectedTeam.optionData && this.selectedTeam.optionData.id === newOption.id) {
-                             this.$set(this.selectedTeam.optionData, 'currentOdds', newOption.currentOdds);
-                             this.$set(this.selectedTeam.optionData, 'currentPrice', newOption.currentPrice);
-                             this.schedulePreview(); // re-calculate expected profit
+                            this.$set(this.selectedTeam.optionData, 'currentOdds', newOption.currentOdds);
+                            this.$set(this.selectedTeam.optionData, 'currentPrice', newOption.currentPrice);
+                            this.schedulePreview(); // re-calculate expected profit
                         }
                     });
                 }
@@ -1788,7 +1827,7 @@ export default {
     cursor: pointer;
     transition: all 0.2s;
 
-    &:hover:not(:disabled) {
+    &:hover:not(:disabled):not(.active) {
         background: #eff6ff;
         border-color: #bfdbfe;
     }
@@ -2201,6 +2240,26 @@ export default {
     grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
     gap: 8px;
     margin-top: 12px;
+    max-height: 160px;
+    overflow-y: auto;
+    padding-right: 4px;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+
+        &:hover {
+            background: #94a3b8;
+        }
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
 }
 
 .slip-opt-btn {
@@ -2216,7 +2275,7 @@ export default {
     cursor: pointer;
     transition: all 0.2s;
 
-    &:hover:not(:disabled) {
+    &:hover:not(:disabled):not(.active) {
         border-color: #93c5fd;
         background: #eff6ff;
     }
@@ -2372,6 +2431,43 @@ export default {
     color: #2563eb;
 }
 
+.tp-notice {
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &.warning {
+        background-color: #fff7ed;
+        border: 1px solid #fed7aa;
+        color: #ea580c;
+
+        i {
+            font-size: 16px;
+        }
+
+        .action-link {
+            color: #ea580c;
+            text-decoration: underline;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+    }
+
+    &.error {
+        background-color: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #ef4444;
+
+        i {
+            font-size: 16px;
+        }
+    }
+}
+
 .tp-submit-btn {
     width: 100%;
     padding: 14px;
@@ -2385,13 +2481,21 @@ export default {
     &.blue {
         background: #2563eb;
 
-        &:hover {
+        &:hover:not(:disabled) {
             background: #1d4ed8;
         }
     }
 
+    &.orange {
+        background: #f97316;
+
+        &:hover:not(:disabled) {
+            background: #ea580c;
+        }
+    }
+
     &:disabled {
-        background: #cbd5e1;
+        opacity: 0.5;
         cursor: not-allowed;
     }
 }

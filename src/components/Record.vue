@@ -213,6 +213,10 @@ export default {
         {
           value: 38,
           label: this.$t("uc.finance.record.transMessage38")
+        },
+        {
+          value: 39,
+          label: this.$t("uc.finance.record.transMessage39")
         }
       ],
       coinList: [],

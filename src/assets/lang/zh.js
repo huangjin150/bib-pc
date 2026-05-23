@@ -1039,6 +1039,7 @@
                 transMessage36: "预测市场盈利",
                 transMessage37: "持仓费",
                 transMessage38: "预测手续费",
+                transMessage39: "竞猜退款",
                 chargetime: '交易时间',
                 type: '类型',
                 fee: '手续费',

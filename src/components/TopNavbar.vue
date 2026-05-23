@@ -177,7 +177,7 @@ export default {
       showdownload: false,
       showPreferencesModal: false,
       currentLang: 'zh',
-      upColor: localStorage.getItem('upColor') || 'green', // 'green' or 'red'
+      upColor: localStorage.getItem('upColor') || 'green',
       navItems: [
         { name: '行情', path: '/market' },
         { name: '合约', path: '/swap' },
