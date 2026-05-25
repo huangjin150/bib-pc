@@ -111,8 +111,16 @@
               </div>
 
               <div class="register-input-group">
-                <input type="text" :disabled="promotionStatus" v-model="registerForm.inviteCode" placeholder="邀请码"
-                  class="form-input" />
+                <input v-show="!noInviteCode" type="text" :disabled="promotionStatus || noInviteCode" v-model="registerForm.inviteCode" placeholder="请输入邀请码"
+                  class="form-input" :class="{ 'error': inviteCodeError }" />
+                <div class="no-invite-wrapper" v-if="!promotionStatus">
+                  <label class="custom-checkbox">
+                    <input type="checkbox" v-model="noInviteCode" @change="handleNoInviteCodeChange">
+                    <span class="checkmark"></span>
+                    <span class="checkbox-text">我没有邀请码</span>
+                  </label>
+                </div>
+                <div v-if="inviteCodeError" class="error-message">{{ inviteCodeError }}</div>
               </div>
 
               <button class="register-submit-btn" @click="handleEmailRegister">
@@ -157,8 +165,16 @@
               </div>
 
               <div class="register-input-group">
-                <input type="text" :disabled="promotionStatus" v-model="registerForm.inviteCode" placeholder="邀请码"
-                  class="form-input" />
+                <input v-show="!noInviteCode" type="text" :disabled="promotionStatus || noInviteCode" v-model="registerForm.inviteCode" placeholder="请输入邀请码"
+                  class="form-input" :class="{ 'error': inviteCodeError }" />
+                <div class="no-invite-wrapper" v-if="!promotionStatus">
+                  <label class="custom-checkbox">
+                    <input type="checkbox" v-model="noInviteCode" @change="handleNoInviteCodeChange">
+                    <span class="checkmark"></span>
+                    <span class="checkbox-text">我没有邀请码</span>
+                  </label>
+                </div>
+                <div v-if="inviteCodeError" class="error-message">{{ inviteCodeError }}</div>
               </div>
 
               <button class="register-submit-btn" @click="handlePhoneRegister">
@@ -199,6 +215,8 @@ export default {
       phoneError: '',
       phoneVerificationCodeError: '',
       phonePasswordError: '',
+      inviteCodeError: '',
+      noInviteCode: false,
       promotionStatus: false,
       VerificationData: {
         geetest_challenge: '',
@@ -256,10 +274,17 @@ export default {
 
   },
   methods: {
+    handleNoInviteCodeChange() {
+      if (this.noInviteCode) {
+        this.registerForm.inviteCode = '';
+        this.inviteCodeError = '';
+      }
+    },
     clearPhoneErrors() {
       this.phoneError = ''
       this.phonePasswordError = ''
       this.phoneVerificationCodeError = ''
+      this.inviteCodeError = ''
     },
     validatePhoneForm() {
       this.clearPhoneErrors()
@@ -280,6 +305,12 @@ export default {
       // 密码校验
       if (!this.registerForm.password) {
         this.phonePasswordError = '请输入密码'
+        isValid = false
+      }
+
+      // 邀请码校验
+      if (!this.noInviteCode && !this.registerForm.inviteCode) {
+        this.inviteCodeError = '请输入邀请码'
         isValid = false
       }
 
@@ -308,6 +339,7 @@ export default {
       this.emailError = ''
       this.passwordError = ''
       this.verificationCodeError = ''
+      this.inviteCodeError = ''
     },
 
     isValidEmail(email) {
@@ -334,6 +366,12 @@ export default {
       // 密码校验
       if (!this.registerForm.password) {
         this.passwordError = '请输入密码'
+        isValid = false
+      }
+
+      // 邀请码校验
+      if (!this.noInviteCode && !this.registerForm.inviteCode) {
+        this.inviteCodeError = '请输入邀请码'
         isValid = false
       }
 
@@ -864,6 +902,75 @@ export default {
 
 .form-input.error {
   border-color: #ff4d4f;
+}
+
+.no-invite-wrapper {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  padding-left: 4px;
+}
+
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.custom-checkbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  height: 16px;
+  width: 16px;
+  background-color: transparent;
+  border: 1px solid #2f2f2f;
+  border-radius: 4px;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.custom-checkbox:hover input ~ .checkmark {
+  border-color: #d4ff00;
+}
+
+.custom-checkbox input:checked ~ .checkmark {
+  background-color: #d4ff00;
+  border-color: #d4ff00;
+}
+
+.checkmark:after {
+  content: "";
+  display: none;
+  width: 4px;
+  height: 8px;
+  border: solid #000;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-bottom: 2px;
+}
+
+.custom-checkbox input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.checkbox-text {
+  color: #8e8e92;
+  font-size: 13px;
+  transition: color 0.2s;
+}
+
+.custom-checkbox input:checked ~ .checkbox-text {
+  color: #fff;
 }
 
 .error-message {
