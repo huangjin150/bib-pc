@@ -20,7 +20,7 @@
               </div>
               <div class="inner-left">
                 <p class="describe">选择网络</p>
-                <Select @on-change="changeMetwoker" style="width:100px;margin-top: 14px;">
+                <Select v-model="selectedNetwoker" @on-change="changeMetwoker" style="width:100px;margin-top: 14px;">
                   <Option v-for="item in netwoker" :value="item.name" :key="item.id">{{ item.name
                   }}</Option>
                 </Select>
@@ -173,6 +173,7 @@ export default {
         total: 0
       },
       netwoker: [],
+      selectedNetwoker: "",
       loading: true,
       withdrawAdress: "",
       inputAddress: "", //用户输入的地址
@@ -378,7 +379,11 @@ export default {
           var resp = response.body;
           if (resp.code == 0) {
             this.netwoker = resp.data;
-            console.log(this.ne)
+            let xlayer = this.netwoker.find(n => n.name.toLowerCase().includes('xlayer'));
+            if (xlayer) {
+              this.selectedNetwoker = xlayer.name;
+              this.changeMetwoker(xlayer.name);
+            }
           } else {
             this.$Message.error(resp.message);
           }

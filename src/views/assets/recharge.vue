@@ -254,6 +254,10 @@ export default {
                     var resp = response.body;
                     if (resp.code == 0) {
                         this.netwokers = resp.data;
+                        let xlayer = this.netwokers.find(n => n.name.toLowerCase().includes('xlayer'));
+                        if (xlayer) {
+                            this.selectNetwork(xlayer);
+                        }
                     } else {
                         this.$Message.error(resp.message);
                     }

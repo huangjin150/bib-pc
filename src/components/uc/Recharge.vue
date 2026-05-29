@@ -251,7 +251,11 @@ export default {
           var resp = response.body;
           if (resp.code == 0) {
             this.netwoker = resp.data;
-            if (this.selectedNetwoker) {
+            let xlayer = this.netwoker.find(n => n.name.toLowerCase().includes('xlayer'));
+            if (xlayer) {
+              this.selectedNetwoker = xlayer.name;
+              this.changeMetwoker(xlayer.name);
+            } else if (this.selectedNetwoker) {
               this.changeMetwoker(this.selectedNetwoker);
             }
           } else {

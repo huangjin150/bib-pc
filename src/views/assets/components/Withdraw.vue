@@ -32,7 +32,7 @@
         <Input type="password" v-model="fundpwd" :placeholder="$t('otc.chat.msg7')"></Input>
       </p> -->
       <p slot="header">
-        提示
+        输入资金密码
       </p>
       <Form class="withdraw-form-inline" ref="formInline" :model="formInline" inline>
         <!-- <FormItem>
