@@ -1151,7 +1151,9 @@ export default {
             this.contractCoinInfo = resp;
             if (this.contractCoinInfo.leverageType == 1) {
               this.leverageList = this.contractCoinInfo.leverage.split(",");
-              if (this.leverageList.includes("100")) {
+              if (this.leverageList.includes("3")) {
+                this.leverage = "3";
+              } else if (this.leverageList.includes("100")) {
                 this.leverage = "100";
               } else {
                 this.leverage = this.leverageList[0];
@@ -1160,7 +1162,10 @@ export default {
             } else {
               let maxLeverage = this.contractCoinInfo.leverage ? Number(this.contractCoinInfo.leverage.split(',').pop()) : 200;
               let minLeverage = this.contractCoinInfo.leverage ? Number(this.contractCoinInfo.leverage.split(',')[0]) : 1;
-              if (maxLeverage >= 100 && minLeverage <= 100) {
+              if (maxLeverage >= 3 && minLeverage <= 3) {
+                this.leverage = "3";
+                this.leverageModalValue = 3;
+              } else if (maxLeverage >= 100 && minLeverage <= 100) {
                 this.leverage = "100";
                 this.leverageModalValue = 100;
               } else {
