@@ -1,364 +1,402 @@
 <template>
-    <div class="sports-page">
-        <!-- Left Sidebar: Sports Categories & Promotion -->
-        <div class="left-sidebar">
+    <div class="sports-layout">
+        <!-- Top Menu: Sports Categories -->
+        <div class="top-menu">
             <div class="ls-header">
                 <i class="el-icon-trophy"></i>
                 <h2>体育竞猜</h2>
             </div>
             <div class="ls-menu">
-                <div v-for="(leagues, country) in groupedLeagues" :key="country">
+                <div class="menu-country-group" v-for="(leagues, country) in groupedLeagues" :key="country">
                     <div class="menu-country-header">{{ country }}</div>
-                    <div class="menu-item" v-for="league in leagues" :key="league.id"
-                        :class="{ active: activeLeagueId === league.id }" @click="activeLeagueId = league.id">
-                        <img v-if="leagues.imgurl" style="width: 20px; height: 20px;" :src="leagues.imgurl" alt="">
-                        <span class="menu-text">{{ league.name }}</span>
-                        <span class="menu-count">{{ league.matchCount }}</span>
+                    <div class="menu-item-group">
+                        <div class="menu-item" v-for="league in leagues" :key="league.id"
+                            :class="{ active: activeLeagueId === league.id }" @click="activeLeagueId = league.id">
+                            <img v-if="leagues.imgurl" style="width: 20px; height: 20px;" :src="leagues.imgurl" alt="">
+                            <span class="menu-text">{{ league.name }}</span>
+                            <span class="menu-count">{{ league.matchCount }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="main-column">
-            <div class="match-section">
-                <div class="match-filters-top">
-                    <div class="match-tabs">
-                        <button v-for="tab in tabs" :key="tab.key" class="match-tab"
-                            :class="{ active: activeTab === tab.key }" @click="activeTab = tab.key">
-                            {{ tab.label }}
-                            <span class="tab-badge" v-if="getTabEventCount(tab.key) > 0">{{
-                                getTabEventCount(tab.key) }}</span>
-                        </button>
+        <div class="sports-page">
+            <div class="main-column">
+                <div class="match-section">
+                    <div class="match-filters-top">
+                        <div class="match-tabs">
+                            <button v-for="tab in tabs" :key="tab.key" class="match-tab"
+                                :class="{ active: activeTab === tab.key }" @click="activeTab = tab.key">
+                                {{ tab.label }}
+                                <span class="tab-badge" v-if="getTabEventCount(tab.key) > 0">{{
+                                    getTabEventCount(tab.key) }}</span>
+                            </button>
+                        </div>
+                        <div class="filters-right">
+                            <el-input v-model="searchKeyword" placeholder="搜索赛事/球队" prefix-icon="el-icon-search"
+                                size="small" class="filter-search"></el-input>
+                        </div>
                     </div>
-                    <div class="filters-right">
-                        <el-input v-model="searchKeyword" placeholder="搜索赛事/球队" prefix-icon="el-icon-search"
-                            size="small" class="filter-search"></el-input>
+
+                    <!-- Match List Table Layout -->
+                    <div class="match-table-container">
+                        <!-- Empty State -->
+                        <div v-if="!activeCategory || !filteredEvents(activeCategory).length" class="empty-match-state">
+                            <div class="empty-text">暂无赛事</div>
+                        </div>
+                        <!-- Match List -->
+                        <table v-else class="match-table">
+                            <tbody>
+                                <template v-for="(group, groupIndex) in filteredEvents(activeCategory)">
+                                    <!-- 比赛分组头部 (点击展开/收起) -->
+                                    <tr class="match-group-title" :key="'group-title-' + groupIndex"
+                                        @click="toggleGroupExpand(group)">
+                                        <td colspan="7">
+                                            <div class="match-group-header">
+                                                <div class="match-group-info">
+                                                    <i
+                                                        :class="group.expanded ? 'el-icon-arrow-down' : 'el-icon-arrow-right'"></i>
+                                                    <span class="match-group-name">{{ group.title }}</span>
+                                                    <span class="match-group-time">{{ group.time ?
+                                                        group.time.substring(5, 16).replace('T', ' ') : '--' }}</span>
+                                                </div>
+                                                <span class="status-badge" :class="statusClass(group.statusText)">{{
+                                                    group.statusText }}</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- 该比赛下的所有盘口 -->
+                                    <template v-if="group.expanded">
+                                        <tr v-for="(event, eventIndex) in group.markets" class="sport-group-header"
+                                            :key="'header-' + groupIndex + '-' + eventIndex"
+                                            @click="handleCardClick(event)">
+                                            <td colspan="7">
+                                                <div class="group-header-content">
+                                                    <div class="group-header-left">
+                                                        <div class="match-time-display header-time">
+                                                            <span class="time-date">{{ (event.markets &&
+                                                                event.markets[0] &&
+                                                                event.markets[0].matchTime) ?
+                                                                event.markets[0].matchTime.substring(5, 10).replace('-',
+                                                                    '/') :
+                                                                '--' }}</span>
+                                                            <span class="time-hour">{{ (event.markets &&
+                                                                event.markets[0] &&
+                                                                event.markets[0].matchTime) ?
+                                                                event.markets[0].matchTime.substring(11, 16) : '--'
+                                                            }}</span>
+                                                        </div>
+                                                        <div class="league-title-display">
+                                                            <span class="market-title"
+                                                                :title="event.markets && event.markets[0] ? event.markets[0].marketTitle : event.title">{{
+                                                                    event.markets && event.markets[0]
+                                                                        ? event.markets[0].marketTitle : event.title }}</span>
+                                                        </div>
+                                                    </div>
+                                                    <template
+                                                        v-if="event.markets && event.markets[0] && event.markets[0].options && event.markets[0].options.length > 2">
+                                                        <div class="group-header-options-full">
+                                                            <div class="header-odd-item"
+                                                                v-for="option in event.markets[0].options.slice(0, 6)"
+                                                                :key="option.id">
+                                                                <button class="table-odd-btn mini-btn"
+                                                                    :class="{ 'disabled': !option.bettable, 'active': isSelectedOption(option) }"
+                                                                    :disabled="!option.bettable"
+                                                                    @click.stop="openTrade(event, option, event.markets[0])">
+                                                                    <span class="header-odd-label">{{ option.optionName
+                                                                    }}</span>
+                                                                    <span class="header-odd-value">{{
+                                                                        formatOddsLabel(option)
+                                                                    }}</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="header-odd-item"
+                                                                v-if="event.markets[0].options.length > 6">
+                                                                <button
+                                                                    style="border: none; background-color: transparent;"
+                                                                    class="table-odd-btn mini-btn more-btn"
+                                                                    @click.stop="openMoreOptionsDialog(event)">
+                                                                    <span class="header-odd-label">更多选项</span>
+                                                                    <i class="el-icon-arrow-right more-icon"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                    <template v-else>
+                                                        <div class="group-header-center">
+                                                            <div class="rule-desc"
+                                                                :title="event.markets && event.markets[0] ? event.markets[0].ruleDesc : ''">
+                                                                {{ event.markets && event.markets[0] &&
+                                                                    event.markets[0].ruleDesc ? event.markets[0].ruleDesc :
+                                                                    '--'
+                                                                }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="group-header-right">
+                                                            <div class="header-odds"
+                                                                v-if="event.teams[0].optionData || event.teams[1].optionData">
+                                                                <div class="header-odd-item"
+                                                                    v-if="event.teams[0].optionData">
+                                                                    <button class="table-odd-btn mini-btn"
+                                                                        :class="{ 'disabled': !event.teams[0].optionData.bettable, 'active': isSelectedOption(event.teams[0].optionData) }"
+                                                                        :disabled="!event.teams[0].optionData.bettable"
+                                                                        @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
+                                                                        <span class="header-odd-label">{{
+                                                                            event.teams[0].name
+                                                                        }}</span>
+                                                                        <span class="header-odd-value">{{
+                                                                            formatOddsLabel(event.teams[0].optionData)
+                                                                        }}</span>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="header-odd-item"
+                                                                    v-if="event.teams[1].optionData">
+                                                                    <button class="table-odd-btn mini-btn"
+                                                                        :class="{ 'disabled': !event.teams[1].optionData.bettable, 'active': isSelectedOption(event.teams[1].optionData) }"
+                                                                        :disabled="!event.teams[1].optionData.bettable"
+                                                                        @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
+                                                                        <span class="header-odd-label">{{
+                                                                            event.teams[1].name
+                                                                        }}</span>
+                                                                        <span class="header-odd-value">{{
+                                                                            formatOddsLabel(event.teams[1].optionData)
+                                                                        }}</span>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </template>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-
-                <!-- Match List Table Layout -->
-                <div class="match-table-container">
-                    <!-- Empty State -->
-                    <div v-if="!activeCategory || !filteredEvents(activeCategory).length" class="empty-match-state">
-                        <div class="empty-text">暂无赛事</div>
+                <div class="orders-panel">
+                    <div class="orders-panel-top">
+                        <div class="orders-header">
+                            <div class="order-tabs">
+                                <button v-for="tab in orderTabs" :key="tab.key" class="order-tab"
+                                    :class="{ active: activeOrderTab === tab.key }" @click="activeOrderTab = tab.key">
+                                    {{ tab.label }}
+                                    <span class="tab-count">({{ tab.count }})</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <!-- Match List -->
-                    <table v-else class="match-table">
-                        <tbody>
-                            <template v-for="(event, index) in filteredEvents(activeCategory)">
-                                <tr class="sport-group-header" :key="'header-' + index" @click="handleCardClick(event)">
-                                    <td colspan="7">
-                                        <div class="group-header-content">
-                                            <div class="group-header-left">
-                                                <div class="match-time-display header-time">
-                                                    <span class="time-date">{{ (event.markets && event.markets[0] &&
-                                                        event.markets[0].matchTime) ?
-                                                        event.markets[0].matchTime.substring(5, 10).replace('-', '/') :
-                                                        '--' }}</span>
-                                                    <span class="time-hour">{{ (event.markets && event.markets[0] &&
-                                                        event.markets[0].matchTime) ?
-                                                        event.markets[0].matchTime.substring(11, 16) : '--' }}</span>
-                                                </div>
-                                                <div class="league-title-display">
-                                                    <span class="market-title">{{ event.markets && event.markets[0]
-                                                        ? event.markets[0].marketTitle : event.title }}</span>
-                                                </div>
-                                            </div>
-                                            <template
-                                                v-if="event.markets && event.markets[0] && event.markets[0].options && event.markets[0].options.length > 2">
-                                                <div class="group-header-options-full">
-                                                    <div class="header-odd-item"
-                                                        v-for="option in event.markets[0].options.slice(0, 6)"
-                                                        :key="option.id">
-                                                        <button class="table-odd-btn mini-btn"
-                                                            :class="{ 'disabled': !option.bettable, 'active': isSelectedOption(option) }"
-                                                            :disabled="!option.bettable"
-                                                            @click.stop="openTrade(event, option, event.markets[0])">
-                                                            <span class="header-odd-label">{{ option.optionName
-                                                                }}</span>
-                                                            <span class="header-odd-value">{{ formatOddsLabel(option)
-                                                                }}</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="header-odd-item"
-                                                        v-if="event.markets[0].options.length > 6">
-                                                        <button style="border: none; background-color: transparent;"
-                                                            class="table-odd-btn mini-btn more-btn"
-                                                            @click.stop="openMoreOptionsDialog(event)">
-                                                            <span class="header-odd-label">更多选项</span>
-                                                            <i class="el-icon-arrow-right more-icon"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </template>
-                                            <template v-else>
-                                                <div class="group-header-center">
-                                                    <div class="team home-team">
-                                                        <img v-if="event.homeLogo" class="team-logo"
-                                                            :src="event.homeLogo" alt="" />
-                                                        <span class="team-name" :title="event.teams[0].name">{{
-                                                            event.teams[0].name }}</span>
-                                                    </div>
-                                                    <div class="score-display">
-                                                        VS
-                                                    </div>
-                                                    <div class="team away-team">
-                                                        <span class="team-name" :title="event.teams[1].name">{{
-                                                            event.teams[1].name }}</span>
-                                                        <img v-if="event.awayLogo" class="team-logo"
-                                                            :src="event.awayLogo" alt="" />
-                                                    </div>
-                                                </div>
-                                                <div class="group-header-right">
-                                                    <div class="header-odds"
-                                                        v-if="event.teams[0].optionData || event.teams[1].optionData">
-                                                        <div class="header-odd-item" v-if="event.teams[0].optionData">
-                                                            <button class="table-odd-btn mini-btn"
-                                                                :class="{ 'disabled': !event.teams[0].optionData.bettable, 'active': isSelectedOption(event.teams[0].optionData) }"
-                                                                :disabled="!event.teams[0].optionData.bettable"
-                                                                @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
-                                                                <span class="header-odd-label">{{ event.teams[0].name
-                                                                    }}</span>
-                                                                <span class="header-odd-value">{{
-                                                                    formatOddsLabel(event.teams[0].optionData) }}</span>
-                                                            </button>
-                                                        </div>
-                                                        <div class="header-odd-item" v-if="event.teams[1].optionData">
-                                                            <button class="table-odd-btn mini-btn"
-                                                                :class="{ 'disabled': !event.teams[1].optionData.bettable, 'active': isSelectedOption(event.teams[1].optionData) }"
-                                                                :disabled="!event.teams[1].optionData.bettable"
-                                                                @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
-                                                                <span class="header-odd-label">{{ event.teams[1].name
-                                                                    }}</span>
-                                                                <span class="header-odd-value">{{
-                                                                    formatOddsLabel(event.teams[1].optionData) }}</span>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </template>
-                                        </div>
+
+                    <div v-if="filteredOrders.length" class="orders-table-container" @scroll="handleOrderScroll">
+                        <table class="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>赛事</th>
+                                    <th>选项</th>
+                                    <th>下单时间</th>
+                                    <th>下注金额</th>
+                                    <th>赔率</th>
+                                    <th>预计可得</th>
+                                    <th v-if="activeOrderTab === 'history'">实际回报</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="order in visibleOrders" :key="order.id">
+                                    <td>
+                                        <div class="order-title">{{ order.marketTitle }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="order-option">{{ order.optionName }}</span>
+                                    </td>
+                                    <td class="time-col">{{ formatDateTime(order.betTime) }}</td>
+                                    <td><strong>{{ formatAmount(order.betAmount) }} USDT</strong></td>
+                                    <td><strong>{{ formatOdds(order.odds) }}</strong></td>
+                                    <td><strong>{{ formatAmount(order.expectReturnAmount) }} USDT</strong></td>
+                                    <td v-if="activeOrderTab === 'history'">
+                                        <strong v-if="order.orderStatus !== 1">{{ formatAmount(order.actualReturnAmount)
+                                        }}
+                                            USDT</strong>
+                                        <span v-else>--</span>
+                                    </td>
+                                    <td>
+                                        <span class="order-status" :class="getOrderStatusClass(order)">
+                                            {{ getOrderStatusText(order) }}
+                                        </span>
                                     </td>
                                 </tr>
-                            </template>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="orders-panel">
-                <div class="orders-panel-top">
-                    <div class="orders-header">
-                        <div class="order-tabs">
-                            <button v-for="tab in orderTabs" :key="tab.key" class="order-tab"
-                                :class="{ active: activeOrderTab === tab.key }" @click="activeOrderTab = tab.key">
-                                {{ tab.label }}
-                                <span class="tab-count">({{ tab.count }})</span>
-                            </button>
+                            </tbody>
+                        </table>
+                        <div v-if="isLoadingOrders" class="loading-more">
+                            加载中...
+                        </div>
+                        <div v-if="!hasMoreOrders && orders.length > 0" class="no-more-data">
+                            没有更多数据了
                         </div>
                     </div>
-                </div>
 
-                <div v-if="filteredOrders.length" class="orders-table-container" @scroll="handleOrderScroll">
-                    <table class="orders-table">
-                        <thead>
-                            <tr>
-                                <th>赛事</th>
-                                <th>选项</th>
-                                <th>下单时间</th>
-                                <th>下注金额</th>
-                                <th>赔率</th>
-                                <th>预计可得</th>
-                                <th v-if="activeOrderTab === 'history'">实际回报</th>
-                                <th>状态</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="order in visibleOrders" :key="order.id">
-                                <td>
-                                    <div class="order-title">{{ order.marketTitle }}</div>
-                                </td>
-                                <td>
-                                    <span class="order-option">{{ order.optionName }}</span>
-                                </td>
-                                <td class="time-col">{{ formatDateTime(order.betTime) }}</td>
-                                <td><strong>{{ formatAmount(order.betAmount) }} USDT</strong></td>
-                                <td><strong>{{ formatOdds(order.odds) }}</strong></td>
-                                <td><strong>{{ formatAmount(order.expectReturnAmount) }} USDT</strong></td>
-                                <td v-if="activeOrderTab === 'history'">
-                                    <strong v-if="order.orderStatus !== 1">{{ formatAmount(order.actualReturnAmount) }}
-                                        USDT</strong>
-                                    <span v-else>--</span>
-                                </td>
-                                <td>
-                                    <span class="order-status" :class="getOrderStatusClass(order)">
-                                        {{ getOrderStatusText(order) }}
-                                    </span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div v-if="isLoadingOrders" class="loading-more">
-                        加载中...
+                    <div v-if="!isLogin" class="empty-orders-state">
+                        <span @click="$router.push('/login')"
+                            style="cursor: pointer; color: #0066ff; text-decoration: underline;">登录</span>后查看订单
                     </div>
-                    <div v-if="!hasMoreOrders && orders.length > 0" class="no-more-data">
-                        没有更多数据了
+                    <div v-else-if="!filteredOrders.length && !isLoadingOrders" class="empty-orders-state">
+                        当前暂无订单
                     </div>
-                </div>
-
-                <div v-if="!isLogin" class="empty-orders-state">
-                    <span @click="$router.push('/login')"
-                        style="cursor: pointer; color: #0066ff; text-decoration: underline;">登录</span>后查看订单
-                </div>
-                <div v-else-if="!filteredOrders.length && !isLoadingOrders" class="empty-orders-state">
-                    当前暂无订单
                 </div>
             </div>
-        </div>
 
-        <div class="right-sidebar">
-            <div class="betting-slip-panel">
-                <div class="panel-header">
-                    <h3>下单</h3>
-                </div>
-                <template v-if="selectedEvent">
-                    <div class="slip-content">
-                        <div class="selected-bet-card">
-                            <div class="bet-match-header">
-                                <div class="match-info">
-                                    <div class="match-title">{{ selectedEvent.title }}</div>
-                                    <div class="bet-status-row">
-                                        <span
-                                            :class="selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 ? 'status-badge-gray' : 'status-badge-green'">
-                                            {{ selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 ?
-                                                selectedEvent.statusText : '可下注' }}
-                                        </span>
-                                        <span class="deadline-text">截止 {{ selectedEvent.closeTime ?
-                                            selectedEvent.closeTime.substring(0, 16).replace('T', ' ') : '--' }}</span>
+            <div class="right-sidebar">
+                <div class="betting-slip-panel">
+                    <div class="panel-header">
+                        <h3>下单</h3>
+                    </div>
+                    <template v-if="selectedEvent">
+                        <div class="slip-content">
+                            <div class="selected-bet-card">
+                                <div class="bet-match-header">
+                                    <div class="match-info">
+                                        <div class="match-title">{{ selectedEvent.title }}</div>
+                                        <div class="bet-status-row">
+                                            <span
+                                                :class="selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 ? 'status-badge-gray' : 'status-badge-green'">
+                                                {{ selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 ?
+                                                    selectedEvent.statusText : '可下注' }}
+                                            </span>
+                                            <span class="deadline-text">截止 {{ selectedEvent.closeTime ?
+                                                selectedEvent.closeTime.substring(0, 16).replace('T', ' ') : '--'
+                                            }}</span>
+                                        </div>
                                     </div>
                                 </div>
+
+                                <div class="slip-options-group" v-if="selectedEvent.teams">
+                                    <button v-for="(team, index) in selectedEvent.teams" :key="index"
+                                        v-if="team.optionData" class="slip-opt-btn"
+                                        :class="{ 'active': selectedTeam && selectedTeam.id === team.optionData.id, 'disabled': !team.optionData.bettable || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 }"
+                                        :disabled="!team.optionData.bettable || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4"
+                                        @click="openTrade(selectedEvent, team.optionData, team.marketData)">
+                                        <img v-if="(index === 0 && selectedEvent.homeLogo) || (index === 1 && selectedEvent.awayLogo)"
+                                            class="slip-team-logo"
+                                            :src="index === 0 ? selectedEvent.homeLogo : selectedEvent.awayLogo"
+                                            alt="" />
+                                        <span class="opt-name">{{ team.name }}</span>
+                                        <span class="opt-odds">{{ formatOddsLabel(team.optionData) }}</span>
+                                    </button>
+                                </div>
                             </div>
 
-                            <div class="slip-options-group" v-if="selectedEvent.teams">
-                                <button v-for="(team, index) in selectedEvent.teams" :key="index" v-if="team.optionData"
-                                    class="slip-opt-btn"
-                                    :class="{ 'active': selectedTeam && selectedTeam.id === team.optionData.id, 'disabled': !team.optionData.bettable || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 }"
-                                    :disabled="!team.optionData.bettable || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4"
-                                    @click="openTrade(selectedEvent, team.optionData, team.marketData)">
-                                    <img v-if="(index === 0 && selectedEvent.homeLogo) || (index === 1 && selectedEvent.awayLogo)"
-                                        class="slip-team-logo"
-                                        :src="index === 0 ? selectedEvent.homeLogo : selectedEvent.awayLogo" alt="" />
-                                    <span class="opt-name">{{ team.name }}</span>
-                                    <span class="opt-odds">{{ formatOddsLabel(team.optionData) }}</span>
+                            <template
+                                v-if="selectedTeam && selectedTeam.marketData && selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4 && isAnyOptionBettable(selectedEvent)">
+                                <div class="stake-section">
+                                    <div class="stake-input-label">下注金额</div>
+                                    <div class="stake-input-wrap">
+                                        <input type="number" v-model.number="tradeAmount" min="0" step="1"
+                                            placeholder="输入下注金额"
+                                            :disabled="selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4" />
+                                        <span class="stake-unit">USDT</span>
+                                    </div>
+                                    <div class="stake-balance-row">
+                                        <span class="balance-text">可用余额: {{ walletBalance !== null ?
+                                            formatAmount(walletBalance) : '--' }} USDT</span>
+                                        <a v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4"
+                                            href="javascript:void(0)" class="recharge-link"
+                                            @click="$router.push('/recharge')">充值</a>
+                                    </div>
+                                </div>
+
+                                <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4"
+                                    class="tp-quick-amounts">
+                                    <button v-for="amount in quickAmounts" :key="amount"
+                                        @click="setTradeAmount(amount)">
+                                        {{ amount }}
+                                    </button>
+                                </div>
+
+                                <div class="odds-info-card">
+                                    <div class="odds-info-row">
+                                        <span class="info-label">当前赔率</span>
+                                        <span class="info-value odds-value">{{ formatOddsLabel(selectedTeam.optionData)
+                                        }}</span>
+                                    </div>
+                                </div>
+
+                                <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4"
+                                    class="odds-info-card">
+                                    <div class="odds-info-row">
+                                        <span class="info-label">预计可得</span>
+                                        <span class="info-value return-value">{{
+                                            formatAmount(betPreview.expectReturnAmount
+                                                || 0) }} USDT</span>
+                                    </div>
+                                </div>
+
+                                <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4"
+                                    class="odds-info-card">
+                                    <div class="odds-info-row">
+                                        <span class="info-label">预计盈利</span>
+                                        <span v-if="formatAmount(expectedProfit) > 0" class="info-value profit-value">{{
+                                            formatAmount(expectedProfit) }} USDT</span>
+                                        <span v-else class="info-value profit-value">0.00 USDT</span>
+                                    </div>
+                                </div>
+
+                                <div class="tp-notice warning" v-if="insufficientBalance">
+                                    <i class="el-icon-warning-outline"></i>
+                                    <span>
+                                        资金账户余额不足，
+                                        <a v-if="contractWalletBalance >= 0.01" href="javascript:void(0)"
+                                            class="action-link" @click="$router.push('/assets/transfer')">去划转</a>
+                                        <a v-else href="javascript:void(0)" class="action-link"
+                                            @click="$router.push('/recharge')">去充值</a>
+                                    </span>
+                                </div>
+                                <div class="tp-notice error" v-else-if="previewError">
+                                    <i class="el-icon-circle-close"></i>
+                                    {{ previewError }}
+                                </div>
+
+                                <button v-if="!isLogin" class="tp-submit-btn blue" @click="$router.push('/login')">
+                                    请先登录
                                 </button>
+                                <button v-else class="tp-submit-btn blue" @click="submitBet"
+                                    :disabled="isSubmitting || isPreviewLoading || !canSubmit">
+                                    {{ selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 ? '比赛已结束' :
+                                        (isSubmitting ? '下注中...' : '确认下注') }}
+                                </button>
+                            </template>
+                            <div v-else class="empty-selection-hint">
+                                请在上方选择你要下注的赛果
                             </div>
                         </div>
+                    </template>
 
-                        <template
-                            v-if="selectedTeam && selectedTeam.marketData && selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4 && isAnyOptionBettable(selectedEvent)">
-                            <div class="stake-section">
-                                <div class="stake-input-label">下注金额</div>
-                                <div class="stake-input-wrap">
-                                    <input type="number" v-model.number="tradeAmount" min="0" step="1"
-                                        placeholder="输入下注金额"
-                                        :disabled="selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4" />
-                                    <span class="stake-unit">USDT</span>
-                                </div>
-                                <div class="stake-balance-row">
-                                    <span class="balance-text">可用余额: {{ walletBalance !== null ?
-                                        formatAmount(walletBalance) : '--' }} USDT</span>
-                                    <a v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4"
-                                        href="javascript:void(0)" class="recharge-link"
-                                        @click="$router.push('/recharge')">充值</a>
-                                </div>
-                            </div>
-
-                            <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4"
-                                class="tp-quick-amounts">
-                                <button v-for="amount in quickAmounts" :key="amount" @click="setTradeAmount(amount)">
-                                    {{ amount }}
-                                </button>
-                            </div>
-
-                            <div class="odds-info-card">
-                                <div class="odds-info-row">
-                                    <span class="info-label">当前赔率</span>
-                                    <span class="info-value odds-value">{{ formatOddsLabel(selectedTeam.optionData)
-                                    }}</span>
-                                </div>
-                            </div>
-
-                            <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4"
-                                class="odds-info-card">
-                                <div class="odds-info-row">
-                                    <span class="info-label">预计可得</span>
-                                    <span class="info-value return-value">{{ formatAmount(betPreview.expectReturnAmount
-                                        || 0) }} USDT</span>
-                                </div>
-                            </div>
-
-                            <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4"
-                                class="odds-info-card">
-                                <div class="odds-info-row">
-                                    <span class="info-label">预计盈利</span>
-                                    <span v-if="formatAmount(expectedProfit) > 0" class="info-value profit-value">{{
-                                        formatAmount(expectedProfit) }} USDT</span>
-                                    <span v-else class="info-value profit-value">0.00 USDT</span>
-                                </div>
-                            </div>
-
-                            <div class="tp-notice warning" v-if="insufficientBalance">
-                                <i class="el-icon-warning-outline"></i>
-                                <span>
-                                    资金账户余额不足，
-                                    <a v-if="contractWalletBalance >= 0.01" href="javascript:void(0)"
-                                        class="action-link" @click="$router.push('/assets/transfer')">去划转</a>
-                                    <a v-else href="javascript:void(0)" class="action-link"
-                                        @click="$router.push('/recharge')">去充值</a>
-                                </span>
-                            </div>
-                            <div class="tp-notice error" v-else-if="previewError">
-                                <i class="el-icon-circle-close"></i>
-                                {{ previewError }}
-                            </div>
-
-                            <button v-if="!isLogin" class="tp-submit-btn blue" @click="$router.push('/login')">
-                                请先登录
-                            </button>
-                            <button v-else class="tp-submit-btn blue" @click="submitBet"
-                                :disabled="isSubmitting || isPreviewLoading || !canSubmit">
-                                {{ selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 ? '比赛已结束' :
-                                    (isSubmitting ? '下注中...' : '确认下注') }}
-                            </button>
-                        </template>
-                        <div v-else class="empty-selection-hint">
-                            请在上方选择你要下注的赛果
-                        </div>
+                    <div v-else class="empty-slip">
+                        请选择比赛或赛果开始下注
                     </div>
-                </template>
-
-                <div v-else class="empty-slip">
-                    请选择比赛或赛果开始下注
                 </div>
             </div>
+
+            <!-- More Options Dialog -->
+            <el-dialog :visible.sync="showMoreOptionsDialog" title="更多选项" width="600px"
+                custom-class="more-options-dialog" @close="currentMoreOptionsEvent = null">
+                <div v-if="currentMoreOptionsEvent && currentMoreOptionsEvent.markets && currentMoreOptionsEvent.markets[0]"
+                    class="more-options-grid">
+                    <div v-for="option in currentMoreOptionsEvent.markets[0].options" :key="option.id"
+                        class="more-option-item">
+                        <button class="table-odd-btn mini-btn"
+                            :class="{ 'disabled': !option.bettable, 'active': isSelectedOption(option) }"
+                            :disabled="!option.bettable"
+                            @click.stop="openTradeAndCloseDialog(currentMoreOptionsEvent, option, currentMoreOptionsEvent.markets[0])">
+                            <span class="header-odd-label">{{ option.optionName }}</span>
+                            <span class="header-odd-value">{{ formatOddsLabel(option) }}</span>
+                        </button>
+                    </div>
+                </div>
+            </el-dialog>
         </div>
-
-        <!-- More Options Dialog -->
-        <el-dialog :visible.sync="showMoreOptionsDialog" title="更多选项" width="600px" custom-class="more-options-dialog"
-            @close="currentMoreOptionsEvent = null">
-            <div v-if="currentMoreOptionsEvent && currentMoreOptionsEvent.markets && currentMoreOptionsEvent.markets[0]"
-                class="more-options-grid">
-                <div v-for="option in currentMoreOptionsEvent.markets[0].options" :key="option.id"
-                    class="more-option-item">
-                    <button class="table-odd-btn mini-btn"
-                        :class="{ 'disabled': !option.bettable, 'active': isSelectedOption(option) }"
-                        :disabled="!option.bettable"
-                        @click.stop="openTradeAndCloseDialog(currentMoreOptionsEvent, option, currentMoreOptionsEvent.markets[0])">
-                        <span class="header-odd-label">{{ option.optionName }}</span>
-                        <span class="header-odd-value">{{ formatOddsLabel(option) }}</span>
-                    </button>
-                </div>
-            </div>
-        </el-dialog>
     </div>
 </template>
 
@@ -405,7 +443,8 @@ export default {
             oddsChangeOption: 'any',
             searchKeyword: '',
             showMoreOptionsDialog: false,
-            currentMoreOptionsEvent: null
+            currentMoreOptionsEvent: null,
+            matchGroups: {}
         }
     },
     computed: {
@@ -496,6 +535,9 @@ export default {
             handler(newVal) {
                 console.log('activeCategory changed:', newVal);
             }
+        },
+        activeLeagueId() {
+            this.activeTab = 'live'; // 切换赛事（联赛）时，默认重置为“进行中”状态
         }
     },
     methods: {
@@ -612,11 +654,8 @@ export default {
                 });
 
                 if (resp && resp.code === 0 && resp.data) {
-                    resp.data.forEach(item => {
-                        console.log('item', item)
-                        const match = item.match;
-                        const leagueData = item.league;
-                        const markets = item.markets || [];
+                    resp.data.forEach(leagueData => {
+                        console.log('leagueData', leagueData);
 
                         let league = this.categories.find(c => c.id === leagueData.id);
                         if (!league) {
@@ -626,48 +665,90 @@ export default {
                                 leagueCode: leagueData.leagueCode,
                                 country: leagueData.country,
                                 sportType: leagueData.sportType,
-                                matchCount: 0,
+                                matchCount: leagueData.matchCount || 0,
                                 expanded: true,
                                 events: []
                             };
                             this.categories.push(league);
                         }
 
-                        markets.forEach(market => {
-                            const event = {
-                                id: match.id + '_' + market.id, // Ensure unique ID for each market
-                                matchId: match.id,
-                                title: match.matchName,
-                                time: match.startTime,
-                                closeTime: market.closeTime,
-                                marketCount: 1,
-                                matchStatus: match.matchStatus,
-                                statusText: this.getMatchStatusText(match.matchStatus),
-                                expanded: false,
-                                markets: [market], // Keep single market in array to match existing logic
-                                teams: [],
-                                homeLogo: match.homeLogo,
-                                awayLogo: match.awayLogo
-                            };
+                        const matches = leagueData.matches || [];
+                        matches.forEach(match => {
+                            const markets = match.markets || [];
 
-                            // Map options to teams for UI rendering
-                            if (market.options) {
-                                const options = market.options;
-                                event.teams = options.map((opt, idx) => {
-                                    return {
-                                        id: 't' + (idx + 1) + '_' + match.id + '_' + market.id,
-                                        name: opt.optionName,
-                                        shortName: opt.optionName.substring(0, 4).toUpperCase(),
-                                        score: idx === 0 ? (match.homeScore == null ? '-' : match.homeScore) : (idx === 1 ? (match.awayScore == null ? '-' : match.awayScore) : '-'),
-                                        color: idx === 0 ? 'light-blue' : (idx === 1 ? 'dark-red' : 'blue'),
-                                        icon: idx === 0 ? (match.homeLogo || '🏳️') : (idx === 1 ? (match.awayLogo || '🏳️') : '🎯'),
-                                        optionData: opt,
-                                        marketData: market,
-                                        bettable: Boolean(opt.bettable)
-                                    };
-                                });
-                                // fallback if options are less than 2
-                                if (options.length === 0) {
+                            markets.forEach(market => {
+                                const event = {
+                                    id: match.id + '_' + market.id, // Ensure unique ID for each market
+                                    matchId: match.id,
+                                    title: match.matchName,
+                                    time: match.startTime,
+                                    closeTime: market.closeTime,
+                                    marketCount: 1,
+                                    matchStatus: match.matchStatus,
+                                    statusText: this.getMatchStatusText(match.matchStatus),
+                                    expanded: false,
+                                    markets: [market], // Keep single market in array to match existing logic
+                                    teams: [],
+                                    homeLogo: match.homeLogo,
+                                    awayLogo: match.awayLogo
+                                };
+
+                                // Map options to teams for UI rendering
+                                if (market.options) {
+                                    const options = market.options;
+                                    event.teams = options.map((opt, idx) => {
+                                        return {
+                                            id: 't' + (idx + 1) + '_' + match.id + '_' + market.id,
+                                            name: opt.optionName,
+                                            shortName: opt.optionName.substring(0, 4).toUpperCase(),
+                                            score: idx === 0 ? (match.homeScore == null ? '-' : match.homeScore) : (idx === 1 ? (match.awayScore == null ? '-' : match.awayScore) : '-'),
+                                            color: idx === 0 ? 'light-blue' : (idx === 1 ? 'dark-red' : 'blue'),
+                                            icon: idx === 0 ? (match.homeLogo || '🏳️') : (idx === 1 ? (match.awayLogo || '🏳️') : '🎯'),
+                                            optionData: opt,
+                                            marketData: market,
+                                            bettable: Boolean(opt.bettable)
+                                        };
+                                    });
+                                    // fallback if options are less than 2
+                                    if (options.length === 0) {
+                                        event.teams = [
+                                            {
+                                                id: 't1_' + match.id + '_' + market.id,
+                                                name: match.homeTeam || '主队',
+                                                shortName: (match.homeTeam || '主队').substring(0, 4).toUpperCase(),
+                                                score: match.homeScore == null ? '-' : match.homeScore,
+                                                color: 'light-blue',
+                                                icon: match.homeLogo || '🏳️',
+                                                optionData: null,
+                                                marketData: null,
+                                                bettable: false
+                                            },
+                                            {
+                                                id: 't2_' + match.id + '_' + market.id,
+                                                name: match.awayTeam || '客队',
+                                                shortName: (match.awayTeam || '客队').substring(0, 4).toUpperCase(),
+                                                score: match.awayScore == null ? '-' : match.awayScore,
+                                                color: 'dark-red',
+                                                icon: match.awayLogo || '🏳️',
+                                                optionData: null,
+                                                marketData: null,
+                                                bettable: false
+                                            }
+                                        ];
+                                    } else if (options.length === 1) {
+                                        event.teams.push({
+                                            id: 't2_' + match.id + '_' + market.id,
+                                            name: match.awayTeam || '客队',
+                                            shortName: (match.awayTeam || '客队').substring(0, 4).toUpperCase(),
+                                            score: match.awayScore == null ? '-' : match.awayScore,
+                                            color: 'dark-red',
+                                            icon: match.awayLogo || '🏳️',
+                                            optionData: null,
+                                            marketData: null,
+                                            bettable: false
+                                        });
+                                    }
+                                } else {
                                     event.teams = [
                                         {
                                             id: 't1_' + match.id + '_' + market.id,
@@ -692,47 +773,10 @@ export default {
                                             bettable: false
                                         }
                                     ];
-                                } else if (options.length === 1) {
-                                    event.teams.push({
-                                        id: 't2_' + match.id + '_' + market.id,
-                                        name: match.awayTeam || '客队',
-                                        shortName: (match.awayTeam || '客队').substring(0, 4).toUpperCase(),
-                                        score: match.awayScore == null ? '-' : match.awayScore,
-                                        color: 'dark-red',
-                                        icon: match.awayLogo || '🏳️',
-                                        optionData: null,
-                                        marketData: null,
-                                        bettable: false
-                                    });
                                 }
-                            } else {
-                                event.teams = [
-                                    {
-                                        id: 't1_' + match.id + '_' + market.id,
-                                        name: match.homeTeam || '主队',
-                                        shortName: (match.homeTeam || '主队').substring(0, 4).toUpperCase(),
-                                        score: match.homeScore == null ? '-' : match.homeScore,
-                                        color: 'light-blue',
-                                        icon: match.homeLogo || '🏳️',
-                                        optionData: null,
-                                        marketData: null,
-                                        bettable: false
-                                    },
-                                    {
-                                        id: 't2_' + match.id + '_' + market.id,
-                                        name: match.awayTeam || '客队',
-                                        shortName: (match.awayTeam || '客队').substring(0, 4).toUpperCase(),
-                                        score: match.awayScore == null ? '-' : match.awayScore,
-                                        color: 'dark-red',
-                                        icon: match.awayLogo || '🏳️',
-                                        optionData: null,
-                                        marketData: null,
-                                        bettable: false
-                                    }
-                                ];
-                            }
 
-                            league.events.push(event);
+                                league.events.push(event);
+                            });
                         });
                     });
 
@@ -798,13 +842,39 @@ export default {
                 });
             }
 
+            let filtered = [];
             if (this.activeTab === 'live') {
-                return events.filter(event => event.matchStatus === 2);
+                filtered = events.filter(event => event.matchStatus === 2);
+            } else if (this.activeTab === 'upcoming') {
+                filtered = events.filter(event => this.isUpcomingEvent(event));
+            } else {
+                filtered = events.filter(event => this.isEndedEvent(event));
             }
-            if (this.activeTab === 'upcoming') {
-                return events.filter(event => this.isUpcomingEvent(event));
-            }
-            return events.filter(event => this.isEndedEvent(event));
+
+            // 按比赛ID进行分组
+            const grouped = {};
+            filtered.forEach(event => {
+                if (!grouped[event.matchId]) {
+                    // 尝试保留组件中已有的展开/收起状态
+                    const existingGroup = this.matchGroups ? this.matchGroups[event.matchId] : null;
+                    const isExpanded = existingGroup !== undefined && existingGroup !== null ? existingGroup : true;
+
+                    grouped[event.matchId] = {
+                        matchId: event.matchId,
+                        title: event.title,
+                        time: event.time,
+                        matchStatus: event.matchStatus,
+                        statusText: event.statusText,
+                        homeLogo: event.homeLogo,
+                        awayLogo: event.awayLogo,
+                        markets: [],
+                        expanded: isExpanded
+                    };
+                }
+                grouped[event.matchId].markets.push(event);
+            });
+
+            return Object.values(grouped);
         },
         getTabEventCount(tabKey) {
             if (!this.activeCategory) return 0;
@@ -976,15 +1046,13 @@ export default {
             this.previewError = '';
         },
         toggleExpand(targetEvent) {
-            const isExpanding = !targetEvent.expanded;
-            this.categories.forEach(category => {
-                category.events.forEach(event => {
-                    event.expanded = false;
-                });
-            });
-            if (isExpanding) {
-                targetEvent.expanded = true;
-            }
+            // 废弃，逻辑已移至 toggleGroupExpand
+        },
+        toggleGroupExpand(group) {
+            const newExpandedState = !group.expanded;
+            this.$set(group, 'expanded', newExpandedState);
+            // 保存状态到组件中，以便 filteredEvents 重新执行时能记住展开/收起状态
+            this.$set(this.matchGroups, group.matchId, newExpandedState);
         },
         schedulePreview() {
             if (this.previewTimer) {
@@ -1221,11 +1289,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.sports-page {
+.sports-layout {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     margin: 0 auto;
-    padding: 20px;
+    padding: 10px 20px 20px 20px;
     gap: 20px;
     height: calc(100vh - 70px);
     color: #1f2937;
@@ -1235,25 +1303,35 @@ export default {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-/* Left Sidebar */
-.left-sidebar {
-    width: 240px;
+.sports-page {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Top Menu */
+.top-menu {
     flex-shrink: 0;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     overflow: hidden;
+    align-items: center;
 }
 
 .ls-header {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 20px;
+    padding: 0 20px;
+    height: 100%;
+    min-height: 60px;
     color: #2563eb;
-    border-bottom: 1px solid #f3f4f6;
+    border-right: 1px solid #f3f4f6;
 
     i {
         font-size: 20px;
@@ -1263,24 +1341,68 @@ export default {
         margin: 0;
         font-size: 18px;
         font-weight: 700;
+        white-space: nowrap;
     }
 }
 
 .ls-menu {
     flex: 1;
-    overflow-y: auto;
-    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 10px 20px;
+    gap: 20px;
+    align-items: center;
+
+    /* Hide scrollbar for cleaner look */
+    &::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+}
+
+.menu-country-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    border-right: 1px dashed #e2e8f0;
+    padding-right: 20px;
+
+    &:last-child {
+        border-right: none;
+        padding-right: 0;
+    }
+}
+
+.menu-country-header {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.menu-item-group {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
 }
 
 .menu-item {
     display: flex;
     align-items: center;
-    padding: 12px 16px;
+    padding: 8px 16px;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s;
     color: #4b5563;
-    margin-bottom: 4px;
+    white-space: nowrap;
 
     &:hover {
         background: #f8fafc;
@@ -1305,22 +1427,14 @@ export default {
 }
 
 .menu-text {
-    flex: 1;
+    margin-left: 8px;
+    margin-right: 8px;
     font-size: 14px;
 }
 
 .menu-count {
     font-size: 12px;
     color: #9ca3af;
-}
-
-.menu-country-header {
-    padding: 8px 16px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #6b7280;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
 .ls-banner {
@@ -1679,6 +1793,19 @@ export default {
     padding: 0 20px;
 }
 
+.rule-desc {
+    font-size: 12px;
+    color: #4b5563;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.4;
+    padding: 0 10px;
+    white-space: normal;
+    word-break: break-word;
+}
+
 .score-display {
     display: flex;
     flex-direction: column;
@@ -1791,12 +1918,54 @@ export default {
 
     .header-odd-item {
         flex: 0 0 auto;
-        width: 90px;
+        width: 100px;
     }
 }
 
+.match-group-title {
+    cursor: pointer;
+    background: #f8fafc;
+    border-bottom: 1px solid #e5e7eb;
+    transition: background 0.2s;
+
+    &:hover {
+        background: #f1f5f9;
+    }
+}
+
+.match-group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+}
+
+.match-group-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f2937;
+
+    i {
+        font-size: 16px;
+        color: #6b7280;
+    }
+}
+
+.match-group-name {
+    color: #2563eb;
+}
+
+.match-group-time {
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 500;
+}
+
 .group-header-right {
-    flex: 0 0 220px;
+    flex: 0 0 240px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -1823,9 +1992,10 @@ export default {
     background: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
-    padding: 4px 8px;
+    padding: 6px;
     cursor: pointer;
     transition: all 0.2s;
+    min-height: 48px;
 
     &:hover:not(:disabled):not(.active) {
         background: #eff6ff;
@@ -1856,10 +2026,12 @@ export default {
     font-size: 11px;
     color: #6b7280;
     font-weight: 500;
-    max-width: 100px;
+    width: 100%;
+    text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-bottom: 2px;
 }
 
 .header-odd-value {
@@ -1894,6 +2066,7 @@ export default {
     display: flex;
     flex-direction: column;
     gap: 2px;
+    overflow: hidden;
 }
 
 .sport-name {
@@ -1903,9 +2076,12 @@ export default {
 }
 
 .market-title {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
-    color: #000;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sport-icon {
@@ -2600,12 +2776,16 @@ export default {
 }
 
 @media (max-width: 1200px) {
-    .sports-page {
-        flex-wrap: wrap;
+    .sports-layout {
         overflow-y: auto;
     }
 
-    .left-sidebar {
+    .sports-page {
+        flex-wrap: wrap;
+        overflow-y: visible;
+    }
+
+    .top-menu {
         display: none;
     }
 
