@@ -29,7 +29,7 @@
                             <button v-for="tab in tabs" :key="tab.key" class="match-tab"
                                 :class="{ active: activeTab === tab.key }" @click="activeTab = tab.key">
                                 {{ tab.label }}
-                                <span class="tab-badge" v-if="getTabEventCount(tab.key) > 0">{{
+                                <span class="tab-badge" v-if="tab.key !== 'ended' && getTabEventCount(tab.key) > 0">{{
                                     getTabEventCount(tab.key) }}</span>
                             </button>
                         </div>
@@ -57,10 +57,13 @@
                                                 <i
                                                     :class="group.expanded ? 'el-icon-arrow-down' : 'el-icon-arrow-right'"></i>
                                                 <span class="match-group-name">{{ group.title }}</span>
+                                                <span v-if="group.matchStatus === 3 || group.matchStatus === 4" class="match-group-score">
+                                                    {{ group.homeScore !== null ? group.homeScore : '-' }} - {{ group.awayScore !== null ? group.awayScore : '-' }}
+                                                </span>
                                                 <span class="match-group-time">{{ group.time ? group.time.substring(5,
                                                     16).replace('T', ' ') : '--' }}</span>
                                             </div>
-                                            <span class="status-badge" :class="statusClass(group.statusText)">{{
+                                            <span v-if="group.matchStatus !== 3 && group.matchStatus !== 4" class="status-badge" :class="statusClass(group.statusText)">{{
                                                 group.statusText }}</span>
                                         </div>
                                     </td>
@@ -867,6 +870,8 @@ export default {
                         statusText: event.statusText,
                         homeLogo: event.homeLogo,
                         awayLogo: event.awayLogo,
+                        homeScore: event.teams && event.teams[0] ? event.teams[0].score : null,
+                        awayScore: event.teams && event.teams[1] ? event.teams[1].score : null,
                         markets: [],
                         expanded: isExpanded
                     };
@@ -1960,6 +1965,16 @@ export default {
 
 .match-group-name {
     color: #2563eb;
+}
+
+.match-group-score {
+    color: #ef4444;
+    font-size: 16px;
+    font-weight: 800;
+    margin: 0 8px;
+    background: #fee2e2;
+    padding: 2px 8px;
+    border-radius: 6px;
 }
 
 .match-group-time {
