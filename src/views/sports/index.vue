@@ -47,31 +47,26 @@
                         </div>
                         <!-- Match List -->
                         <table v-else class="match-table">
-                            <tbody>
-                                <template v-for="(group, groupIndex) in filteredEvents(activeCategory)">
-                                    <!-- 比赛分组头部 (点击展开/收起) -->
-                                    <tr class="match-group-title" :key="'group-title-' + groupIndex"
-                                        @click="toggleGroupExpand(group)">
-                                        <td colspan="7">
-                                            <div class="match-group-header">
-                                                <div class="match-group-info">
-                                                    <i
-                                                        :class="group.expanded ? 'el-icon-arrow-down' : 'el-icon-arrow-right'"></i>
-                                                    <span class="match-group-name">{{ group.title }}</span>
-                                                    <span class="match-group-time">{{ group.time ?
-                                                        group.time.substring(5, 16).replace('T', ' ') : '--' }}</span>
-                                                </div>
-                                                <span class="status-badge" :class="statusClass(group.statusText)">{{
-                                                    group.statusText }}</span>
+                            <tbody v-for="(group, groupIndex) in filteredEvents(activeCategory)" :key="'group-body-' + (group.matchId || groupIndex)">
+                                <!-- 比赛分组头部 (点击展开/收起) -->
+                                <tr class="match-group-title" @click="toggleGroupExpand(group)">
+                                    <td colspan="7">
+                                        <div class="match-group-header">
+                                            <div class="match-group-info">
+                                                <i :class="group.expanded ? 'el-icon-arrow-down' : 'el-icon-arrow-right'"></i>
+                                                <span class="match-group-name">{{ group.title }}</span>
+                                                <span class="match-group-time">{{ group.time ? group.time.substring(5, 16).replace('T', ' ') : '--' }}</span>
                                             </div>
-                                        </td>
-                                    </tr>
+                                            <span class="status-badge" :class="statusClass(group.statusText)">{{ group.statusText }}</span>
+                                        </div>
+                                    </td>
+                                </tr>
 
-                                    <!-- 该比赛下的所有盘口 -->
-                                    <template v-if="group.expanded">
-                                        <tr v-for="(event, eventIndex) in group.markets" class="sport-group-header"
-                                            :key="'header-' + groupIndex + '-' + eventIndex"
-                                            @click="handleCardClick(event)">
+                                <!-- 该比赛下的所有盘口 -->
+                                <template v-if="group.expanded">
+                                    <tr v-for="(event, eventIndex) in group.markets" class="sport-group-header"
+                                        :key="'header-' + (group.matchId || groupIndex) + '-' + (event.id || eventIndex)"
+                                        @click="handleCardClick(event)">
                                             <td colspan="7">
                                                 <div class="group-header-content">
                                                     <div class="group-header-left">
@@ -172,7 +167,6 @@
                                             </td>
                                         </tr>
                                     </template>
-                                </template>
                             </tbody>
                         </table>
                     </div>
@@ -1927,6 +1921,10 @@ export default {
     background: #f8fafc;
     border-bottom: 1px solid #e5e7eb;
     transition: background 0.2s;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 
     &:hover {
         background: #f1f5f9;
