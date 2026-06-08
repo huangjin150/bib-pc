@@ -47,17 +47,21 @@
                         </div>
                         <!-- Match List -->
                         <table v-else class="match-table">
-                            <tbody v-for="(group, groupIndex) in filteredEvents(activeCategory)" :key="'group-body-' + (group.matchId || groupIndex)">
+                            <tbody v-for="(group, groupIndex) in filteredEvents(activeCategory)"
+                                :key="'group-body-' + (group.matchId || groupIndex)">
                                 <!-- 比赛分组头部 (点击展开/收起) -->
                                 <tr class="match-group-title" @click="toggleGroupExpand(group)">
                                     <td colspan="7">
                                         <div class="match-group-header">
                                             <div class="match-group-info">
-                                                <i :class="group.expanded ? 'el-icon-arrow-down' : 'el-icon-arrow-right'"></i>
+                                                <i
+                                                    :class="group.expanded ? 'el-icon-arrow-down' : 'el-icon-arrow-right'"></i>
                                                 <span class="match-group-name">{{ group.title }}</span>
-                                                <span class="match-group-time">{{ group.time ? group.time.substring(5, 16).replace('T', ' ') : '--' }}</span>
+                                                <span class="match-group-time">{{ group.time ? group.time.substring(5,
+                                                    16).replace('T', ' ') : '--' }}</span>
                                             </div>
-                                            <span class="status-badge" :class="statusClass(group.statusText)">{{ group.statusText }}</span>
+                                            <span class="status-badge" :class="statusClass(group.statusText)">{{
+                                                group.statusText }}</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -67,106 +71,107 @@
                                     <tr v-for="(event, eventIndex) in group.markets" class="sport-group-header"
                                         :key="'header-' + (group.matchId || groupIndex) + '-' + (event.id || eventIndex)"
                                         @click="handleCardClick(event)">
-                                            <td colspan="7">
-                                                <div class="group-header-content">
-                                                    <div class="group-header-left">
-                                                        <div class="match-time-display header-time">
-                                                            <span class="time-date">{{ (event.markets &&
-                                                                event.markets[0] &&
-                                                                event.markets[0].matchTime) ?
-                                                                event.markets[0].matchTime.substring(5, 10).replace('-',
-                                                                    '/') :
-                                                                '--' }}</span>
-                                                            <span class="time-hour">{{ (event.markets &&
-                                                                event.markets[0] &&
-                                                                event.markets[0].matchTime) ?
-                                                                event.markets[0].matchTime.substring(11, 16) : '--'
-                                                            }}</span>
+                                        <td colspan="7">
+                                            <div class="group-header-content">
+                                                <div class="group-header-left">
+                                                    <div class="match-time-display header-time">
+                                                        <span class="time-date">{{ (event.markets &&
+                                                            event.markets[0] &&
+                                                            event.markets[0].matchTime) ?
+                                                            event.markets[0].matchTime.substring(5, 10).replace('-',
+                                                                '/') :
+                                                            '--' }}</span>
+                                                        <span class="time-hour">{{ (event.markets &&
+                                                            event.markets[0] &&
+                                                            event.markets[0].matchTime) ?
+                                                            event.markets[0].matchTime.substring(11, 16) : '--'
+                                                        }}</span>
+                                                    </div>
+                                                    <div class="league-title-display">
+                                                        <span class="market-title"
+                                                            :title="event.markets && event.markets[0] ? event.markets[0].marketTitle : event.title">{{
+                                                                event.markets && event.markets[0]
+                                                                    ? event.markets[0].marketTitle : event.title }}</span>
+                                                    </div>
+                                                </div>
+                                                <template
+                                                    v-if="event.markets && event.markets[0] && event.markets[0].options && event.markets[0].options.length > 2">
+                                                    <div class="group-header-options-full">
+                                                        <div class="header-odd-item"
+                                                            v-for="option in event.markets[0].options.slice(0, 6)"
+                                                            :key="option.id">
+                                                            <button class="table-odd-btn mini-btn"
+                                                                :class="{ 'disabled': !option.bettable, 'active': isSelectedOption(option) }"
+                                                                :disabled="!option.bettable" :title="option.optionName"
+                                                                @click.stop="openTrade(event, option, event.markets[0])">
+                                                                <span class="header-odd-label">{{ option.optionName
+                                                                }}</span>
+                                                                <span class="header-odd-value">{{
+                                                                    formatOddsLabel(option)
+                                                                }}</span>
+                                                            </button>
                                                         </div>
-                                                        <div class="league-title-display">
-                                                            <span class="market-title"
-                                                                :title="event.markets && event.markets[0] ? event.markets[0].marketTitle : event.title">{{
-                                                                    event.markets && event.markets[0]
-                                                                        ? event.markets[0].marketTitle : event.title }}</span>
+                                                        <div class="header-odd-item"
+                                                            v-if="event.markets[0].options.length > 6">
+                                                            <button style="border: none; background-color: transparent;"
+                                                                class="table-odd-btn mini-btn more-btn"
+                                                                @click.stop="openMoreOptionsDialog(event)">
+                                                                <span class="header-odd-label">更多选项</span>
+                                                                <i class="el-icon-arrow-right more-icon"></i>
+                                                            </button>
                                                         </div>
                                                     </div>
-                                                    <template
-                                                        v-if="event.markets && event.markets[0] && event.markets[0].options && event.markets[0].options.length > 2">
-                                                        <div class="group-header-options-full">
+                                                </template>
+                                                <template v-else>
+                                                    <div class="group-header-center">
+                                                        <div class="rule-desc"
+                                                            :title="event.markets && event.markets[0] ? event.markets[0].ruleDesc : ''">
+                                                            {{ event.markets && event.markets[0] &&
+                                                                event.markets[0].ruleDesc ? event.markets[0].ruleDesc :
+                                                                '--'
+                                                            }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="group-header-right">
+                                                        <div class="header-odds"
+                                                            v-if="event.teams[0].optionData || event.teams[1].optionData">
                                                             <div class="header-odd-item"
-                                                                v-for="option in event.markets[0].options.slice(0, 6)"
-                                                                :key="option.id">
+                                                                v-if="event.teams[0].optionData">
                                                                 <button class="table-odd-btn mini-btn"
-                                                                    :class="{ 'disabled': !option.bettable, 'active': isSelectedOption(option) }"
-                                                                    :disabled="!option.bettable"
-                                                                    @click.stop="openTrade(event, option, event.markets[0])">
-                                                                    <span class="header-odd-label">{{ option.optionName
+                                                                    :class="{ 'disabled': !event.teams[0].optionData.bettable, 'active': isSelectedOption(event.teams[0].optionData) }"
+                                                                    :disabled="!event.teams[0].optionData.bettable"
+                                                                    :title="event.teams[0].name"
+                                                                    @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
+                                                                    <span class="header-odd-label">{{
+                                                                        event.teams[0].name
                                                                     }}</span>
                                                                     <span class="header-odd-value">{{
-                                                                        formatOddsLabel(option)
+                                                                        formatOddsLabel(event.teams[0].optionData)
                                                                     }}</span>
                                                                 </button>
                                                             </div>
                                                             <div class="header-odd-item"
-                                                                v-if="event.markets[0].options.length > 6">
-                                                                <button
-                                                                    style="border: none; background-color: transparent;"
-                                                                    class="table-odd-btn mini-btn more-btn"
-                                                                    @click.stop="openMoreOptionsDialog(event)">
-                                                                    <span class="header-odd-label">更多选项</span>
-                                                                    <i class="el-icon-arrow-right more-icon"></i>
+                                                                v-if="event.teams[1].optionData">
+                                                                <button class="table-odd-btn mini-btn"
+                                                                    :class="{ 'disabled': !event.teams[1].optionData.bettable, 'active': isSelectedOption(event.teams[1].optionData) }"
+                                                                    :disabled="!event.teams[1].optionData.bettable"
+                                                                    :title="event.teams[1].name"
+                                                                    @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
+                                                                    <span class="header-odd-label">{{
+                                                                        event.teams[1].name
+                                                                    }}</span>
+                                                                    <span class="header-odd-value">{{
+                                                                        formatOddsLabel(event.teams[1].optionData)
+                                                                    }}</span>
                                                                 </button>
                                                             </div>
                                                         </div>
-                                                    </template>
-                                                    <template v-else>
-                                                        <div class="group-header-center">
-                                                            <div class="rule-desc"
-                                                                :title="event.markets && event.markets[0] ? event.markets[0].ruleDesc : ''">
-                                                                {{ event.markets && event.markets[0] &&
-                                                                    event.markets[0].ruleDesc ? event.markets[0].ruleDesc :
-                                                                    '--'
-                                                                }}
-                                                            </div>
-                                                        </div>
-                                                        <div class="group-header-right">
-                                                            <div class="header-odds"
-                                                                v-if="event.teams[0].optionData || event.teams[1].optionData">
-                                                                <div class="header-odd-item"
-                                                                    v-if="event.teams[0].optionData">
-                                                                    <button class="table-odd-btn mini-btn"
-                                                                        :class="{ 'disabled': !event.teams[0].optionData.bettable, 'active': isSelectedOption(event.teams[0].optionData) }"
-                                                                        :disabled="!event.teams[0].optionData.bettable"
-                                                                        @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
-                                                                        <span class="header-odd-label">{{
-                                                                            event.teams[0].name
-                                                                        }}</span>
-                                                                        <span class="header-odd-value">{{
-                                                                            formatOddsLabel(event.teams[0].optionData)
-                                                                        }}</span>
-                                                                    </button>
-                                                                </div>
-                                                                <div class="header-odd-item"
-                                                                    v-if="event.teams[1].optionData">
-                                                                    <button class="table-odd-btn mini-btn"
-                                                                        :class="{ 'disabled': !event.teams[1].optionData.bettable, 'active': isSelectedOption(event.teams[1].optionData) }"
-                                                                        :disabled="!event.teams[1].optionData.bettable"
-                                                                        @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
-                                                                        <span class="header-odd-label">{{
-                                                                            event.teams[1].name
-                                                                        }}</span>
-                                                                        <span class="header-odd-value">{{
-                                                                            formatOddsLabel(event.teams[1].optionData)
-                                                                        }}</span>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </template>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </template>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
                             </tbody>
                         </table>
                     </div>
@@ -212,7 +217,7 @@
                                     <td><strong>{{ formatAmount(order.expectReturnAmount) }} USDT</strong></td>
                                     <td v-if="activeOrderTab === 'history'">
                                         <strong v-if="order.orderStatus !== 1">{{ formatAmount(order.actualReturnAmount)
-                                        }}
+                                            }}
                                             USDT</strong>
                                         <span v-else>--</span>
                                     </td>
@@ -261,7 +266,7 @@
                                             </span>
                                             <span class="deadline-text">截止 {{ selectedEvent.closeTime ?
                                                 selectedEvent.closeTime.substring(0, 16).replace('T', ' ') : '--'
-                                            }}</span>
+                                                }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -271,6 +276,7 @@
                                         v-if="team.optionData" class="slip-opt-btn"
                                         :class="{ 'active': selectedTeam && selectedTeam.id === team.optionData.id, 'disabled': !team.optionData.bettable || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 }"
                                         :disabled="!team.optionData.bettable || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4"
+                                        :title="team.name"
                                         @click="openTrade(selectedEvent, team.optionData, team.marketData)">
                                         <img v-if="(index === 0 && selectedEvent.homeLogo) || (index === 1 && selectedEvent.awayLogo)"
                                             class="slip-team-logo"
@@ -313,7 +319,7 @@
                                     <div class="odds-info-row">
                                         <span class="info-label">当前赔率</span>
                                         <span class="info-value odds-value">{{ formatOddsLabel(selectedTeam.optionData)
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                 </div>
 
@@ -2025,6 +2031,7 @@ export default {
     color: #6b7280;
     font-weight: 500;
     width: 100%;
+    max-width: 100%;
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
@@ -2448,6 +2455,7 @@ export default {
     padding: 8px;
     cursor: pointer;
     transition: all 0.2s;
+    min-height: 50px;
 
     &:hover:not(:disabled):not(.active) {
         border-color: #93c5fd;
@@ -2478,7 +2486,9 @@ export default {
 .opt-name {
     font-size: 12px;
     color: #6b7280;
+    width: 100%;
     max-width: 100%;
+    text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
