@@ -57,14 +57,17 @@
                                                 <i
                                                     :class="group.expanded ? 'el-icon-arrow-down' : 'el-icon-arrow-right'"></i>
                                                 <span class="match-group-name">{{ group.title }}</span>
-                                                <span v-if="group.matchStatus === 3 || group.matchStatus === 4" class="match-group-score">
-                                                    {{ group.homeScore !== null ? group.homeScore : '-' }} - {{ group.awayScore !== null ? group.awayScore : '-' }}
+                                                <span v-if="group.matchStatus === 3 || group.matchStatus === 4"
+                                                    class="match-group-score">
+                                                    {{ group.homeScore !== null ? group.homeScore : '-' }} - {{
+                                                    group.awayScore !== null ? group.awayScore : '-' }}
                                                 </span>
                                                 <span class="match-group-time">{{ group.time ? group.time.substring(5,
                                                     16).replace('T', ' ') : '--' }}</span>
                                             </div>
-                                            <span v-if="group.matchStatus !== 3 && group.matchStatus !== 4" class="status-badge" :class="statusClass(group.statusText)">{{
-                                                group.statusText }}</span>
+                                            <span v-if="group.matchStatus !== 3 && group.matchStatus !== 4"
+                                                class="status-badge" :class="statusClass(group.statusText)">{{
+                                                    group.statusText }}</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -77,19 +80,6 @@
                                         <td colspan="7">
                                             <div class="group-header-content">
                                                 <div class="group-header-left">
-                                                    <div class="match-time-display header-time">
-                                                        <span class="time-date">{{ (event.markets &&
-                                                            event.markets[0] &&
-                                                            event.markets[0].matchTime) ?
-                                                            event.markets[0].matchTime.substring(5, 10).replace('-',
-                                                                '/') :
-                                                            '--' }}</span>
-                                                        <span class="time-hour">{{ (event.markets &&
-                                                            event.markets[0] &&
-                                                            event.markets[0].matchTime) ?
-                                                            event.markets[0].matchTime.substring(11, 16) : '--'
-                                                        }}</span>
-                                                    </div>
                                                     <div class="league-title-display">
                                                         <span class="market-title"
                                                             :title="event.markets && event.markets[0] ? event.markets[0].marketTitle : event.title">{{
@@ -108,10 +98,10 @@
                                                                 :disabled="!option.bettable" :title="option.optionName"
                                                                 @click.stop="openTrade(event, option, event.markets[0])">
                                                                 <span class="header-odd-label">{{ option.optionName
-                                                                }}</span>
+                                                                    }}</span>
                                                                 <span class="header-odd-value">{{
                                                                     formatOddsLabel(option)
-                                                                }}</span>
+                                                                    }}</span>
                                                             </button>
                                                         </div>
                                                         <div class="header-odd-item"
@@ -147,10 +137,10 @@
                                                                     @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
                                                                     <span class="header-odd-label">{{
                                                                         event.teams[0].name
-                                                                    }}</span>
+                                                                        }}</span>
                                                                     <span class="header-odd-value">{{
                                                                         formatOddsLabel(event.teams[0].optionData)
-                                                                    }}</span>
+                                                                        }}</span>
                                                                 </button>
                                                             </div>
                                                             <div class="header-odd-item"
@@ -162,10 +152,10 @@
                                                                     @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
                                                                     <span class="header-odd-label">{{
                                                                         event.teams[1].name
-                                                                    }}</span>
+                                                                        }}</span>
                                                                     <span class="header-odd-value">{{
                                                                         formatOddsLabel(event.teams[1].optionData)
-                                                                    }}</span>
+                                                                        }}</span>
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -220,7 +210,7 @@
                                     <td><strong>{{ formatAmount(order.expectReturnAmount) }} USDT</strong></td>
                                     <td v-if="activeOrderTab === 'history'">
                                         <strong v-if="order.orderStatus !== 1">{{ formatAmount(order.actualReturnAmount)
-                                            }}
+                                        }}
                                             USDT</strong>
                                         <span v-else>--</span>
                                     </td>
@@ -269,7 +259,7 @@
                                             </span>
                                             <span class="deadline-text">截止 {{ selectedEvent.closeTime ?
                                                 selectedEvent.closeTime.substring(0, 16).replace('T', ' ') : '--'
-                                                }}</span>
+                                            }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -322,7 +312,7 @@
                                     <div class="odds-info-row">
                                         <span class="info-label">当前赔率</span>
                                         <span class="info-value odds-value">{{ formatOddsLabel(selectedTeam.optionData)
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                 </div>
 
