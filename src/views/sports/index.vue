@@ -1757,7 +1757,7 @@ export default {
     align-items: center;
     justify-content: space-between;
     background: #fff;
-    padding: 6px 20px 6px 20px;
+    padding: 6px 20px 12px 48px;
     border-radius: 12px;
     border: 1px solid #f3f4f6;
     cursor: pointer;
