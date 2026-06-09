@@ -60,7 +60,7 @@
                                                 <span v-if="group.matchStatus === 3 || group.matchStatus === 4"
                                                     class="match-group-score">
                                                     {{ group.homeScore !== null ? group.homeScore : '-' }} - {{
-                                                    group.awayScore !== null ? group.awayScore : '-' }}
+                                                        group.awayScore !== null ? group.awayScore : '-' }}
                                                 </span>
                                                 <span class="match-group-time">{{ group.time ? group.time.substring(5,
                                                     16).replace('T', ' ') : '--' }}</span>
@@ -98,10 +98,10 @@
                                                                 :disabled="!option.bettable" :title="option.optionName"
                                                                 @click.stop="openTrade(event, option, event.markets[0])">
                                                                 <span class="header-odd-label">{{ option.optionName
-                                                                    }}</span>
+                                                                }}</span>
                                                                 <span class="header-odd-value">{{
                                                                     formatOddsLabel(option)
-                                                                    }}</span>
+                                                                }}</span>
                                                             </button>
                                                         </div>
                                                         <div class="header-odd-item"
@@ -137,10 +137,10 @@
                                                                     @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
                                                                     <span class="header-odd-label">{{
                                                                         event.teams[0].name
-                                                                        }}</span>
+                                                                    }}</span>
                                                                     <span class="header-odd-value">{{
                                                                         formatOddsLabel(event.teams[0].optionData)
-                                                                        }}</span>
+                                                                    }}</span>
                                                                 </button>
                                                             </div>
                                                             <div class="header-odd-item"
@@ -152,10 +152,10 @@
                                                                     @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
                                                                     <span class="header-odd-label">{{
                                                                         event.teams[1].name
-                                                                        }}</span>
+                                                                    }}</span>
                                                                     <span class="header-odd-value">{{
                                                                         formatOddsLabel(event.teams[1].optionData)
-                                                                        }}</span>
+                                                                    }}</span>
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -210,7 +210,7 @@
                                     <td><strong>{{ formatAmount(order.expectReturnAmount) }} USDT</strong></td>
                                     <td v-if="activeOrderTab === 'history'">
                                         <strong v-if="order.orderStatus !== 1">{{ formatAmount(order.actualReturnAmount)
-                                        }}
+                                            }}
                                             USDT</strong>
                                         <span v-else>--</span>
                                     </td>
@@ -259,7 +259,7 @@
                                             </span>
                                             <span class="deadline-text">截止 {{ selectedEvent.closeTime ?
                                                 selectedEvent.closeTime.substring(0, 16).replace('T', ' ') : '--'
-                                            }}</span>
+                                                }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -312,7 +312,7 @@
                                     <div class="odds-info-row">
                                         <span class="info-label">当前赔率</span>
                                         <span class="info-value odds-value">{{ formatOddsLabel(selectedTeam.optionData)
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                 </div>
 
@@ -1757,7 +1757,7 @@ export default {
     align-items: center;
     justify-content: space-between;
     background: #fff;
-    padding: 12px 20px 6px 20px;
+    padding: 6px 20px 6px 20px;
     border-radius: 12px;
     border: 1px solid #f3f4f6;
     cursor: pointer;
@@ -1818,7 +1818,7 @@ export default {
 }
 
 .status-badge {
-    font-size: 11px;
+    font-size: 16px;
     padding: 2px 8px;
     border-radius: 10px;
     font-weight: 600;
@@ -1936,7 +1936,7 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
+    padding: 20px 20px;
 }
 
 .match-group-info {
@@ -1954,7 +1954,9 @@ export default {
 }
 
 .match-group-name {
-    color: #2563eb;
+    color: #111827;
+    font-size: 20px;
+    font-weight: 700;
 }
 
 .match-group-score {
@@ -1969,7 +1971,7 @@ export default {
 
 .match-group-time {
     color: #6b7280;
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 500;
 }
 
@@ -2088,7 +2090,7 @@ export default {
 .market-title {
     font-size: 14px;
     font-weight: 700;
-    color: #111827;
+    color: #2563eb;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2252,7 +2254,7 @@ export default {
 .order-status {
     padding: 4px 12px;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: 16px;
     font-weight: 600;
 
     &.is-pending {
