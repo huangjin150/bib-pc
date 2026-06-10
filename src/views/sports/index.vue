@@ -98,10 +98,10 @@
                                                                 :disabled="!option.bettable" :title="option.optionName"
                                                                 @click.stop="openTrade(event, option, event.markets[0])">
                                                                 <span class="header-odd-label">{{ option.optionName
-                                                                }}</span>
+                                                                    }}</span>
                                                                 <span class="header-odd-value">{{
                                                                     formatOddsLabel(option)
-                                                                }}</span>
+                                                                    }}</span>
                                                             </button>
                                                         </div>
                                                         <div class="header-odd-item"
@@ -137,10 +137,10 @@
                                                                     @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
                                                                     <span class="header-odd-label">{{
                                                                         event.teams[0].name
-                                                                    }}</span>
+                                                                        }}</span>
                                                                     <span class="header-odd-value">{{
                                                                         formatOddsLabel(event.teams[0].optionData)
-                                                                    }}</span>
+                                                                        }}</span>
                                                                 </button>
                                                             </div>
                                                             <div class="header-odd-item"
@@ -152,10 +152,10 @@
                                                                     @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
                                                                     <span class="header-odd-label">{{
                                                                         event.teams[1].name
-                                                                    }}</span>
+                                                                        }}</span>
                                                                     <span class="header-odd-value">{{
                                                                         formatOddsLabel(event.teams[1].optionData)
-                                                                    }}</span>
+                                                                        }}</span>
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -210,7 +210,7 @@
                                     <td><strong>{{ formatAmount(order.expectReturnAmount) }} USDT</strong></td>
                                     <td v-if="activeOrderTab === 'history'">
                                         <strong v-if="order.orderStatus !== 1">{{ formatAmount(order.actualReturnAmount)
-                                            }}
+                                        }}
                                             USDT</strong>
                                         <span v-else>--</span>
                                     </td>
@@ -259,7 +259,7 @@
                                             </span>
                                             <span class="deadline-text">截止 {{ selectedEvent.closeTime ?
                                                 selectedEvent.closeTime.substring(0, 16).replace('T', ' ') : '--'
-                                                }}</span>
+                                            }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -312,7 +312,7 @@
                                     <div class="odds-info-row">
                                         <span class="info-label">当前赔率</span>
                                         <span class="info-value odds-value">{{ formatOddsLabel(selectedTeam.optionData)
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                 </div>
 
@@ -884,8 +884,8 @@ export default {
         },
         getOrderStatusText(order) {
             if (order.orderStatus === 1) return '待结算';
-            if (order.orderStatus === 2) return '赢';
-            if (order.orderStatus === 3) return '输';
+            if (order.orderStatus === 2) return '成功';
+            if (order.orderStatus === 3) return '失败';
             if (order.orderStatus === 4) return '退款';
             return '未知';
         },
