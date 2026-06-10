@@ -8,7 +8,6 @@
             </div>
             <div class="ls-menu">
                 <div class="menu-country-group" v-for="(leagues, country) in groupedLeagues" :key="country">
-                    <div class="menu-country-header">{{ country }}</div>
                     <div class="menu-item-group">
                         <div class="menu-item" v-for="league in leagues" :key="league.id"
                             :class="{ active: activeLeagueId === league.id }" @click="activeLeagueId = league.id">
@@ -98,10 +97,10 @@
                                                                 :disabled="!option.bettable" :title="option.optionName"
                                                                 @click.stop="openTrade(event, option, event.markets[0])">
                                                                 <span class="header-odd-label">{{ option.optionName
-                                                                    }}</span>
+                                                                }}</span>
                                                                 <span class="header-odd-value">{{
                                                                     formatOddsLabel(option)
-                                                                    }}</span>
+                                                                }}</span>
                                                             </button>
                                                         </div>
                                                         <div class="header-odd-item"
@@ -137,10 +136,10 @@
                                                                     @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
                                                                     <span class="header-odd-label">{{
                                                                         event.teams[0].name
-                                                                        }}</span>
+                                                                    }}</span>
                                                                     <span class="header-odd-value">{{
                                                                         formatOddsLabel(event.teams[0].optionData)
-                                                                        }}</span>
+                                                                    }}</span>
                                                                 </button>
                                                             </div>
                                                             <div class="header-odd-item"
@@ -152,10 +151,10 @@
                                                                     @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
                                                                     <span class="header-odd-label">{{
                                                                         event.teams[1].name
-                                                                        }}</span>
+                                                                    }}</span>
                                                                     <span class="header-odd-value">{{
                                                                         formatOddsLabel(event.teams[1].optionData)
-                                                                        }}</span>
+                                                                    }}</span>
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -210,7 +209,7 @@
                                     <td><strong>{{ formatAmount(order.expectReturnAmount) }} USDT</strong></td>
                                     <td v-if="activeOrderTab === 'history'">
                                         <strong v-if="order.orderStatus !== 1">{{ formatAmount(order.actualReturnAmount)
-                                        }}
+                                            }}
                                             USDT</strong>
                                         <span v-else>--</span>
                                     </td>
@@ -259,7 +258,7 @@
                                             </span>
                                             <span class="deadline-text">截止 {{ selectedEvent.closeTime ?
                                                 selectedEvent.closeTime.substring(0, 16).replace('T', ' ') : '--'
-                                            }}</span>
+                                                }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -312,7 +311,7 @@
                                     <div class="odds-info-row">
                                         <span class="info-label">当前赔率</span>
                                         <span class="info-value odds-value">{{ formatOddsLabel(selectedTeam.optionData)
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                 </div>
 
