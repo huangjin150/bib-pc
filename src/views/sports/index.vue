@@ -97,10 +97,10 @@
                                                                 :disabled="!option.bettable" :title="option.optionName"
                                                                 @click.stop="openTrade(event, option, event.markets[0])">
                                                                 <span class="header-odd-label">{{ option.optionName
-                                                                }}</span>
+                                                                    }}</span>
                                                                 <span class="header-odd-value">{{
                                                                     formatOddsLabel(option)
-                                                                }}</span>
+                                                                    }}</span>
                                                             </button>
                                                         </div>
                                                         <div class="header-odd-item"
@@ -136,10 +136,10 @@
                                                                     @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
                                                                     <span class="header-odd-label">{{
                                                                         event.teams[0].name
-                                                                    }}</span>
+                                                                        }}</span>
                                                                     <span class="header-odd-value">{{
                                                                         formatOddsLabel(event.teams[0].optionData)
-                                                                    }}</span>
+                                                                        }}</span>
                                                                 </button>
                                                             </div>
                                                             <div class="header-odd-item"
@@ -151,10 +151,10 @@
                                                                     @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
                                                                     <span class="header-odd-label">{{
                                                                         event.teams[1].name
-                                                                    }}</span>
+                                                                        }}</span>
                                                                     <span class="header-odd-value">{{
                                                                         formatOddsLabel(event.teams[1].optionData)
-                                                                    }}</span>
+                                                                        }}</span>
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -209,7 +209,7 @@
                                     <td><strong>{{ formatAmount(order.expectReturnAmount) }} USDT</strong></td>
                                     <td v-if="activeOrderTab === 'history'">
                                         <strong v-if="order.orderStatus !== 1">{{ formatAmount(order.actualReturnAmount)
-                                            }}
+                                        }}
                                             USDT</strong>
                                         <span v-else>--</span>
                                     </td>
@@ -246,118 +246,126 @@
                     </div>
                     <template v-if="selectedEvent">
                         <div class="slip-content">
-                            <div class="selected-bet-card">
-                                <div class="bet-match-header">
-                                    <div class="match-info">
-                                        <div class="match-title">{{ selectedEvent.title }}</div>
-                                        <div class="bet-status-row">
-                                            <span
-                                                :class="selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 ? 'status-badge-gray' : 'status-badge-green'">
-                                                {{ selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 ?
+                            <div class="slip-scrollable-area">
+                                <div class="selected-bet-card">
+                                    <div class="bet-match-header">
+                                        <div class="match-info">
+                                            <div class="match-title">{{ selectedEvent.title }}</div>
+                                            <div class="bet-status-row">
+                                                <span
+                                                    :class="selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 ? 'status-badge-gray' : 'status-badge-green'">
+                                                    {{ selectedEvent.matchStatus === 3 || selectedEvent.matchStatus ===
+                                                        4 ?
                                                     selectedEvent.statusText : '可下注' }}
-                                            </span>
-                                            <span class="deadline-text">截止 {{ selectedEvent.closeTime ?
-                                                selectedEvent.closeTime.substring(0, 16).replace('T', ' ') : '--'
+                                                </span>
+                                                <span class="deadline-text">截止 {{ selectedEvent.closeTime ?
+                                                    selectedEvent.closeTime.substring(0, 16).replace('T', ' ') : '--'
                                                 }}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="slip-options-group" v-if="selectedEvent.teams">
-                                    <button v-for="(team, index) in selectedEvent.teams" :key="index"
-                                        v-if="team.optionData" class="slip-opt-btn"
-                                        :class="{ 'active': selectedTeam && selectedTeam.id === team.optionData.id, 'disabled': !team.optionData.bettable || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 }"
-                                        :disabled="!team.optionData.bettable || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4"
-                                        :title="team.name"
-                                        @click="openTrade(selectedEvent, team.optionData, team.marketData)">
-                                        <img v-if="(index === 0 && selectedEvent.homeLogo) || (index === 1 && selectedEvent.awayLogo)"
-                                            class="slip-team-logo"
-                                            :src="index === 0 ? selectedEvent.homeLogo : selectedEvent.awayLogo"
-                                            alt="" />
-                                        <span class="opt-name">{{ team.name }}</span>
-                                        <span class="opt-odds">{{ formatOddsLabel(team.optionData) }}</span>
-                                    </button>
+                                    <div class="slip-options-group" v-if="selectedEvent.teams">
+                                        <button v-for="(team, index) in selectedEvent.teams" :key="index"
+                                            v-if="team.optionData" class="slip-opt-btn"
+                                            :class="{ 'active': selectedTeam && selectedTeam.id === team.optionData.id, 'disabled': !team.optionData.bettable || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 }"
+                                            :disabled="!team.optionData.bettable || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4"
+                                            :title="team.name"
+                                            @click="openTrade(selectedEvent, team.optionData, team.marketData)">
+                                            <img v-if="(index === 0 && selectedEvent.homeLogo) || (index === 1 && selectedEvent.awayLogo)"
+                                                class="slip-team-logo"
+                                                :src="index === 0 ? selectedEvent.homeLogo : selectedEvent.awayLogo"
+                                                alt="" />
+                                            <span class="opt-name">{{ team.name }}</span>
+                                            <span class="opt-odds">{{ formatOddsLabel(team.optionData) }}</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
                             <template
                                 v-if="selectedTeam && selectedTeam.marketData && selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4 && isAnyOptionBettable(selectedEvent)">
-                                <div class="stake-section">
-                                    <div class="stake-input-label">下注金额</div>
-                                    <div class="stake-input-wrap">
-                                        <input type="number" v-model.number="tradeAmount" min="0" step="1"
-                                            placeholder="输入下注金额"
-                                            :disabled="selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4" />
-                                        <span class="stake-unit">USDT</span>
+                                <div class="slip-bottom-area">
+                                    <div class="stake-section">
+                                        <div class="stake-input-label">下注金额</div>
+                                        <div class="stake-input-wrap">
+                                            <input type="number" v-model.number="tradeAmount" min="0" step="1"
+                                                placeholder="输入下注金额"
+                                                :disabled="selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4" />
+                                            <span class="stake-unit">USDT</span>
+                                        </div>
+                                        <div class="stake-balance-row">
+                                            <span class="balance-text">可用余额: {{ walletBalance !== null ?
+                                                formatAmount(walletBalance) : '--' }} USDT</span>
+                                            <a v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4"
+                                                href="javascript:void(0)" class="recharge-link"
+                                                @click="$router.push('/recharge')">充值</a>
+                                        </div>
                                     </div>
-                                    <div class="stake-balance-row">
-                                        <span class="balance-text">可用余额: {{ walletBalance !== null ?
-                                            formatAmount(walletBalance) : '--' }} USDT</span>
-                                        <a v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4"
-                                            href="javascript:void(0)" class="recharge-link"
-                                            @click="$router.push('/recharge')">充值</a>
-                                    </div>
-                                </div>
 
-                                <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4"
-                                    class="tp-quick-amounts">
-                                    <button v-for="amount in quickAmounts" :key="amount"
-                                        @click="setTradeAmount(amount)">
-                                        {{ amount }}
+                                    <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4"
+                                        class="tp-quick-amounts">
+                                        <button v-for="amount in quickAmounts" :key="amount"
+                                            @click="setTradeAmount(amount)">
+                                            {{ amount }}
+                                        </button>
+                                    </div>
+
+                                    <div class="odds-info-card">
+                                        <div class="odds-info-row">
+                                            <span class="info-label">当前赔率</span>
+                                            <span class="info-value odds-value">{{
+                                                formatOddsLabel(selectedTeam.optionData)
+                                                }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4"
+                                        class="odds-info-card">
+                                        <div class="odds-info-row">
+                                            <span class="info-label">预计可得</span>
+                                            <span class="info-value return-value">{{
+                                                formatAmount(betPreview.expectReturnAmount
+                                                    || 0) }} USDT</span>
+                                        </div>
+                                    </div>
+
+                                    <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4"
+                                        class="odds-info-card">
+                                        <div class="odds-info-row">
+                                            <span class="info-label">预计盈利</span>
+                                            <span v-if="formatAmount(expectedProfit) > 0"
+                                                class="info-value profit-value">{{
+                                                    formatAmount(expectedProfit) }} USDT</span>
+                                            <span v-else class="info-value profit-value">0.00 USDT</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="tp-notice warning" v-if="insufficientBalance">
+                                        <i class="el-icon-warning-outline"></i>
+                                        <span>
+                                            资金账户余额不足，
+                                            <a v-if="contractWalletBalance >= 0.01" href="javascript:void(0)"
+                                                class="action-link" @click="$router.push('/assets/transfer')">去划转</a>
+                                            <a v-else href="javascript:void(0)" class="action-link"
+                                                @click="$router.push('/recharge')">去充值</a>
+                                        </span>
+                                    </div>
+                                    <div class="tp-notice error" v-else-if="previewError">
+                                        <i class="el-icon-circle-close"></i>
+                                        {{ previewError }}
+                                    </div>
+
+                                    <button v-if="!isLogin" class="tp-submit-btn blue" @click="$router.push('/login')">
+                                        请先登录
+                                    </button>
+                                    <button v-else class="tp-submit-btn blue" @click="submitBet"
+                                        :disabled="isSubmitting || isPreviewLoading || !canSubmit">
+                                        {{ selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 ? '比赛已结束'
+                                            :
+                                            (isSubmitting ? '下注中...' : '确认下注') }}
                                     </button>
                                 </div>
-
-                                <div class="odds-info-card">
-                                    <div class="odds-info-row">
-                                        <span class="info-label">当前赔率</span>
-                                        <span class="info-value odds-value">{{ formatOddsLabel(selectedTeam.optionData)
-                                            }}</span>
-                                    </div>
-                                </div>
-
-                                <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4"
-                                    class="odds-info-card">
-                                    <div class="odds-info-row">
-                                        <span class="info-label">预计可得</span>
-                                        <span class="info-value return-value">{{
-                                            formatAmount(betPreview.expectReturnAmount
-                                                || 0) }} USDT</span>
-                                    </div>
-                                </div>
-
-                                <div v-if="selectedEvent.matchStatus !== 3 && selectedEvent.matchStatus !== 4"
-                                    class="odds-info-card">
-                                    <div class="odds-info-row">
-                                        <span class="info-label">预计盈利</span>
-                                        <span v-if="formatAmount(expectedProfit) > 0" class="info-value profit-value">{{
-                                            formatAmount(expectedProfit) }} USDT</span>
-                                        <span v-else class="info-value profit-value">0.00 USDT</span>
-                                    </div>
-                                </div>
-
-                                <div class="tp-notice warning" v-if="insufficientBalance">
-                                    <i class="el-icon-warning-outline"></i>
-                                    <span>
-                                        资金账户余额不足，
-                                        <a v-if="contractWalletBalance >= 0.01" href="javascript:void(0)"
-                                            class="action-link" @click="$router.push('/assets/transfer')">去划转</a>
-                                        <a v-else href="javascript:void(0)" class="action-link"
-                                            @click="$router.push('/recharge')">去充值</a>
-                                    </span>
-                                </div>
-                                <div class="tp-notice error" v-else-if="previewError">
-                                    <i class="el-icon-circle-close"></i>
-                                    {{ previewError }}
-                                </div>
-
-                                <button v-if="!isLogin" class="tp-submit-btn blue" @click="$router.push('/login')">
-                                    请先登录
-                                </button>
-                                <button v-else class="tp-submit-btn blue" @click="submitBet"
-                                    :disabled="isSubmitting || isPreviewLoading || !canSubmit">
-                                    {{ selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 ? '比赛已结束' :
-                                        (isSubmitting ? '下注中...' : '确认下注') }}
-                                </button>
                             </template>
                             <div v-else class="empty-selection-hint">
                                 请在上方选择你要下注的赛果
@@ -552,7 +560,7 @@ export default {
         },
         formatAmount(value) {
             const number = Number(value || 0);
-            return number.toFixed(2);
+            return number.toFixed(4);
         },
         formatPrice(value) {
             const number = Number(value || 0);
@@ -560,7 +568,7 @@ export default {
         },
         formatOdds(value) {
             const number = Number(value || 0);
-            return number ? number.toFixed(2) + 'x' : '--';
+            return number ? number.toFixed(4) + 'x' : '--';
         },
         formatOddsLabel(option) {
             if (!option) {
@@ -873,13 +881,15 @@ export default {
         getTabEventCount(tabKey) {
             if (!this.activeCategory) return 0;
             const events = this.activeCategory.events || [];
+            let filtered = [];
             if (tabKey === 'live') {
-                return events.filter(event => event.matchStatus === 2).length;
+                filtered = events.filter(event => event.matchStatus === 2);
+            } else if (tabKey === 'upcoming') {
+                filtered = events.filter(event => this.isUpcomingEvent(event));
+            } else {
+                filtered = events.filter(event => this.isEndedEvent(event));
             }
-            if (tabKey === 'upcoming') {
-                return events.filter(event => this.isUpcomingEvent(event)).length;
-            }
-            return events.filter(event => this.isEndedEvent(event)).length;
+            return new Set(filtered.map(e => e.matchId)).size;
         },
         getOrderStatusText(order) {
             if (order.orderStatus === 1) return '待结算';
@@ -2305,12 +2315,13 @@ export default {
 
 /* Right Sidebar */
 .right-sidebar {
-    width: 320px;
+    width: 380px;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
     gap: 20px;
-    overflow-y: auto;
+    height: 100%;
+    overflow-y: hidden;
 
     &::-webkit-scrollbar {
         width: 0;
@@ -2322,6 +2333,9 @@ export default {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .panel-header {
@@ -2392,7 +2406,38 @@ export default {
 }
 
 .slip-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+    padding: 0;
+}
+
+.slip-scrollable-area {
+    flex: 1;
+    overflow-y: auto;
     padding: 20px;
+    padding-bottom: 0;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+}
+
+.slip-bottom-area {
+    padding: 20px;
+    flex-shrink: 0;
+    background: #fff;
+    border-top: 1px solid #f3f4f6;
 }
 
 .selected-bet-card {
@@ -2427,26 +2472,7 @@ export default {
     grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
     gap: 8px;
     margin-top: 12px;
-    max-height: 160px;
-    overflow-y: auto;
     padding-right: 4px;
-
-    &::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 4px;
-
-        &:hover {
-            background: #94a3b8;
-        }
-    }
-
-    &::-webkit-scrollbar-track {
-        background: transparent;
-    }
 }
 
 .slip-opt-btn {
@@ -2520,7 +2546,11 @@ export default {
     text-align: center;
     color: #9ca3af;
     font-size: 13px;
-    padding: 20px 0;
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .quick-amounts-label,
@@ -2695,6 +2725,10 @@ export default {
     text-align: center;
     color: #9ca3af;
     font-size: 14px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .settings-panel {
@@ -2810,7 +2844,12 @@ export default {
     .right-sidebar {
         flex: 1 1 100%;
         width: 100%;
+        height: auto;
         overflow-y: visible;
+    }
+
+    .betting-slip-panel {
+        height: 600px;
     }
 }
 
