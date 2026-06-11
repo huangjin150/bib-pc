@@ -76,6 +76,14 @@
             </div>
         </div>
 
+        <!-- 资金密码弹窗 -->
+        <Modal v-model="showPasswordModal" title="请输入资金密码" @on-ok="submitTransfer" @on-cancel="cancelTransfer">
+            <div class="password-input-wrapper">
+                <Input style="border: 1px solid #000; border-radius: 4px;" type="password" v-model="jyPassword"
+                    placeholder="请输入资金密码" />
+            </div>
+        </Modal>
+
         <div class="transfer-header">
             <h2 class="title">转账记录</h2>
         </div>
@@ -109,7 +117,9 @@ export default {
             ],
             amountError: false,
             amountErrorMessage: '',
-            transferFee: ''
+            transferFee: '',
+            showPasswordModal: false,
+            jyPassword: ''
         }
     },
     computed: {
@@ -176,9 +186,31 @@ export default {
             if (!isRecipientValid || !isAmountValid) {
                 return;
             }
+
+            // 显示密码弹窗
+            this.jyPassword = '';
+            this.showPasswordModal = true;
+        },
+
+        cancelTransfer() {
+            this.showPasswordModal = false;
+            this.jyPassword = '';
+        },
+
+        submitTransfer() {
+            if (!this.jyPassword) {
+                this.$Notice.error({
+                    title: '错误',
+                    desc: '请输入资金密码'
+                });
+                // 因为 ViewUI 的 Modal 在点击 ok 后默认会关闭，所以需要一些机制或者重新打开，这里简单提示
+                return;
+            }
+
             let params = {
                 to: this.recipientId, // 接收人（账号或者UID）
-                amount: this.transferAmount
+                amount: this.transferAmount,
+                jyPassword: this.jyPassword
             };
 
             this.$http
@@ -188,6 +220,7 @@ export default {
                     if (resp.code == 0) {
                         this.transferAmount = ''
                         this.recipientId = ''
+                        this.showPasswordModal = false;
                         if (this.$refs.swapAssetsRef) {
                             this.$refs.swapAssetsRef.getList(0)
                         }
@@ -481,7 +514,32 @@ export default {
     padding-left: 16px;
 }
 
+.password-input-wrapper {
+    padding: 10px 0;
+}
+
 ::v-deep(.ivu-table-wrapper) {
     border: none;
+}
+
+::v-deep(.ivu-input:focus) {
+    border-color: #000;
+}
+
+::v-deep(.ivu-btn-primary) {
+    background-color: #000;
+    color: #ffffff;
+}
+
+::v-deep(.ivu-btn-text) {
+    border: 1px solid #f4f4f4;
+}
+
+::v-deep(.ivu-page-item-active) {
+    border-color: #000;
+}
+
+::v-deep(.ivu-page-item-active a) {
+    color: #000;
 }
 </style>
