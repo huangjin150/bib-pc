@@ -16,8 +16,7 @@
           <nav class="main-nav">
             <router-link v-for="item in navItems" :key="item.path" :to="item.path" class="nav-item">
               {{ item.name }}
-              <img v-if="item.path === '/eventContract'" style="margin-left: 6px;" src="../assets/svg/mini_hot.svg"
-                alt="">
+              <img v-if="item.path === '/sports'" style="margin-left: 6px;" src="../assets/svg/mini_hot.svg" alt="">
             </router-link>
           </nav>
         </div>
