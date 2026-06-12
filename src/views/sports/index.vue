@@ -55,9 +55,11 @@
                                             <div class="match-group-info">
                                                 <i
                                                     :class="group.expanded ? 'el-icon-arrow-down' : 'el-icon-arrow-right'"></i>
-                                                <img v-if="group.homeLogo" :src="group.homeLogo" class="group-team-logo" alt="">
+                                                <img v-if="group.homeLogo" :src="group.homeLogo" class="group-team-logo"
+                                                    alt="">
                                                 <span class="match-group-name">{{ group.title }}</span>
-                                                <img v-if="group.awayLogo" :src="group.awayLogo" class="group-team-logo" alt="">
+                                                <img v-if="group.awayLogo" :src="group.awayLogo" class="group-team-logo"
+                                                    alt="">
                                                 <span v-if="group.matchStatus === 3 || group.matchStatus === 4"
                                                     class="match-group-score">
                                                     {{ group.homeScore !== null ? group.homeScore : '-' }} - {{
@@ -95,7 +97,7 @@
                                                             v-for="option in event.markets[0].options.slice(0, 6)"
                                                             :key="option.id">
                                                             <button class="table-odd-btn mini-btn"
-                                                                :class="{ 'disabled': !option.bettable, 'active': isSelectedOption(option) }"
+                                                                :class="{ 'disabled': !option.bettable, 'active': isSelectedOption(option), 'odds-up': option.oddsUp, 'odds-down': option.oddsDown }"
                                                                 :disabled="!option.bettable" :title="option.optionName"
                                                                 @click.stop="openTrade(event, option, event.markets[0])">
                                                                 <span class="header-odd-label">{{ option.optionName
@@ -132,7 +134,7 @@
                                                             <div class="header-odd-item"
                                                                 v-if="event.teams[0].optionData">
                                                                 <button class="table-odd-btn mini-btn"
-                                                                    :class="{ 'disabled': !event.teams[0].optionData.bettable, 'active': isSelectedOption(event.teams[0].optionData) }"
+                                                                    :class="{ 'disabled': !event.teams[0].optionData.bettable, 'active': isSelectedOption(event.teams[0].optionData), 'odds-up': event.teams[0].optionData.oddsUp, 'odds-down': event.teams[0].optionData.oddsDown }"
                                                                     :disabled="!event.teams[0].optionData.bettable"
                                                                     :title="event.teams[0].name"
                                                                     @click.stop="openTrade(event, event.teams[0].optionData, event.teams[0].marketData)">
@@ -147,7 +149,7 @@
                                                             <div class="header-odd-item"
                                                                 v-if="event.teams[1].optionData">
                                                                 <button class="table-odd-btn mini-btn"
-                                                                    :class="{ 'disabled': !event.teams[1].optionData.bettable, 'active': isSelectedOption(event.teams[1].optionData) }"
+                                                                    :class="{ 'disabled': !event.teams[1].optionData.bettable, 'active': isSelectedOption(event.teams[1].optionData), 'odds-up': event.teams[1].optionData.oddsUp, 'odds-down': event.teams[1].optionData.oddsDown }"
                                                                     :disabled="!event.teams[1].optionData.bettable"
                                                                     :title="event.teams[1].name"
                                                                     @click.stop="openTrade(event, event.teams[1].optionData, event.teams[1].marketData)">
@@ -442,7 +444,8 @@ export default {
             searchKeyword: '',
             showMoreOptionsDialog: false,
             currentMoreOptionsEvent: null,
-            matchGroups: {}
+            matchGroups: {},
+            stompClient: null
         }
     },
     computed: {
@@ -774,7 +777,7 @@ export default {
                         country: item.country,
                         sportType: item.sportType,
                         matchCount: item.matchCount,
-                        expanded: true,
+                        expanded: false,
                         events: []
                     }));
                     if (this.categories.length > 0) {
@@ -804,7 +807,7 @@ export default {
                                 country: leagueData.country,
                                 sportType: leagueData.sportType,
                                 matchCount: leagueData.matchCount || 0,
-                                expanded: true,
+                                expanded: false,
                                 events: []
                             };
                             this.categories.push(league);
@@ -1128,17 +1131,45 @@ export default {
                 const resp = response.body;
                 if (resp && resp.code === 0 && resp.data) {
                     const match = resp.data.match || resp.data;
-                    const markets = resp.data.markets || match.markets || [];
+                    const newMarkets = resp.data.markets || match.markets || [];
 
-                    if (markets.length > 0) {
+                    if (newMarkets.length > 0) {
                         this.categories.forEach(league => {
                             const hasMatch = league.events.some(e => e.matchId === matchId);
                             if (hasMatch) {
+                                // 处理旧赔率以触发闪烁动画
+                                const oldEvents = league.events.filter(e => e.matchId === matchId);
+                                oldEvents.forEach(oldEvent => {
+                                    if (oldEvent.markets) {
+                                        oldEvent.markets.forEach(oldMarket => {
+                                            const newMarket = newMarkets.find(m => m.id === oldMarket.id);
+                                            if (newMarket && newMarket.options && oldMarket.options) {
+                                                newMarket.options.forEach(newOpt => {
+                                                    const oldOpt = oldMarket.options.find(o => o.id === newOpt.id);
+                                                    if (oldOpt) {
+                                                        const oldOdds = oldOpt.currentOdds;
+                                                        const newOdds = newOpt.currentOdds;
+                                                        if (oldOdds !== undefined && newOdds !== oldOdds) {
+                                                            const isUp = newOdds > oldOdds;
+                                                            this.$set(newOpt, 'oddsUp', isUp);
+                                                            this.$set(newOpt, 'oddsDown', !isUp);
+                                                            setTimeout(() => {
+                                                                this.$set(newOpt, 'oddsUp', false);
+                                                                this.$set(newOpt, 'oddsDown', false);
+                                                            }, 1000);
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+
                                 // 移除该比赛的旧数据（包括 base event）
                                 league.events = league.events.filter(e => e.matchId !== matchId);
 
                                 // 添加带有详情盘口的新数据
-                                markets.forEach(market => {
+                                newMarkets.forEach(market => {
                                     league.events.push(this.mapMarketToEvent(match, market));
                                 });
                             }
@@ -1282,7 +1313,6 @@ export default {
             });
         },
         startWebsock() {
-            console.log('change')
             if (this.stompClient) {
                 this.stompClient.ws.close();
             }
@@ -1297,8 +1327,12 @@ export default {
                 stompClient.subscribe("/topic/quiz/odds/change", function (msg) {
                     try {
                         const resp = JSON.parse(msg.body);
-                        if (resp) {
-                            that.updateOddsFromWebsocket(resp);
+                        if (resp && resp.matchId) {
+                            if (that.matchGroups[resp.matchId]) {
+                                that.loadMatchDetails(resp.matchId);
+                            } else {
+                                that.updateOddsFromWebsocket(resp);
+                            }
                         }
                     } catch (e) {
                         console.error('Failed to parse odds change message', e);
@@ -1307,7 +1341,6 @@ export default {
             });
         },
         updateOddsFromWebsocket(data) {
-            // Find the event that needs updating
             let eventFound = null;
             this.categories.forEach(category => {
                 const event = category.events.find(e => e.matchId === data.matchId && e.markets && e.markets.some(m => m.id === data.marketId));
@@ -1324,16 +1357,48 @@ export default {
                         // Update in market options array
                         const optIndex = market.options.findIndex(o => o.id === newOption.id);
                         if (optIndex !== -1) {
-                            this.$set(market.options[optIndex], 'currentOdds', newOption.currentOdds);
+                            const oldOdds = market.options[optIndex].currentOdds;
+                            const newOdds = newOption.currentOdds;
+
+                            this.$set(market.options[optIndex], 'currentOdds', newOdds);
                             this.$set(market.options[optIndex], 'currentPrice', newOption.currentPrice);
+
+                            if (oldOdds !== undefined && newOdds !== oldOdds) {
+                                const isUp = newOdds > oldOdds;
+                                this.$set(market.options[optIndex], 'oddsUp', isUp);
+                                this.$set(market.options[optIndex], 'oddsDown', !isUp);
+
+                                setTimeout(() => {
+                                    if (market.options[optIndex]) {
+                                        this.$set(market.options[optIndex], 'oddsUp', false);
+                                        this.$set(market.options[optIndex], 'oddsDown', false);
+                                    }
+                                }, 1000);
+                            }
                         }
 
                         // Update in mapped teams array
                         if (eventFound.teams) {
                             const team = eventFound.teams.find(t => t.optionData && t.optionData.id === newOption.id);
                             if (team) {
-                                this.$set(team.optionData, 'currentOdds', newOption.currentOdds);
+                                const oldOdds = team.optionData.currentOdds;
+                                const newOdds = newOption.currentOdds;
+
+                                this.$set(team.optionData, 'currentOdds', newOdds);
                                 this.$set(team.optionData, 'currentPrice', newOption.currentPrice);
+
+                                if (oldOdds !== undefined && newOdds !== oldOdds) {
+                                    const isUp = newOdds > oldOdds;
+                                    this.$set(team.optionData, 'oddsUp', isUp);
+                                    this.$set(team.optionData, 'oddsDown', !isUp);
+
+                                    setTimeout(() => {
+                                        if (team.optionData) {
+                                            this.$set(team.optionData, 'oddsUp', false);
+                                            this.$set(team.optionData, 'oddsDown', false);
+                                        }
+                                    }, 1000);
+                                }
                             }
                         }
 
@@ -2134,6 +2199,18 @@ export default {
         }
     }
 
+    &.odds-up {
+        .header-odd-value {
+            color: #ef4444;
+        }
+    }
+
+    &.odds-down {
+        .header-odd-value {
+            color: #ef4444;
+        }
+    }
+
     &:disabled {
         opacity: 0.5;
         cursor: not-allowed;
@@ -2158,6 +2235,7 @@ export default {
     font-size: 14px;
     font-weight: 700;
     color: #1f2937;
+    transition: color 0.3s;
 }
 
 .match-time-display {
