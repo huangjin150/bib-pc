@@ -13,7 +13,7 @@
                             :class="{ active: activeLeagueId === league.id }" @click="activeLeagueId = league.id">
                             <img v-if="leagues.imgurl" style="width: 20px; height: 20px;" :src="leagues.imgurl" alt="">
                             <span class="menu-text">{{ league.name }}</span>
-                            <span class="menu-count">{{ league.matchCount }}</span>
+                            <span class="menu-count">{{ getLeagueLiveCount(league) }}</span>
                         </div>
                     </div>
                 </div>
@@ -55,7 +55,9 @@
                                             <div class="match-group-info">
                                                 <i
                                                     :class="group.expanded ? 'el-icon-arrow-down' : 'el-icon-arrow-right'"></i>
+                                                <img v-if="group.homeLogo" :src="group.homeLogo" class="group-team-logo" alt="">
                                                 <span class="match-group-name">{{ group.title }}</span>
+                                                <img v-if="group.awayLogo" :src="group.awayLogo" class="group-team-logo" alt="">
                                                 <span v-if="group.matchStatus === 3 || group.matchStatus === 4"
                                                     class="match-group-score">
                                                     {{ group.homeScore !== null ? group.homeScore : '-' }} - {{
@@ -256,7 +258,7 @@
                                                     :class="selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4 ? 'status-badge-gray' : 'status-badge-green'">
                                                     {{ selectedEvent.matchStatus === 3 || selectedEvent.matchStatus ===
                                                         4 ?
-                                                    selectedEvent.statusText : '可下注' }}
+                                                        selectedEvent.statusText : '可下注' }}
                                                 </span>
                                                 <span class="deadline-text">截止 {{ selectedEvent.closeTime ?
                                                     selectedEvent.closeTime.substring(0, 16).replace('T', ' ') : '--'
@@ -272,10 +274,7 @@
                                             :disabled="!team.optionData.bettable || selectedEvent.matchStatus === 3 || selectedEvent.matchStatus === 4"
                                             :title="team.name"
                                             @click="openTrade(selectedEvent, team.optionData, team.marketData)">
-                                            <img v-if="(index === 0 && selectedEvent.homeLogo) || (index === 1 && selectedEvent.awayLogo)"
-                                                class="slip-team-logo"
-                                                :src="index === 0 ? selectedEvent.homeLogo : selectedEvent.awayLogo"
-                                                alt="" />
+
                                             <span class="opt-name">{{ team.name }}</span>
                                             <span class="opt-odds">{{ formatOddsLabel(team.optionData) }}</span>
                                         </button>
@@ -418,11 +417,10 @@ export default {
             previewTimer: null,
             quickAmounts: [10, 20, 50, 100, 500],
             tabs: [
-                { key: 'live', label: '进行中' },
-                { key: 'upcoming', label: '未开始' },
+                { key: 'upcoming', label: '进行中' },
                 { key: 'ended', label: '已结束' }
             ],
-            activeTab: 'live',
+            activeTab: 'upcoming',
             orderTabs: [
                 { key: 'active', label: '当前记录', count: 0 },
                 { key: 'history', label: '历史订单', count: 0 }
@@ -537,7 +535,7 @@ export default {
             }
         },
         activeLeagueId() {
-            this.activeTab = 'live'; // 切换赛事（联赛）时，默认重置为“进行中”状态
+            this.activeTab = 'upcoming'; // 切换赛事（联赛）时，默认重置为“进行中”状态
         }
     },
     methods: {
@@ -593,6 +591,146 @@ export default {
             this.selectedTeam = null;
             this.betPreview = this.createEmptyPreview();
             this.previewError = '';
+        },
+        mapMarketToEvent(match, market) {
+            const event = {
+                id: match.id + '_' + market.id, // Ensure unique ID for each market
+                matchId: match.id,
+                title: match.matchName || match.homeTeam + ' vs ' + match.awayTeam,
+                time: match.startTime,
+                closeTime: market.closeTime,
+                marketCount: 1,
+                matchStatus: match.matchStatus,
+                statusText: this.getMatchStatusText(match.matchStatus),
+                expanded: false,
+                markets: [market], // Keep single market in array to match existing logic
+                teams: [],
+                homeLogo: match.homeLogo,
+                awayLogo: match.awayLogo
+            };
+
+            // Map options to teams for UI rendering
+            if (market.options) {
+                const options = market.options;
+                event.teams = options.map((opt, idx) => {
+                    return {
+                        id: 't' + (idx + 1) + '_' + match.id + '_' + market.id,
+                        name: opt.optionName,
+                        shortName: opt.optionName.substring(0, 4).toUpperCase(),
+                        score: idx === 0 ? (match.homeScore == null ? '-' : match.homeScore) : (idx === 1 ? (match.awayScore == null ? '-' : match.awayScore) : '-'),
+                        color: idx === 0 ? 'light-blue' : (idx === 1 ? 'dark-red' : 'blue'),
+                        icon: idx === 0 ? (match.homeLogo || '🏳️') : (idx === 1 ? (match.awayLogo || '🏳️') : '🎯'),
+                        optionData: opt,
+                        marketData: market,
+                        bettable: Boolean(opt.bettable)
+                    };
+                });
+                // fallback if options are less than 2
+                if (options.length === 0) {
+                    event.teams = [
+                        {
+                            id: 't1_' + match.id + '_' + market.id,
+                            name: match.homeTeam || '主队',
+                            shortName: (match.homeTeam || '主队').substring(0, 4).toUpperCase(),
+                            score: match.homeScore == null ? '-' : match.homeScore,
+                            color: 'light-blue',
+                            icon: match.homeLogo || '🏳️',
+                            optionData: null,
+                            marketData: null,
+                            bettable: false
+                        },
+                        {
+                            id: 't2_' + match.id + '_' + market.id,
+                            name: match.awayTeam || '客队',
+                            shortName: (match.awayTeam || '客队').substring(0, 4).toUpperCase(),
+                            score: match.awayScore == null ? '-' : match.awayScore,
+                            color: 'dark-red',
+                            icon: match.awayLogo || '🏳️',
+                            optionData: null,
+                            marketData: null,
+                            bettable: false
+                        }
+                    ];
+                } else if (options.length === 1) {
+                    event.teams.push({
+                        id: 't2_' + match.id + '_' + market.id,
+                        name: match.awayTeam || '客队',
+                        shortName: (match.awayTeam || '客队').substring(0, 4).toUpperCase(),
+                        score: match.awayScore == null ? '-' : match.awayScore,
+                        color: 'dark-red',
+                        icon: match.awayLogo || '🏳️',
+                        optionData: null,
+                        marketData: null,
+                        bettable: false
+                    });
+                }
+            } else {
+                event.teams = [
+                    {
+                        id: 't1_' + match.id + '_' + market.id,
+                        name: match.homeTeam || '主队',
+                        shortName: (match.homeTeam || '主队').substring(0, 4).toUpperCase(),
+                        score: match.homeScore == null ? '-' : match.homeScore,
+                        color: 'light-blue',
+                        icon: match.homeLogo || '🏳️',
+                        optionData: null,
+                        marketData: null,
+                        bettable: false
+                    },
+                    {
+                        id: 't2_' + match.id + '_' + market.id,
+                        name: match.awayTeam || '客队',
+                        shortName: (match.awayTeam || '客队').substring(0, 4).toUpperCase(),
+                        score: match.awayScore == null ? '-' : match.awayScore,
+                        color: 'dark-red',
+                        icon: match.awayLogo || '🏳️',
+                        optionData: null,
+                        marketData: null,
+                        bettable: false
+                    }
+                ];
+            }
+            return event;
+        },
+        createBaseEvent(match) {
+            return {
+                id: match.id + '_base',
+                matchId: match.id,
+                title: match.matchName || match.homeTeam + ' vs ' + match.awayTeam,
+                time: match.startTime,
+                closeTime: null,
+                marketCount: 0,
+                matchStatus: match.matchStatus,
+                statusText: this.getMatchStatusText(match.matchStatus),
+                expanded: false,
+                markets: [],
+                teams: [
+                    {
+                        id: 't1_' + match.id,
+                        name: match.homeTeam || '主队',
+                        shortName: (match.homeTeam || '主队').substring(0, 4).toUpperCase(),
+                        score: match.homeScore == null ? '-' : match.homeScore,
+                        color: 'light-blue',
+                        icon: match.homeLogo || '🏳️',
+                        optionData: null,
+                        marketData: null,
+                        bettable: false
+                    },
+                    {
+                        id: 't2_' + match.id,
+                        name: match.awayTeam || '客队',
+                        shortName: (match.awayTeam || '客队').substring(0, 4).toUpperCase(),
+                        score: match.awayScore == null ? '-' : match.awayScore,
+                        color: 'dark-red',
+                        icon: match.awayLogo || '🏳️',
+                        optionData: null,
+                        marketData: null,
+                        bettable: false
+                    }
+                ],
+                homeLogo: match.homeLogo,
+                awayLogo: match.awayLogo
+            };
         },
         getDrawOption(event) {
             if (!event || !event.markets || event.markets.length === 0) return null;
@@ -676,107 +814,13 @@ export default {
                         matches.forEach(match => {
                             const markets = match.markets || [];
 
-                            markets.forEach(market => {
-                                const event = {
-                                    id: match.id + '_' + market.id, // Ensure unique ID for each market
-                                    matchId: match.id,
-                                    title: match.matchName,
-                                    time: match.startTime,
-                                    closeTime: market.closeTime,
-                                    marketCount: 1,
-                                    matchStatus: match.matchStatus,
-                                    statusText: this.getMatchStatusText(match.matchStatus),
-                                    expanded: false,
-                                    markets: [market], // Keep single market in array to match existing logic
-                                    teams: [],
-                                    homeLogo: match.homeLogo,
-                                    awayLogo: match.awayLogo
-                                };
-
-                                // Map options to teams for UI rendering
-                                if (market.options) {
-                                    const options = market.options;
-                                    event.teams = options.map((opt, idx) => {
-                                        return {
-                                            id: 't' + (idx + 1) + '_' + match.id + '_' + market.id,
-                                            name: opt.optionName,
-                                            shortName: opt.optionName.substring(0, 4).toUpperCase(),
-                                            score: idx === 0 ? (match.homeScore == null ? '-' : match.homeScore) : (idx === 1 ? (match.awayScore == null ? '-' : match.awayScore) : '-'),
-                                            color: idx === 0 ? 'light-blue' : (idx === 1 ? 'dark-red' : 'blue'),
-                                            icon: idx === 0 ? (match.homeLogo || '🏳️') : (idx === 1 ? (match.awayLogo || '🏳️') : '🎯'),
-                                            optionData: opt,
-                                            marketData: market,
-                                            bettable: Boolean(opt.bettable)
-                                        };
-                                    });
-                                    // fallback if options are less than 2
-                                    if (options.length === 0) {
-                                        event.teams = [
-                                            {
-                                                id: 't1_' + match.id + '_' + market.id,
-                                                name: match.homeTeam || '主队',
-                                                shortName: (match.homeTeam || '主队').substring(0, 4).toUpperCase(),
-                                                score: match.homeScore == null ? '-' : match.homeScore,
-                                                color: 'light-blue',
-                                                icon: match.homeLogo || '🏳️',
-                                                optionData: null,
-                                                marketData: null,
-                                                bettable: false
-                                            },
-                                            {
-                                                id: 't2_' + match.id + '_' + market.id,
-                                                name: match.awayTeam || '客队',
-                                                shortName: (match.awayTeam || '客队').substring(0, 4).toUpperCase(),
-                                                score: match.awayScore == null ? '-' : match.awayScore,
-                                                color: 'dark-red',
-                                                icon: match.awayLogo || '🏳️',
-                                                optionData: null,
-                                                marketData: null,
-                                                bettable: false
-                                            }
-                                        ];
-                                    } else if (options.length === 1) {
-                                        event.teams.push({
-                                            id: 't2_' + match.id + '_' + market.id,
-                                            name: match.awayTeam || '客队',
-                                            shortName: (match.awayTeam || '客队').substring(0, 4).toUpperCase(),
-                                            score: match.awayScore == null ? '-' : match.awayScore,
-                                            color: 'dark-red',
-                                            icon: match.awayLogo || '🏳️',
-                                            optionData: null,
-                                            marketData: null,
-                                            bettable: false
-                                        });
-                                    }
-                                } else {
-                                    event.teams = [
-                                        {
-                                            id: 't1_' + match.id + '_' + market.id,
-                                            name: match.homeTeam || '主队',
-                                            shortName: (match.homeTeam || '主队').substring(0, 4).toUpperCase(),
-                                            score: match.homeScore == null ? '-' : match.homeScore,
-                                            color: 'light-blue',
-                                            icon: match.homeLogo || '🏳️',
-                                            optionData: null,
-                                            marketData: null,
-                                            bettable: false
-                                        },
-                                        {
-                                            id: 't2_' + match.id + '_' + market.id,
-                                            name: match.awayTeam || '客队',
-                                            shortName: (match.awayTeam || '客队').substring(0, 4).toUpperCase(),
-                                            score: match.awayScore == null ? '-' : match.awayScore,
-                                            color: 'dark-red',
-                                            icon: match.awayLogo || '🏳️',
-                                            optionData: null,
-                                            marketData: null,
-                                            bettable: false
-                                        }
-                                    ];
-                                }
-
-                                league.events.push(event);
-                            });
+                            if (markets.length === 0) {
+                                league.events.push(this.createBaseEvent(match));
+                            } else {
+                                markets.forEach(market => {
+                                    league.events.push(this.mapMarketToEvent(match, market));
+                                });
+                            }
                         });
                     });
 
@@ -807,6 +851,13 @@ export default {
                             }
                         }
                     }
+
+                    // 为已展开的比赛重新加载详情，以免数据丢失
+                    Object.keys(this.matchGroups).forEach(matchId => {
+                        if (this.matchGroups[matchId]) {
+                            this.loadMatchDetails(matchId);
+                        }
+                    });
                 } else {
                 }
                 this.isLoading = false;
@@ -828,6 +879,12 @@ export default {
         },
         isUpcomingEvent(event) {
             return event.matchStatus === 1;
+        },
+        getLeagueLiveCount(league) {
+            if (!league || !league.events) return 0;
+            // 获取当前分类下所有“进行中”（当前对应 matchStatus === 1，即原未开始状态）的独立赛事数量
+            const liveEvents = league.events.filter(event => this.isUpcomingEvent(event));
+            return new Set(liveEvents.map(e => e.matchId)).size;
         },
         filteredEvents(category) {
             let events = category.events || [];
@@ -855,9 +912,9 @@ export default {
             const grouped = {};
             filtered.forEach(event => {
                 if (!grouped[event.matchId]) {
-                    // 尝试保留组件中已有的展开/收起状态
+                    // 尝试保留组件中已有的展开/收起状态，默认改为收起（false）
                     const existingGroup = this.matchGroups ? this.matchGroups[event.matchId] : null;
-                    const isExpanded = existingGroup !== undefined && existingGroup !== null ? existingGroup : true;
+                    const isExpanded = existingGroup !== undefined && existingGroup !== null ? existingGroup : false;
 
                     grouped[event.matchId] = {
                         matchId: event.matchId,
@@ -1057,6 +1114,40 @@ export default {
             this.$set(group, 'expanded', newExpandedState);
             // 保存状态到组件中，以便 filteredEvents 重新执行时能记住展开/收起状态
             this.$set(this.matchGroups, group.matchId, newExpandedState);
+
+            if (newExpandedState) {
+                // 如果当前只有一个 base event，说明还没有真实的盘口数据
+                const hasRealMarkets = group.markets.some(e => e.markets && e.markets.length > 0);
+                if (!hasRealMarkets) {
+                    this.loadMatchDetails(group.matchId);
+                }
+            }
+        },
+        loadMatchDetails(matchId) {
+            this.$http.get(this.swapHost + `/quiz/matches/${matchId}`).then(response => {
+                const resp = response.body;
+                if (resp && resp.code === 0 && resp.data) {
+                    const match = resp.data.match || resp.data;
+                    const markets = resp.data.markets || match.markets || [];
+
+                    if (markets.length > 0) {
+                        this.categories.forEach(league => {
+                            const hasMatch = league.events.some(e => e.matchId === matchId);
+                            if (hasMatch) {
+                                // 移除该比赛的旧数据（包括 base event）
+                                league.events = league.events.filter(e => e.matchId !== matchId);
+
+                                // 添加带有详情盘口的新数据
+                                markets.forEach(market => {
+                                    league.events.push(this.mapMarketToEvent(match, market));
+                                });
+                            }
+                        });
+                    }
+                }
+            }).catch(err => {
+                console.error('加载比赛详情失败:', err);
+            });
         },
         schedulePreview() {
             if (this.previewTimer) {
@@ -1204,7 +1295,6 @@ export default {
 
             stompClient.connect({}, function (frame) {
                 stompClient.subscribe("/topic/quiz/odds/change", function (msg) {
-                    that.getMatches();
                     try {
                         const resp = JSON.parse(msg.body);
                         if (resp) {
@@ -1966,6 +2056,15 @@ export default {
     color: #111827;
     font-size: 20px;
     font-weight: 700;
+}
+
+.group-team-logo {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #f3f4f6;
 }
 
 .match-group-score {
