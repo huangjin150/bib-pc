@@ -584,7 +584,7 @@ export default {
             return new Date(value).toLocaleString();
         },
         isSelectedOption(option) {
-            return this.selectedTeam && this.selectedTeam.id === option.id;
+            return this.selectedTeam && this.selectedTeam.optionData && this.selectedTeam.optionData.id === option.id;
         },
         setTradeAmount(amount) {
             this.tradeAmount = amount;
@@ -1174,6 +1174,28 @@ export default {
                                 });
                             }
                         });
+
+                        // Re-bind selected team to update right panel odds and UI states if the selected match was updated
+                        if (this.selectedTeam && this.selectedTeam.optionData) {
+                            let updatedOption = null;
+                            let updatedMarket = null;
+                            for (let m of newMarkets) {
+                                if (m.options) {
+                                    const foundOpt = m.options.find(o => o.id === this.selectedTeam.optionData.id);
+                                    if (foundOpt) {
+                                        updatedOption = foundOpt;
+                                        updatedMarket = m;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (updatedOption) {
+                                // Keep the reactive properties intact and trigger update
+                                this.$set(this.selectedTeam, 'optionData', updatedOption);
+                                this.$set(this.selectedTeam, 'marketData', updatedMarket);
+                                this.schedulePreview(); // Update right panel expected profit
+                            }
+                        }
                     }
                 }
             }).catch(err => {
@@ -1404,8 +1426,24 @@ export default {
 
                         // Update currently selected option in right panel if it matches
                         if (this.selectedTeam && this.selectedTeam.optionData && this.selectedTeam.optionData.id === newOption.id) {
-                            this.$set(this.selectedTeam.optionData, 'currentOdds', newOption.currentOdds);
+                            const oldOdds = this.selectedTeam.optionData.currentOdds;
+                            const newOdds = newOption.currentOdds;
+
+                            this.$set(this.selectedTeam.optionData, 'currentOdds', newOdds);
                             this.$set(this.selectedTeam.optionData, 'currentPrice', newOption.currentPrice);
+                            
+                            if (oldOdds !== undefined && newOdds !== oldOdds) {
+                                const isUp = newOdds > oldOdds;
+                                this.$set(this.selectedTeam.optionData, 'oddsUp', isUp);
+                                this.$set(this.selectedTeam.optionData, 'oddsDown', !isUp);
+
+                                setTimeout(() => {
+                                    if (this.selectedTeam.optionData) {
+                                        this.$set(this.selectedTeam.optionData, 'oddsUp', false);
+                                        this.$set(this.selectedTeam.optionData, 'oddsDown', false);
+                                    }
+                                }, 1000);
+                            }
                             this.schedulePreview(); // re-calculate expected profit
                         }
                     });
