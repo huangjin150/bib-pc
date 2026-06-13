@@ -956,6 +956,8 @@ export default {
             if (order.orderStatus === 2) return '成功';
             if (order.orderStatus === 3) return '失败';
             if (order.orderStatus === 4) return '退款';
+            if (order.orderStatus === 5) return '半赢';
+            if (order.orderStatus === 6) return '半输';
             return '未知';
         },
         getOrderStatusClass(order) {
@@ -963,6 +965,8 @@ export default {
             if (order.orderStatus === 2) return 'is-win';
             if (order.orderStatus === 3) return 'is-lose';
             if (order.orderStatus === 4) return 'is-refund';
+            if (order.orderStatus === 5) return 'is-win';
+            if (order.orderStatus === 6) return 'is-lose';
             return 'is-unknown';
         },
         isHistoryOrder(order) {
@@ -1431,7 +1435,7 @@ export default {
 
                             this.$set(this.selectedTeam.optionData, 'currentOdds', newOdds);
                             this.$set(this.selectedTeam.optionData, 'currentPrice', newOption.currentPrice);
-                            
+
                             if (oldOdds !== undefined && newOdds !== oldOdds) {
                                 const isUp = newOdds > oldOdds;
                                 this.$set(this.selectedTeam.optionData, 'oddsUp', isUp);
