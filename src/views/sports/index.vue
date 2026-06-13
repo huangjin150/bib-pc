@@ -1,6 +1,6 @@
 <template>
     <div class="sports-layout">
-        <!-- Top Menu: Sports Categories -->
+        <!-- 顶部菜单：体育分类 -->
         <div class="top-menu">
             <div class="ls-header">
                 <i class="el-icon-trophy"></i>
@@ -38,13 +38,13 @@
                         </div>
                     </div>
 
-                    <!-- Match List Table Layout -->
+                    <!-- 比赛列表表格布局 -->
                     <div class="match-table-container">
-                        <!-- Empty State -->
+                        <!-- 空状态 -->
                         <div v-if="!activeCategory || !filteredEvents(activeCategory).length" class="empty-match-state">
                             <div class="empty-text">暂无赛事</div>
                         </div>
-                        <!-- Match List -->
+                        <!-- 比赛列表 -->
                         <table v-else class="match-table">
                             <tbody v-for="(group, groupIndex) in filteredEvents(activeCategory)"
                                 :key="'group-body-' + (group.matchId || groupIndex)">
@@ -406,7 +406,7 @@
                 </div>
             </div>
 
-            <!-- More Options Dialog -->
+            <!-- 更多选项弹窗 -->
             <el-dialog :visible.sync="showMoreOptionsDialog" title="更多选项" width="600px"
                 custom-class="more-options-dialog" @close="currentMoreOptionsEvent = null">
                 <div v-if="currentMoreOptionsEvent && currentMoreOptionsEvent.markets && currentMoreOptionsEvent.markets[0]"
@@ -461,8 +461,8 @@ export default {
             isLoadingOrders: false,
             betType: 'single', // 'single' 单注, 'multi' 串关
             betPreview: this.createEmptyPreview(),
-            walletBalance: null, // Track wallet balance separately
-            contractWalletBalance: null, // Track contract wallet balance
+            walletBalance: null, // 单独跟踪资金账户余额
+            contractWalletBalance: null, // 跟踪合约账户余额
             filterLeague: 'all',
             filterTime: 'all',
             acceptHigherOdds: true,
@@ -624,7 +624,7 @@ export default {
         },
         mapMarketToEvent(match, market) {
             const event = {
-                id: match.id + '_' + market.id, // Ensure unique ID for each market
+                id: match.id + '_' + market.id, // 确保每个盘口 ID 唯一
                 matchId: match.id,
                 title: match.matchName || match.homeTeam + ' vs ' + match.awayTeam,
                 time: match.startTime,
@@ -633,13 +633,13 @@ export default {
                 matchStatus: match.matchStatus,
                 statusText: this.getMatchStatusText(match.matchStatus),
                 expanded: false,
-                markets: [market], // Keep single market in array to match existing logic
+                markets: [market], // 在数组中保留单个盘口以匹配现有逻辑
                 teams: [],
                 homeLogo: match.homeLogo,
                 awayLogo: match.awayLogo
             };
 
-            // Map options to teams for UI rendering
+            // 将选项映射为队伍，以便 UI 渲染
             if (market.options) {
                 const options = market.options;
                 event.teams = options.map((opt, idx) => {
@@ -655,7 +655,7 @@ export default {
                         bettable: Boolean(opt.bettable)
                     };
                 });
-                // fallback if options are less than 2
+                // 如果选项少于 2 个，使用回退方案
                 if (options.length === 0) {
                     event.teams = [
                         {
@@ -762,37 +762,6 @@ export default {
                 awayLogo: match.awayLogo
             };
         },
-        getDrawOption(event) {
-            if (!event || !event.markets || event.markets.length === 0) return null;
-            const mainMarket = event.markets[0];
-            if (!mainMarket.options) return null;
-
-            // Usually draw is the middle option or has a specific name/id
-            // This is a simple heuristic: find option that is not team 1 or team 2
-            const t1Id = event.teams[0].optionData ? event.teams[0].optionData.id : null;
-            const t2Id = event.teams[1].optionData ? event.teams[1].optionData.id : null;
-
-            const drawOption = mainMarket.options.find(opt => opt.id !== t1Id && opt.id !== t2Id);
-
-            if (drawOption) {
-                return {
-                    market: mainMarket,
-                    option: drawOption
-                };
-            }
-            return null;
-        },
-        getSportIcon(sportType) {
-            const icons = {
-                1: '⚽', // Football
-                2: '🏀', // Basketball
-                3: '🎾', // Tennis
-                4: '🏐', // Volleyball
-                5: '🏒', // Ice Hockey
-                6: '⚾', // Baseball
-            };
-            return icons[sportType] || '🏆';
-        },
         getLeagues() {
             this.$http.get(this.swapHost + '/quiz/leagues').then(response => {
                 const resp = response.body;
@@ -854,7 +823,7 @@ export default {
                         });
                     });
 
-                    // Re-bind selected event and team if they exist
+                    // 如果存在，重新绑定已选中的赛事和队伍
                     if (this.selectedEvent) {
                         let newSelectedEvent = null;
                         this.categories.forEach(cat => {
@@ -922,7 +891,7 @@ export default {
 
             events.forEach(event => {
                 const groupName = event.groupName || '其他玩法';
-                // Filter by active market group
+                // 按当前激活的盘口分组过滤
                 if (group.activeMarketGroup !== '全部' && groupName !== group.activeMarketGroup) {
                     return;
                 }
@@ -937,7 +906,7 @@ export default {
         filteredEvents(category) {
             let events = category.events || [];
 
-            // Apply search filter
+            // 应用搜索过滤
             if (this.searchKeyword && this.searchKeyword.trim() !== '') {
                 const keyword = this.searchKeyword.trim().toLowerCase();
                 events = events.filter(event => {
@@ -981,7 +950,7 @@ export default {
                     };
                 }
 
-                // Add unique market groups
+                // 添加去重后的盘口分组
                 if (event.groupName && !grouped[event.matchId].marketGroups.includes(event.groupName)) {
                     grouped[event.matchId].marketGroups.push(event.groupName);
                 }
@@ -1026,7 +995,7 @@ export default {
             return order.orderStatus === 2 || order.orderStatus === 3 || order.orderStatus === 4;
         },
         handlePageChange(page) {
-            // Keep for backwards compatibility
+            // 保持向后兼容
         },
         handleOrderScroll(e) {
             const container = e.target;
@@ -1035,7 +1004,7 @@ export default {
 
             if (isAtBottom && !this.isLoadingOrders && this.hasMoreOrders) {
                 this.orderCurrentPage++;
-                this.getMyOrders(true); // append data
+                this.getMyOrders(true); // 追加数据
             }
         },
         getMyOrders(isAppend = false) {
@@ -1065,7 +1034,7 @@ export default {
                     }
                     this.totalOrders = total;
 
-                    // Update tab count
+                    // 更新标签页数量
                     const tab = this.orderTabs.find(t => t.key === this.activeOrderTab);
                     if (tab) {
                         tab.count = total;
@@ -1086,7 +1055,7 @@ export default {
         },
         getOrderCounts() {
             if (!this.isLogin) return;
-            // Fetch active orders count
+            // 获取当前活动订单数量
             this.$http.get(this.swapHost + '/quiz/orders', { params: { pageNo: 1, pageSize: 1, status: 1 } }).then(response => {
                 const resp = response.body;
                 if (resp.code === 0) {
@@ -1094,7 +1063,7 @@ export default {
                     if (tab) tab.count = resp.totalElement || 0;
                 }
             });
-            // Fetch history orders count
+            // 获取历史订单数量
             this.$http.get(this.swapHost + '/quiz/orders', { params: { pageNo: 1, pageSize: 1, status: 2 } }).then(response => {
                 const resp = response.body;
                 if (resp.code === 0) {
@@ -1105,19 +1074,17 @@ export default {
         },
         handleCardClick(event) {
             this.selectedEvent = event;
-            this.toggleExpand(event);
-
             if (event.matchStatus !== 3 && event.matchStatus !== 4) {
                 const firstBettable = this.findFirstBettableOption(event);
                 if (firstBettable) {
                     this.openTrade(event, firstBettable.option, firstBettable.market);
                 } else {
                     this.clearSelectedBet();
-                    this.selectedEvent = event; // Keep event selected for UI, but clear the bet details
+                    this.selectedEvent = event; // 保持 UI 选中状态，但清除下注详情
                 }
             } else {
                 this.clearSelectedBet();
-                this.selectedEvent = event; // Keep event selected for UI to show "Ended" status
+                this.selectedEvent = event; // 保持 UI 选中状态以显示“已结束”状态
             }
         },
         selectEvent(event) {
@@ -1165,9 +1132,6 @@ export default {
                 marketData: market
             };
             this.previewError = '';
-        },
-        toggleExpand(targetEvent) {
-            // 废弃，逻辑已移至 toggleGroupExpand
         },
         toggleGroupExpand(group) {
             const newExpandedState = !group.expanded;
@@ -1246,7 +1210,7 @@ export default {
                                         }
                                     });
                                 } else {
-                                    // Fallback if no marketGroups returned
+                                    // 如果没有返回 marketGroups，使用回退方案
                                     newMarkets.forEach(market => {
                                         league.events.push(this.mapMarketToEvent(match, market));
                                     });
@@ -1254,7 +1218,7 @@ export default {
                             }
                         });
 
-                        // Re-bind selected team to update right panel odds and UI states if the selected match was updated
+                        // 如果选中的比赛已更新，重新绑定选中的队伍以更新右侧面板赔率和 UI 状态
                         if (this.selectedTeam && this.selectedTeam.optionData) {
                             let updatedOption = null;
                             let updatedMarket = null;
@@ -1269,7 +1233,7 @@ export default {
                                 }
                             }
                             if (updatedOption) {
-                                // Keep the reactive properties intact and trigger update
+                                // 保持响应式属性完整并触发更新
                                 this.$set(this.selectedTeam, 'optionData', updatedOption);
                                 this.$set(this.selectedTeam, 'marketData', updatedMarket);
                                 this.schedulePreview(); // Update right panel expected profit
@@ -1292,7 +1256,7 @@ export default {
                 return;
             }
 
-            // Immediately clear the preview when amount changes to prevent mismatch before API returns
+            // 金额变动时立即清除预览，防止 API 返回前数据不匹配
             this.betPreview = this.createEmptyPreview();
             this.isPreviewLoading = true;
 
@@ -1403,7 +1367,7 @@ export default {
                 if (resp && resp.code === 0) {
                     this.$message.success('下注成功');
                     this.tradeAmount = null;
-                    this.getMatches(); // Refresh matches to update odds
+                    this.getMatches(); // 刷新比赛列表以更新赔率
                     this.getMyOrders();
                     return;
                 }
@@ -1451,11 +1415,11 @@ export default {
             });
 
             if (eventFound && data.options && Array.isArray(data.options)) {
-                // Update market options
+                // 更新盘口选项
                 const market = eventFound.markets.find(m => m.id === data.marketId);
                 if (market) {
                     data.options.forEach(newOption => {
-                        // Update in market options array
+                        // 在盘口选项数组中更新
                         const optIndex = market.options.findIndex(o => o.id === newOption.id);
                         if (optIndex !== -1) {
                             const oldOdds = market.options[optIndex].currentOdds;
@@ -1478,7 +1442,7 @@ export default {
                             }
                         }
 
-                        // Update in mapped teams array
+                        // 在映射的队伍数组中更新
                         if (eventFound.teams) {
                             const team = eventFound.teams.find(t => t.optionData && t.optionData.id === newOption.id);
                             if (team) {
@@ -1503,7 +1467,7 @@ export default {
                             }
                         }
 
-                        // Update currently selected option in right panel if it matches
+                        // 如果匹配，更新右侧面板当前选中的选项
                         if (this.selectedTeam && this.selectedTeam.optionData && this.selectedTeam.optionData.id === newOption.id) {
                             const oldOdds = this.selectedTeam.optionData.currentOdds;
                             const newOdds = newOption.currentOdds;
@@ -1523,7 +1487,7 @@ export default {
                                     }
                                 }, 1000);
                             }
-                            this.schedulePreview(); // re-calculate expected profit
+                            this.schedulePreview(); // 重新计算预期利润
                         }
                     });
                 }
@@ -1587,7 +1551,7 @@ export default {
     overflow: hidden;
 }
 
-/* Top Menu */
+/* 顶部菜单 */
 .top-menu {
     flex-shrink: 0;
     display: flex;
@@ -1631,7 +1595,7 @@ export default {
     gap: 20px;
     align-items: center;
 
-    /* Hide scrollbar for cleaner look */
+    /* 隐藏滚动条使界面更整洁 */
     &::-webkit-scrollbar {
         height: 4px;
     }
@@ -1779,7 +1743,7 @@ export default {
     }
 }
 
-/* Main Column */
+/* 主列 */
 .main-column {
     flex: 1;
     min-width: 0;
@@ -1893,7 +1857,7 @@ export default {
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     flex: 3;
-    /* 3/6 of total height */
+    /* 占总高度的 3/6 */
     display: flex;
     flex-direction: column;
     min-height: 0;
@@ -1961,7 +1925,7 @@ export default {
     width: 200px;
 }
 
-/* Match Table */
+/* 比赛表格 */
 .match-table-container {
     padding-right: 10px;
     overflow-x: auto;
@@ -2665,7 +2629,7 @@ export default {
     font-size: 13px;
 }
 
-/* Right Sidebar */
+/* 右侧边栏 */
 .right-sidebar {
     width: 380px;
     flex-shrink: 0;
